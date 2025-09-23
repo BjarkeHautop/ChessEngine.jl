@@ -179,5 +179,3 @@ function promotion_to_char(piece::Int)
         return ""
     end
 end
-using PkgTemplates
-Template(interactive = true)("MyTestPkg")
