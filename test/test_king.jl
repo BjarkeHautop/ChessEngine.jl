@@ -1,0 +1,159 @@
+using ChessEngine
+using Test
+
+@testset "castling works" begin
+    b = start_position()
+
+    # Clear pieces between king and rook for castling
+    b.bitboards[W_BISHOP] = clearbit(b.bitboards[W_BISHOP], square_index(6, 1))
+    b.bitboards[W_KNIGHT] = clearbit(b.bitboards[W_KNIGHT], square_index(7, 1))
+
+    # Generate legal moves for white
+    legal_moves = generate_legal_moves(b)
+
+    # e1 → g1 (short castle)
+    castling_move = Move("e1", "g1"; castling = 1)
+    @test castling_move in legal_moves
+
+    # Make the castling move
+    make_move!(b, castling_move)
+
+    # Verify king and rook positions after castling
+    @test testbit(b.bitboards[W_KING], square_index(7, 1))  # King on g1
+    @test testbit(b.bitboards[W_ROOK], square_index(6, 1))  # Rook on f1
+end
+
+@testset "King move generation" begin
+    b = start_position()
+
+    # Remove e2, f2 pawn, and pieces for castling
+    b.bitboards[W_PAWN] = clearbit(b.bitboards[W_PAWN], square_index(5, 2))
+    b.bitboards[W_PAWN] = clearbit(b.bitboards[W_PAWN], square_index(6, 2))
+    b.bitboards[W_KNIGHT] = clearbit(b.bitboards[W_KNIGHT], square_index(2, 1))
+    b.bitboards[W_BISHOP] = clearbit(b.bitboards[W_BISHOP], square_index(3, 1))
+    b.bitboards[W_QUEEN] = clearbit(b.bitboards[W_QUEEN], square_index(4, 1))
+    b.bitboards[W_BISHOP] = clearbit(b.bitboards[W_BISHOP], square_index(6, 1))
+    b.bitboards[W_KNIGHT] = clearbit(b.bitboards[W_KNIGHT], square_index(7, 1))
+
+    king_moves = generate_king_moves(b)
+
+    expected_moves = [
+        Move("e1", "e2"),
+        Move("e1", "f1"),
+        Move("e1", "f2"),
+        Move("e1", "g1"; castling = 1), # short castle
+        Move("e1", "d1"),
+        Move("e1", "c1"; castling = 2)  # long castle
+    ]
+
+    for em in expected_moves
+        @test em in king_moves
+    end
+
+    # Add a black rook attacking f1 to block short castling
+    b.bitboards[B_ROOK] = setbit(b.bitboards[B_ROOK], square_index(6, 4))  # f4 rook
+    legal_moves = generate_legal_moves(b)
+    # e1 → g1 (short castle) should no longer be allowed
+    short_castle = Move("e1", "g1"; castling = 1)
+    @test !(short_castle in legal_moves)
+    # e1 → c1 (long castle) should still be allowed
+    long_castle = Move("e1", "c1"; castling = 2)
+    @test long_castle in legal_moves
+end
+
+@testset "King move disables castling" begin
+    b = start_position()
+
+    # Clear pieces between king and rook for castling
+    b.bitboards[W_BISHOP] = clearbit(b.bitboards[W_BISHOP], square_index(6, 1))
+    b.bitboards[W_KNIGHT] = clearbit(b.bitboards[W_KNIGHT], square_index(7, 1))
+
+    # Step 1: move king to f1
+    m1 = Move("e1", "f1")
+    make_move!(b, m1)
+
+    b.side_to_move = WHITE
+
+    # Step 2: move king back to e1
+    m2 = Move("f1", "e1")
+    make_move!(b, m2)
+
+    b.side_to_move = WHITE
+
+    # Generate legal moves for white
+    legal_moves = generate_legal_moves(b)
+
+    # e1 → g1 (short castle) should no longer be allowed
+    castling_move = Move("e1", "g1"; castling = 1)
+    @test !(castling_move in legal_moves)
+
+    # King should still be able to move normally
+    @test Move("e1", "f1") in legal_moves
+end
+
+@testset "Castling rights disabled captures" begin
+    b = start_position()
+    @test b.castling_rights == 0x0f
+
+    m1 = Move("d1", "a8"; capture = B_ROOK)
+    make_move!(b, m1)
+    @test b.castling_rights == 0x07
+
+    unmake_move!(b, m1)
+    @test b.castling_rights == 0x0f
+    make_move!(b, m1)
+    @test b.castling_rights == 0x07
+
+    m2 = Move("d8", "a1"; capture = W_ROOK)
+    make_move!(b, m2)
+    @test b.castling_rights == 0x05
+    unmake_move!(b, m2)
+    @test b.castling_rights == 0x07
+    make_move!(b, m2)
+    @test b.castling_rights == 0x05
+
+    m3 = Move("a8", "h8"; capture = B_ROOK)
+    make_move!(b, m3)
+    @test b.castling_rights == 0x01
+    unmake_move!(b, m3)
+    @test b.castling_rights == 0x05
+    make_move!(b, m3)
+    @test b.castling_rights == 0x01
+
+    m4 = Move("a1", "h1"; capture = W_ROOK)
+    make_move!(b, m4)
+    @test b.castling_rights == 0x00
+    unmake_move!(b, m4)
+    @test b.castling_rights == 0x01
+    make_move!(b, m4)
+    @test b.castling_rights == 0x00
+end
+
+@testset "All castling works correctly" begin
+    b = board_from_fen("r3k2r/3p1p2/8/8/8/8/8/R3K2R w KQkq - 0 1")
+
+    make_move!(b, Move("e1", "g1"; castling = 1))  # White short
+    @test testbit(b.bitboards[W_KING], square_index(7, 1))  # King on g1
+    @test testbit(b.bitboards[W_ROOK], square_index(6, 1))  # Rook on f1
+    unmake_move!(b, Move("e1", "g1"; castling = 1))
+    @test testbit(b.bitboards[W_KING], square_index(5, 1))  # King back on e1
+    @test testbit(b.bitboards[W_ROOK], square_index(8, 1))  # Rook back on h1
+
+    make_move!(b, Move("e1", "c1"; castling = 2))  # White long
+    @test testbit(b.bitboards[W_KING], square_index(3, 1))  # King on c1
+    @test testbit(b.bitboards[W_ROOK], square_index(4, 1))  # Rook on d1
+
+    make_move!(b, Move("e8", "c8"; castling = 2))  # Black long
+    @test testbit(b.bitboards[B_KING], square_index(3, 8))  # King on c8
+    @test testbit(b.bitboards[B_ROOK], square_index(4, 8))  # Rook on d8
+    unmake_move!(b, Move("e8", "c8"; castling = 2))
+    @test testbit(b.bitboards[B_KING], square_index(5, 8))  # King back on e8
+    @test testbit(b.bitboards[B_ROOK], square_index(1, 8))  # Rook back on a8
+
+    make_move!(b, Move("e8", "g8"; castling = 1))  # Black short
+    @test testbit(b.bitboards[B_KING], square_index(7, 8))  # King on g8
+    @test testbit(b.bitboards[B_ROOK], square_index(6, 8))  # Rook on f8
+    unmake_move!(b, Move("e8", "g8"; castling = 1))
+    @test testbit(b.bitboards[B_KING], square_index(5, 8))  # King back on e8
+    @test testbit(b.bitboards[B_ROOK], square_index(8, 8))  # Rook back on h8
+end

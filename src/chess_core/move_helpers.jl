@@ -1,0 +1,155 @@
+"""
+Get the square index of the king for the given side
+- `board`: Board struct
+- `side`: Side (WHITE or BLACK)
+Returns: Int (square index 0..63)
+"""
+function king_square(board::Board, side::Side)
+    bb = (side == WHITE) ? board.bitboards[W_KING] : board.bitboards[B_KING]
+    for sq in 0:63
+        if testbit(bb, sq)
+            return sq
+        end
+    end
+    return -1  # shouldn't happen
+end
+
+"""
+Return the piece type at a given square (0..63) using bitboards.
+"""
+function piece_at(board::Board, sq::Int)
+    mask = UInt64(1) << sq
+    for (p, bb) in board.bitboards
+        if bb & mask != 0
+            return p
+        end
+    end
+    return 0
+end
+
+"""
+Check if a square is attacked by the given side.
+- `board`: Board struct
+- `sq`: Int (square index 0..63)
+- `attacker`: Side (WHITE or BLACK)
+Returns: Bool
+"""
+function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
+    ########################
+    # 1) Pawn attacks
+    ########################
+    if attacker == WHITE
+        pawn_attacks = [-9, -7]   # white pawns attack up-left / up-right
+        pawns = board.bitboards[W_PAWN]
+    else
+        pawn_attacks = [7, 9]     # black pawns attack down-left / down-right
+        pawns = board.bitboards[B_PAWN]
+    end
+    for d in pawn_attacks
+        from = sq + d
+        if on_board(from) && testbit(pawns, from)
+            return true
+        end
+    end
+
+    ########################
+    # 2) Knight attacks
+    ########################
+    knight_deltas = [-17, -15, -10, -6, 6, 10, 15, 17]
+    knights = (attacker == WHITE) ? board.bitboards[W_KNIGHT] : board.bitboards[B_KNIGHT]
+    for d in knight_deltas
+        from = sq + d
+        if on_board(from)
+            f1, r1 = file_rank(sq)
+            f2, r2 = file_rank(from)
+            if abs(f1 - f2) <= 2 && abs(r1 - r2) <= 2 && testbit(knights, from)
+                return true
+            end
+        end
+    end
+
+    ########################
+    # 3) Sliding pieces
+    ########################
+    occ = zero(UInt64)
+    for p in ALL_PIECES
+        occ |= board.bitboards[p]
+    end
+
+    function attacked_by_sliders(directions, bb_piece)
+        for d in directions
+            pos = sq
+            prev_f, prev_r = file_rank(pos)
+            while true
+                pos += d
+                if !on_board(pos)
+                    break
+                end
+                f, r = file_rank(pos)
+                if abs(f - prev_f) > 1 || abs(r - prev_r) > 1
+                    break
+                end
+                prev_f, prev_r = f, r
+
+                if testbit(occ, pos)
+                    if testbit(bb_piece, pos)
+                        return true   # correct slider found
+                    else
+                        break        # blocked by wrong piece
+                    end
+                end
+            end
+        end
+        return false
+    end
+
+    # Bishops + queens (diagonals)
+    if attacked_by_sliders(
+        [-9, -7, 7, 9],
+        if (attacker == WHITE)
+            (board.bitboards[W_BISHOP] | board.bitboards[W_QUEEN])
+        else
+            (board.bitboards[B_BISHOP] | board.bitboards[B_QUEEN])
+        end
+    )
+        return true
+    end
+
+    # Rooks + queens (orthogonals)
+    if attacked_by_sliders(
+        [-8, -1, 1, 8],
+        if (attacker == WHITE)
+            (board.bitboards[W_ROOK] | board.bitboards[W_QUEEN])
+        else
+            (board.bitboards[B_ROOK] | board.bitboards[B_QUEEN])
+        end
+    )
+        return true
+    end
+
+    ########################
+    # 4) King attacks
+    ########################
+    king_deltas = [-9, -8, -7, -1, 1, 7, 8, 9]
+    kings = (attacker == WHITE) ? board.bitboards[W_KING] : board.bitboards[B_KING]
+    for d in king_deltas
+        from = sq + d
+        if on_board(from) && testbit(kings, from)
+            return true
+        end
+    end
+
+    return false
+end
+
+"""
+Check if the king of the given side is in check
+- `board`: Board struct
+- `side`: Side (WHITE or BLACK)
+Returns: Bool
+"""
+function in_check(board::Board, side::Side)::Bool
+    king_sq = king_square(board, side)
+    attacker = opposite(side)
+    return square_attacked(board, king_sq, attacker)
+end

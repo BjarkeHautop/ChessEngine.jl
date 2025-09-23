@@ -1,10 +1,17 @@
 using ChessEngine
 using Test
-using Aqua
 
-@testset "ChessEngine.jl" begin
-    @testset "Code quality (Aqua.jl)" begin
-        Aqua.test_all(ChessEngine)
-    end
-    # Write your tests here.
-end
+include("test_board.jl")
+include("test_pawns.jl")
+include("test_knights.jl")
+include("test_sliding_moves.jl")
+include("test_king.jl")
+include("test_game_over.jl")
+include("test_move_helpers.jl")
+include("test_zobrist_hash.jl")
+include("test_unmake_move.jl")
+include("test_evaluate.jl")
+include("test_fen.jl")
+include("test_polyglot.jl")
+
+include("test_aqua.jl")
