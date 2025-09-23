@@ -33,7 +33,7 @@ We can make moves using:
 
 ```julia
 mv = Move("e2", "e4")
-make_move!(board, Move("e2", "e4"))
+make_move!(board, mv)
 ```
 
 We can unmake a move using:
