@@ -25,9 +25,9 @@ function allocate_time(game::Game)
     return time_mangement(remaining, game.increment)
 end
 
-function search_with_time(game::Game; max_depth::Int = 64, verbose::Bool = false)
+function search_with_time(game::Game; max_depth::Int = 64, opening_book::Bool = true, verbose::Bool = false)
     allocated = allocate_time(game)
-    stop_time = time_ns() ÷ 1_000_000 + allocated
+    stop_time = Int(time_ns() ÷ 1_000_000 + allocated)
 
     best_move = nothing
     best_score = 0
@@ -40,7 +40,7 @@ function search_with_time(game::Game; max_depth::Int = 64, verbose::Bool = false
         score,
         move = search(game.board, depth;
             ply = 0, α = (-MATE_VALUE), β = MATE_VALUE,
-            opening_book = true, verbose = verbose,
+            opening_book = opening_book, verbose = verbose,
             stop_time = stop_time)
 
         if move !== nothing
@@ -56,9 +56,9 @@ function search_with_time(game::Game; max_depth::Int = 64, verbose::Bool = false
     return best_score, best_move
 end
 
-function make_timed_move!(game::Game; verbose = false)
+function make_timed_move!(game::Game; opening_book::Bool = true, verbose = false)
     start_time = time_ns() ÷ 1_000_000
-    score, move = search_with_time(game; verbose = verbose)
+    score, move = search_with_time(game; opening_book = opening_book, verbose = verbose)
     elapsed = (time_ns() ÷ 1_000_000) - start_time
 
     if move === nothing

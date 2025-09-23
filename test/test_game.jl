@@ -1,0 +1,42 @@
+using ChessEngine
+using Test
+
+@testset "Game Time Management" begin
+    game = start_game(minutes=5, increment=2)
+
+    @test isa(game, Game)
+    @test game.white_time == 5*60*1000
+    @test game.black_time == 5*60*1000
+    @test game.increment == 2000
+
+    allocated = ChessEngine.allocate_time(game)
+    @test isa(allocated, Int)
+    @test allocated > 0
+
+    # Test make_timed_move!
+    old_white_time = game.white_time
+    score, move = make_timed_move!(game)
+    @test move !== nothing
+    @test game.board.side_to_move == BLACK
+    @test game.white_time < old_white_time + game.increment  # elapsed time subtracted
+
+    old_black_time = game.black_time
+    score, move = make_timed_move!(game)
+    @test game.board.side_to_move == WHITE
+    @test game.black_time < old_black_time + game.increment
+end
+
+@testset "Time management heuristic" begin
+    @test ChessEngine.time_mangement(20000, 2000) == 20000 ÷ 20 + 2000 ÷ 2
+    @test ChessEngine.time_mangement(1000, 0) == 1000 ÷ 20
+end
+
+@testset "Search with time respects allocation" begin
+    game = start_game(minutes=1, increment=0)
+    score, move = make_timed_move!(game; opening_book=false, verbose=false)
+    @test move !== nothing
+    
+    # Should have spent 60000 ms / 20 = 3000ms on first move and then some overhead thus, 56000 < game.white_time < 57000
+    @test game.white_time < 57000
+    @test game.white_time > 56000
+end
