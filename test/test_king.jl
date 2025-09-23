@@ -136,7 +136,7 @@ end
     mv = Move("e1", "g1"; castling = 1)
     @test mv in generate_legal_moves(b)
 
-    make_move!(b, mv)  
+    make_move!(b, mv)
     @test testbit(b.bitboards[W_KING], square_index(7, 1))  # King on g1
     @test testbit(b.bitboards[W_ROOK], square_index(6, 1))  # Rook on f1
 
@@ -148,7 +148,7 @@ end
     mv = Move("e1", "c1"; castling = 2)
     @test mv in generate_legal_moves(b)
 
-    make_move!(b, mv)  
+    make_move!(b, mv)
     @test testbit(b.bitboards[W_KING], square_index(3, 1))  # King on c1
     @test testbit(b.bitboards[W_ROOK], square_index(4, 1))  # Rook on d1
     unmake_move!(b, mv)

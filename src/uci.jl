@@ -180,4 +180,4 @@ function promotion_to_char(piece::Int)
     end
 end
 using PkgTemplates
-Template(interactive=true)("MyTestPkg")
+Template(interactive = true)("MyTestPkg")
