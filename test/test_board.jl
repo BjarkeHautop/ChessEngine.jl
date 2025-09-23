@@ -76,3 +76,22 @@ end
     @test game_phase_value == b.game_phase_value
     @test eval_score == b.eval_score
 end
+
+@testset "init_zobrist!" begin
+    init_zobrist!()
+
+    # Check that side is a UInt64
+    @test isa(ZOBRIST_SIDE[], UInt64)
+
+    # Check pieces array dimensions and type
+    @test size(ZOBRIST_PIECES) == (12, 64)
+    @test all(isa.(ZOBRIST_PIECES, UInt64))
+
+    # Check castling array
+    @test length(ZOBRIST_CASTLING) == 16
+    @test all(isa.(ZOBRIST_CASTLING, UInt64))
+
+    # Check en passant array
+    @test length(ZOBRIST_EP) == 8
+    @test all(isa.(ZOBRIST_EP, UInt64))
+end
