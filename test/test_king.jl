@@ -132,28 +132,51 @@ end
 @testset "All castling works correctly" begin
     b = board_from_fen("r3k2r/3p1p2/8/8/8/8/8/R3K2R w KQkq - 0 1")
 
-    make_move!(b, Move("e1", "g1"; castling = 1))  # White short
+    # White short
+    mv = Move("e1", "g1"; castling = 1)
+    @test mv in generate_legal_moves(b)
+
+    make_move!(b, mv)  
     @test testbit(b.bitboards[W_KING], square_index(7, 1))  # King on g1
     @test testbit(b.bitboards[W_ROOK], square_index(6, 1))  # Rook on f1
-    unmake_move!(b, Move("e1", "g1"; castling = 1))
+
+    unmake_move!(b, mv)
     @test testbit(b.bitboards[W_KING], square_index(5, 1))  # King back on e1
     @test testbit(b.bitboards[W_ROOK], square_index(8, 1))  # Rook back on h1
 
-    make_move!(b, Move("e1", "c1"; castling = 2))  # White long
+    # White long
+    mv = Move("e1", "c1"; castling = 2)
+    @test mv in generate_legal_moves(b)
+
+    make_move!(b, mv)  
     @test testbit(b.bitboards[W_KING], square_index(3, 1))  # King on c1
     @test testbit(b.bitboards[W_ROOK], square_index(4, 1))  # Rook on d1
+    unmake_move!(b, mv)
+    @test testbit(b.bitboards[W_KING], square_index(5, 1))  # King back on e1
+    @test testbit(b.bitboards[W_ROOK], square_index(1, 1))  # Rook back on a1
 
-    make_move!(b, Move("e8", "c8"; castling = 2))  # Black long
+    # Black long
+    b.side_to_move = BLACK
+    mv = Move("e8", "c8"; castling = 2)
+    @test mv in generate_legal_moves(b)
+
+    make_move!(b, mv)
     @test testbit(b.bitboards[B_KING], square_index(3, 8))  # King on c8
     @test testbit(b.bitboards[B_ROOK], square_index(4, 8))  # Rook on d8
-    unmake_move!(b, Move("e8", "c8"; castling = 2))
+
+    unmake_move!(b, mv)
     @test testbit(b.bitboards[B_KING], square_index(5, 8))  # King back on e8
     @test testbit(b.bitboards[B_ROOK], square_index(1, 8))  # Rook back on a8
 
-    make_move!(b, Move("e8", "g8"; castling = 1))  # Black short
+    # Black short
+    mv = Move("e8", "g8"; castling = 1)
+    @test mv in generate_legal_moves(b)
+
+    make_move!(b, mv)
     @test testbit(b.bitboards[B_KING], square_index(7, 8))  # King on g8
     @test testbit(b.bitboards[B_ROOK], square_index(6, 8))  # Rook on f8
-    unmake_move!(b, Move("e8", "g8"; castling = 1))
+
+    unmake_move!(b, mv)
     @test testbit(b.bitboards[B_KING], square_index(5, 8))  # King back on e8
     @test testbit(b.bitboards[B_ROOK], square_index(8, 8))  # Rook back on h8
 end
