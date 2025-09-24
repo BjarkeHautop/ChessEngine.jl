@@ -1,5 +1,5 @@
-using Test
 using ChessEngine
+using Test
 
 @testset "FEN start positon" begin
     fen_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

@@ -129,6 +129,242 @@ function tt_store(hash::UInt64, value::Int, depth::Int, node_type::NodeType, bes
     end
 end
 
+# Quiescence search: only searches captures 
+const MAX_QUIESCENCE_PLY = 4
+
+function quiescence(board::Board, α::Int, β::Int; ply::Int=0)
+    side_to_move = board.side_to_move
+    static_eval = evaluate(board)  # evaluation if we stop here
+
+    if side_to_move == WHITE
+        # White wants to maximize score
+        if static_eval >= β
+            return β   # cutoff
+        end
+        if static_eval > α
+            α = static_eval
+        end
+    else
+        # Black wants to minimize score
+        if static_eval <= α
+            return α   # cutoff
+        end
+        if static_eval < β
+            β = static_eval
+        end
+    end
+
+    # Prevent runaway recursion in capture sequences
+    if ply >= MAX_QUIESCENCE_PLY
+        return static_eval
+    end
+
+    best_score = static_eval
+    for move in generate_captures(board)
+        make_move!(board, move)
+        score = quiescence(board, α, β; ply=ply+1)
+        unmake_move!(board, move)
+
+        if side_to_move == WHITE
+            if score > best_score
+                best_score = score
+            end
+            if best_score > α
+                α = best_score
+            end
+            if α >= β
+                break  # beta cutoff
+            end
+        else
+            if score < best_score
+                best_score = score
+            end
+            if best_score < β
+                β = best_score
+            end
+            if β <= α
+                break  # alpha cutoff
+            end
+        end
+    end
+
+    return best_score
+end
+
+function is_endgame(board::Board)
+    # Consider endgame when phase < 5
+    return board.game_phase_value < 5
+end
+
+# Alpha-beta search with quiescence at leaves
+function _search(board::Board, depth::Int;
+                 ply::Int = 0,
+                 α::Int = -MATE_VALUE,
+                 β::Int = MATE_VALUE,
+                 opening_book::Bool = true,
+                 stop_time::Int = typemax(Int))
+    
+    # Time check
+    if (time_ns() ÷ 1_000_000) >= stop_time
+        return 0, nothing
+    end
+
+    # Opening book
+    if opening_book && ply == 0
+        book_mv = book_move(board, OPENING_BOOK)
+        if book_mv !== nothing
+            return 0, book_mv
+        end
+    end
+
+    hash_before = zobrist_hash(board)
+    
+    # TT lookup
+    val, move, hit = tt_probe(hash_before, depth, α, β)
+    if hit
+        return val, move
+    end
+
+    # Leaf node: use quiescence search
+    if depth == 0
+        return quiescence(board, α, β), nothing
+    end
+
+    # Null move pruning
+    R = 2  # reduction factor for null move pruning
+    if depth > R + 1 && !is_endgame(board)
+        make_null_move!(board)  # side passes
+        score, _ = _search(board, depth - 1 - R; ply = ply + 1, α = -β, β = -β + 1,
+                        opening_book = false, stop_time = stop_time)
+        unmake_null_move!(board)
+        
+        score = -score
+        if board.side_to_move == WHITE && score >= β
+            return score, nothing  # beta cutoff
+        elseif board.side_to_move == BLACK && score <= α
+            return score, nothing
+        end
+    end
+
+    moves = generate_legal_moves(board)
+    moves = sort(moves; by = m -> -move_ordering_score(board, m, ply))
+
+    if isempty(moves)
+        if in_check(board, board.side_to_move)
+            return board.side_to_move == WHITE ? -MATE_VALUE + ply : MATE_VALUE - ply, nothing
+        else
+            return 0, nothing
+        end
+    end
+
+    best_score = board.side_to_move == WHITE ? -Inf : Inf
+    best_move = nothing
+
+    for (i, m) in enumerate(moves)
+        if (time_ns() ÷ 1_000_000) >= stop_time
+            return best_score == -Inf || best_score == Inf ? 0 : best_score, best_move
+        end
+
+        make_move!(board, m)
+        score, _ = _search(board, depth - 1; ply = ply + 1, α = α, β = β,
+                           opening_book = opening_book, stop_time = stop_time)
+        unmake_move!(board, m)
+
+        # Alpha-beta update
+        if board.side_to_move == WHITE
+            if score > best_score
+                best_score = score
+                best_move = m
+                α = max(α, best_score)
+                if best_score >= β
+                    store_killer!(m, ply)
+                    break
+                end
+            end
+        else
+            if score < best_score
+                best_score = score
+                best_move = m
+                β = min(β, best_score)
+                if best_score <= α
+                    store_killer!(m, ply)
+                    break
+                end
+            end
+        end
+    end
+
+    # TT store
+    node_type = EXACT
+    if best_score <= α
+        node_type = UPPERBOUND
+    elseif best_score >= β
+        node_type = LOWERBOUND
+    end
+    tt_store(hash_before, best_score, depth, node_type, best_move)
+
+    return best_score, best_move
+end
+
+function tt_probe_raw(hash::UInt64)
+    idx = tt_index(hash)
+    entry = TRANSPOSITION_TABLE[idx]
+    if entry !== nothing && entry.key == hash
+        return entry.value, entry.best_move, true
+    else
+        return 0, nothing, false
+    end
+end
+
+
+"Reconstruct the principal variation (PV) from the transposition table"
+function extract_pv(board::Board, max_depth::Int)
+    pv = Move[]
+    temp_board = deepcopy(board)
+    for d in 1:max_depth
+        h = zobrist_hash(temp_board)
+        val, move, hit = tt_probe_raw(h)
+        if !hit || move === nothing
+            break
+        end
+        push!(pv, move)
+        make_move!(temp_board, move)
+    end
+    return pv
+end
+
+
+
+# Root-level iterative deepening search
+function search_root(board::Board, max_depth::Int;
+                     stop_time::Int = typemax(Int),
+                     verbose::Bool = false)
+    best_move = nothing
+    best_score = 0
+
+    for depth in 1:max_depth
+        score, move = _search(board, depth; ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
+                              stop_time = stop_time)
+        if move !== nothing
+            best_move = move
+            best_score = score
+        end
+
+        if verbose
+            pv = extract_pv(board, depth)
+            pv_str = join(string.(pv), " ")
+            println("Depth $depth | Score: $best_score | PV: $pv_str")
+        end
+
+        # Stop if out of time
+        if (time_ns() ÷ 1_000_000) >= stop_time
+            break
+        end
+    end
+
+    return best_score, best_move
+end
+
 """
 Search for the best move using minimax with alpha-beta pruning.
 
@@ -145,7 +381,7 @@ Arguments:
 Returns:
 - `(best_score, best_move)`
 """
-function _search(
+function _search_old(
         board::Board,
         depth::Int;
         ply::Int = 0,
@@ -203,8 +439,7 @@ function _search(
     
         make_move!(board, m)
         score, _ = _search(board, depth-1; ply = ply+1, α = α, β = β,
-                   opening_book = opening_book, verbose = verbose,
-                   stop_time = stop_time)
+                   opening_book = opening_book, stop_time = stop_time)
         unmake_move!(board, m)
 
         # Alpha-beta update
@@ -276,8 +511,7 @@ Arguments:
 - `β`: beta value
 - `opening_book`: if true, use opening book moves if available
 - `verbose`: if true, prints a single-line progress indicator (only at root)
-- `stop_time`: time in milliseconds to stop the search (if depth not reached)
-
+- `time_budget`: time in milliseconds to stop the search (if depth not reached)
 Returns:
 - `(best_score, best_move)`
 """
@@ -293,7 +527,5 @@ function search(
 )
     tb = min(time_budget, 1_000_000_000)  # cap to 1e9 ms ~ 11 days
     stop_time = Int((time_ns() ÷ 1_000_000) + tb)
-    return _search(board, depth; ply=ply, α=α, β=β,
-                   opening_book=opening_book, verbose=verbose,
-                   stop_time=stop_time)
+    return search_root(board, depth; stop_time=stop_time, verbose=verbose)
 end

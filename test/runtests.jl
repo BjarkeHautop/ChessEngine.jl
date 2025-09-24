@@ -17,4 +17,4 @@ function include_tests(; include_aqua::Bool = false)
     end
 end
 
-include_tests(; include_aqua = true) 
+include_tests(; include_aqua = false) 

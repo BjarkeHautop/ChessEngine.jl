@@ -153,3 +153,15 @@ function in_check(board::Board, side::Side)::Bool
     attacker = opposite(side)
     return square_attacked(board, king_sq, attacker)
 end
+
+function generate_captures(board::Board)
+    moves = generate_legal_moves(board)
+    capture_moves = Move[]
+    for m in moves
+        if m.capture != 0
+            push!(capture_moves, m)
+        end
+    end
+
+    return capture_moves
+end

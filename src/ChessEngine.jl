@@ -13,10 +13,12 @@ export board_from_fen
 export Move, generate_pawn_moves, generate_knight_moves, generate_bishop_moves
 export generate_rook_moves, generate_queen_moves, generate_king_moves
 export generate_legal_moves, make_move!, game_over, in_check
-export square_attacked, king_square, piece_at
+export square_attacked, king_square, piece_at, generate_captures
 export display_board
 export zobrist_hash
 export unmake_move!
+
+export make_null_move!, unmake_null_move!
 include("piece_square_tables.jl")
 export flip_table
 export piece_square_value

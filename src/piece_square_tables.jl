@@ -134,7 +134,7 @@ const KING_TABLE_END_B = flip_table(KING_TABLE_END_W)
 Return the PSQT value of a piece on a given square.
 - piece: W_PAWN..B_KING
 - square: 0..63 (a1=0, h8=63)
-- phase: Float64 in [0.0, 1.0], where 1.0 = middlegame, 0.0 = endgame
+- phase: Float64 in [0.0, 1.0], where 1.0 = opening, 0.0 = endgame
 """
 function piece_square_value(piece::Int, square::Int, phase::Float64)
     idx = psqt_index(square)
@@ -160,7 +160,7 @@ function piece_square_value(piece::Int, square::Int, phase::Float64)
     elseif piece == B_QUEEN
         return -QUEEN_TABLE_B[idx]
     elseif piece == W_KING
-        # interpolate between middlegame and endgame tables
+        # interpolate between opening and endgame tables
         return round(Int,
             phase * KING_TABLE_W[idx] + (1 - phase) * KING_TABLE_END_W[idx]
         )
