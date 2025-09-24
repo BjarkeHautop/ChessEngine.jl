@@ -25,7 +25,7 @@ include("evaluate_position.jl")
 export evaluate, search, compute_eval_and_phase
 
 include("opening_book.jl")
-export play_move, book_move, polyglot_hash, polyglot_piece_index, OPENING_BOOK
+export book_move, polyglot_hash, polyglot_piece_index, OPENING_BOOK
 export POLYGLOT_RANDOM_ARRAY, WHITE_KING, WHITE_QUEEN, BLACK_KING, BLACK_QUEEN
 
 include("searchj.jl")

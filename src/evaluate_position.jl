@@ -14,27 +14,6 @@ const PIECE_VALUES = Dict(
     B_KING => 0
 )
 
-function init_evaluation!(board::Board)
-    score = 0
-    phase = 0
-    for (p, bb) in board.bitboards
-        while bb != 0
-            sq = trailing_zeros(bb)
-            score += piece_square_value(p, sq, 1.0)  # phase will be applied later
-            if p == W_QUEEN || p == B_QUEEN
-                phase += 4
-            elseif p == W_ROOK || p == B_ROOK
-                phase += 2
-            elseif p == W_BISHOP || p == B_BISHOP || p == W_KNIGHT || p == B_KNIGHT
-                phase += 1
-            end
-            bb &= bb - 1
-        end
-    end
-    board.eval_score = score
-    board.game_phase_value = phase
-end
-
 # material weight used for phase calculation
 function phase_weight(p)
     (p == W_QUEEN || p == B_QUEEN) ? 4 :

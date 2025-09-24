@@ -201,12 +201,3 @@ function decode_polyglot_move(code::UInt16, board::Board)
 end
 
 const OPENING_BOOK = load_polyglot_book(joinpath(@__DIR__, "..", "assets", "komodo.bin"))
-
-function play_move(b::Board)
-    m = book_move(b, OPENING_BOOK)
-    if m !== nothing
-        return m
-    else
-        return search(b, 5)[2]
-    end
-end
