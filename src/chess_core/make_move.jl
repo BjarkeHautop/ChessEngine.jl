@@ -82,7 +82,7 @@ function make_move!(board::Board, m::Move)
     end
 
     # --- Castling rook moves ---
-    if piece_type == W_KING && abs(m.to - m.from) == 2
+    if piece_type == W_KING && m.from == 4 && abs(m.to - m.from) == 2
         if m.to == 6      # short castle (e1 → g1)
             board.bitboards[W_ROOK] = clearbit(board.bitboards[W_ROOK], 7)
             board.bitboards[W_ROOK] = setbit(board.bitboards[W_ROOK], 5)
@@ -94,7 +94,7 @@ function make_move!(board::Board, m::Move)
             board.eval_score -= piece_square_value(W_ROOK, 0, game_phase(board))
             board.eval_score += piece_square_value(W_ROOK, 3, game_phase(board))
         end
-    elseif piece_type == B_KING && abs(m.to - m.from) == 2
+    elseif piece_type == B_KING && m.from == 60 && abs(m.to - m.from) == 2
         if m.to == 62     # short castle (e8 → g8)
             board.bitboards[B_ROOK] = clearbit(board.bitboards[B_ROOK], 63)
             board.bitboards[B_ROOK] = setbit(board.bitboards[B_ROOK], 61)

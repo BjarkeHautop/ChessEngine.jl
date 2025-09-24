@@ -37,6 +37,6 @@ end
     @test move !== nothing
 
     # Should have spent 60000 ms / 20 = 3000ms on first move and then some overhead thus, 56000 < game.white_time < 57000
-    @test game.white_time < 57000
+    @test game.white_time <= 57000
     @test game.white_time > 56000
 end

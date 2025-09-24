@@ -1,19 +1,20 @@
 using ChessEngine
 using Test
 
-include("test_board.jl")
-include("test_evaluate.jl")
-include("test_fen.jl")
-include("test_game_over.jl")
-include("test_game.jl")
-include("test_king.jl")
-include("test_knights.jl")
-include("test_move_helpers.jl")
-include("test_pawns.jl")
-include("test_polyglot.jl")
-include("test_sliding_moves.jl")
-include("test_ui.jl")
-include("test_unmake_move.jl")
-include("test_zobrist_hash.jl")
+function include_tests(; include_aqua::Bool = false)
+    folder = @__DIR__
 
-# include("test_aqua.jl")
+    # Get all .jl files except this script itself
+    this_file = basename(@__FILE__)
+    files = sort(filter(f -> endswith(f, ".jl") && f != this_file, readdir(folder)))
+
+    for file in files
+        if file == "test_aqua.jl"
+            include_aqua && include(joinpath(folder, file))
+        else
+            include(joinpath(folder, file))
+        end
+    end
+end
+
+include_tests(; include_aqua = true) 

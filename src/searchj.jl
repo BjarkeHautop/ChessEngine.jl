@@ -200,9 +200,11 @@ function _search(
         if (time_ns() ÷ 1_000_000) >= stop_time
             return best_score == -Inf || best_score == Inf ? 0 : best_score, best_move
         end
-
+    
         make_move!(board, m)
-        score, _ = search(board, depth-1; ply = ply+1, α = α, β = β, verbose = verbose)
+        score, _ = _search(board, depth-1; ply = ply+1, α = α, β = β,
+                   opening_book = opening_book, verbose = verbose,
+                   stop_time = stop_time)
         unmake_move!(board, m)
 
         # Alpha-beta update
@@ -252,6 +254,33 @@ function _search(
     return best_score, best_move
 end
 
+"""
+    search(
+        board::Board, 
+        depth::Int;
+        ply::Int = 0,
+        α::Int = (-MATE_VALUE),
+        β::Int = MATE_VALUE,
+        opening_book::Bool = true,
+        verbose::Bool = false,
+        time_budget::Int = typemax(Int)
+    )
+
+Search for the best move using minimax with alpha-beta pruning.
+
+Arguments:
+- `board`: current board position
+- `depth`: search depth
+- `ply`: current ply (for mate distance adjustment)
+- `α`: alpha value
+- `β`: beta value
+- `opening_book`: if true, use opening book moves if available
+- `verbose`: if true, prints a single-line progress indicator (only at root)
+- `stop_time`: time in milliseconds to stop the search (if depth not reached)
+
+Returns:
+- `(best_score, best_move)`
+"""
 function search(
     board::Board, 
     depth::Int;
