@@ -38,7 +38,7 @@ function search_with_time(game::Game; max_depth::Int = 64, opening_book::Bool = 
         end
 
         score,
-        move = search(game.board, depth;
+        move = _search(game.board, depth;
             ply = 0, α = (-MATE_VALUE), β = MATE_VALUE,
             opening_book = opening_book, verbose = verbose,
             stop_time = stop_time)

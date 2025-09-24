@@ -140,12 +140,12 @@ Arguments:
 - `β`: beta value
 - `opening_book`: if true, use opening book moves if available
 - `verbose`: if true, prints a single-line progress indicator (only at root)
-- `stop_time`: time in milliseconds to stop the search
+- `stop_time`: time in milliseconds to stop the search (if depth not reached)
 
 Returns:
 - `(best_score, best_move)`
 """
-function search(
+function _search(
         board::Board,
         depth::Int;
         ply::Int = 0,
@@ -250,4 +250,21 @@ function search(
     end
 
     return best_score, best_move
+end
+
+function search(
+    board::Board, 
+    depth::Int;
+    ply::Int = 0,
+    α::Int = (-MATE_VALUE),
+    β::Int = MATE_VALUE,
+    opening_book::Bool = true,
+    verbose::Bool = false,
+    time_budget::Int = typemax(Int)
+)
+    tb = min(time_budget, 1_000_000_000)  # cap to 1e9 ms ~ 11 days
+    stop_time = Int((time_ns() ÷ 1_000_000) + tb)
+    return _search(board, depth; ply=ply, α=α, β=β,
+                   opening_book=opening_book, verbose=verbose,
+                   stop_time=stop_time)
 end
