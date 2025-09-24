@@ -30,4 +30,6 @@ View the documentation at [https://BjarkeHautop.github.io/ChessEngine.jl/stable/
 
 - Improve API
 
+- Update documentation
+
 - UCI?
