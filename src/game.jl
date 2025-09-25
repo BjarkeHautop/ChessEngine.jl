@@ -25,7 +25,12 @@ function allocate_time(game::Game)
     return time_mangement(remaining, game.increment)
 end
 
-function search_with_time(game::Game; max_depth::Int = 64, opening_book::Bool = true, verbose::Bool = false)
+function search_with_time(
+    game::Game;
+    max_depth::Int = 64,
+    opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
+    verbose::Bool = false
+)
     allocated = allocate_time(game)
     stop_time = Int(time_ns() ÷ 1_000_000 + allocated)
 
@@ -56,7 +61,11 @@ function search_with_time(game::Game; max_depth::Int = 64, opening_book::Bool = 
     return best_score, best_move
 end
 
-function make_timed_move!(game::Game; opening_book::Bool = true, verbose = false)
+function make_timed_move!(
+    game::Game; 
+    opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
+    verbose = false
+)
     start_time = time_ns() ÷ 1_000_000
     score, move = search_with_time(game; opening_book = opening_book, verbose = verbose)
     elapsed = (time_ns() ÷ 1_000_000) - start_time

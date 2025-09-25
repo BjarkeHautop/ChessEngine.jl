@@ -19,6 +19,10 @@ struct PolyglotEntry
     learn::UInt32   # unused
 end
 
+struct PolyglotBook
+    entries::Vector{PolyglotEntry}
+end
+
 function load_polyglot_book(path::String)
     bytes = read(path)
     n = div(length(bytes), 16)
@@ -31,7 +35,7 @@ function load_polyglot_book(path::String)
         learn = ntoh(reinterpret(UInt32, bytes[(offset + 12):(offset + 15)])[1])
         entries[i] = PolyglotEntry(key, move, weight, learn)
     end
-    return entries
+    return PolyglotBook(entries)
 end
 
 include("polyglot.jl")
@@ -127,9 +131,9 @@ end
 
 using Distributions
 
-function book_move(board::Board, entries::Vector{PolyglotEntry})
+function book_move(board::Board, book::PolyglotBook)
     key = polyglot_hash(board)
-    candidates = filter(e -> e.key == key, entries)
+    candidates = filter(e -> e.key == key, book.entries)
     if isempty(candidates)
         return nothing
     end
@@ -200,4 +204,4 @@ function decode_polyglot_move(code::UInt16, board::Board)
         en_passant = enp)
 end
 
-const OPENING_BOOK = load_polyglot_book(joinpath(@__DIR__, "..", "assets", "komodo.bin"))
+const KOMODO_OPENING_BOOK = load_polyglot_book(joinpath(@__DIR__, "..", "assets", "komodo.bin"))

@@ -33,7 +33,7 @@ end
 
 @testset "Search with time respects allocation" begin
     game = start_game(minutes = 1, increment = 0)
-    score, move = make_timed_move!(game; opening_book = false, verbose = false)
+    score, move = make_timed_move!(game; opening_book = nothing, verbose = false)
     @test move !== nothing
 
     # Should have spent 60000 ms / 20 = 3000ms on first move and then some overhead thus, 56000 < game.white_time < 57000
