@@ -10,12 +10,12 @@
 A Julia package that implements chess and a simple chess engine. It provides functionalities to represent the chessboard, validate moves, and evaluate positions.
 Particularly, *ChessEngine* implements:
 
-- All chess rules 
-- Bitboard-based board representation  
+- All chess rules
+- Bitboard representation
 - Legal move generation
 - FEN parsing 
 - Opening book support
-- Minimax search with alpha–beta pruning and move ordering heuristics
+- Minimax search with alpha–beta pruning, iterative deepening, quiescence search, transposition tables, null move pruning, and move ordering heuristics
 - Evaluation function based on piece-square tables
 
 ## Resources
@@ -24,12 +24,12 @@ View the documentation at [https://BjarkeHautop.github.io/ChessEngine.jl/stable/
 
 ## To do
 
-- Improve search algorithm (e.g., iterative deepening, quiescence search)
+- Add insufficient material detection
 
 - Implement into Lichess bot (see https://github.com/lichess-bot-devs/lichess-bot)
 
 - Improve API
 
-- Update documentation
+- Improve documentation
 
-- UCI?
+- Implement UCI?
