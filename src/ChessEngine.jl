@@ -35,4 +35,5 @@ include("game.jl")
 export Game, make_timed_move!, search_with_time, start_game, MATE_VALUE, MATE_THRESHOLD
 
 export PolyglotBook, load_polyglot_book
+export SearchResult
 end

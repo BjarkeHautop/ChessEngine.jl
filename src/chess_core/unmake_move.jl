@@ -53,6 +53,4 @@ function unmake_move!(board::Board, m::Move)
     board.halfmove_clock = u.halfmove_clock
     board.eval_score = u.prev_eval_score
     board.game_phase_value = u.prev_game_phase_value
-
-    return board
 end

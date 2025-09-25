@@ -167,6 +167,4 @@ function make_move!(board::Board, m::Move)
     # --- Save history & flip side ---
     push!(board.position_history, zobrist_hash(board))
     board.side_to_move = (board.side_to_move == WHITE ? BLACK : WHITE)
-
-    return board
 end

@@ -30,35 +30,37 @@ function search_with_time(
     max_depth::Int = 64,
     opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
     verbose::Bool = false
-)
+)::SearchResult
     allocated = allocate_time(game)
     stop_time = Int(time_ns() ÷ 1_000_000 + allocated)
 
-    best_move = nothing
-    best_score = 0
+    best_result = SearchResult(nothing, nothing, false)
 
     for depth in 1:max_depth
         if (time_ns() ÷ 1_000_000) >= stop_time
             break
         end
 
-        score,
-        move = _search(game.board, depth;
-            ply = 0, α = (-MATE_VALUE), β = MATE_VALUE,
-            opening_book = opening_book,
+        result = _search(game.board, depth;
+            ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
+            opening_book = depth == 1 ? opening_book : nothing,  # book only at root
             stop_time = stop_time)
 
-        if move !== nothing
-            best_move = move
-            best_score = score
+        # Propagate a book move immediately
+        if result.from_book
+            return result
         end
 
-        if abs(best_score) >= MATE_THRESHOLD
-            break
+        if result.move !== nothing
+            best_result = result
+        end
+
+        if abs(best_result.score) >= MATE_THRESHOLD
+            return best_result
         end
     end
 
-    return best_score, best_move
+    return best_result
 end
 
 function make_timed_move!(
@@ -67,24 +69,28 @@ function make_timed_move!(
     verbose = false
 )
     start_time = time_ns() ÷ 1_000_000
-    score, move = search_with_time(game; opening_book = opening_book, verbose = verbose)
+    result = search_with_time(game; opening_book = opening_book, verbose = verbose)
     elapsed = (time_ns() ÷ 1_000_000) - start_time
 
-    if move === nothing
-        return score, move
+    if result.move === nothing
+        return nothing
     end
 
-    make_move!(game.board, move)
+    side_moved = game.board.side_to_move
 
-    if game.board.side_to_move == BLACK
+    make_move!(game.board, result.move)
+
+    if side_moved == WHITE
         game.white_time -= elapsed
         game.white_time += game.increment
     else
         game.black_time -= elapsed
         game.black_time += game.increment
     end
-
-    return score, move
+    if verbose
+        println("Move made: ", result.move, " Score: ", result.score, " Time used (ms): ", elapsed)
+        println("White time (ms): ", game.white_time, " Black time (ms): ", game.black_time)
+    end
 end
 
 # Start a 5 min + 2 sec increment game

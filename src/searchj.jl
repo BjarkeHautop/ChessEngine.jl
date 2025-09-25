@@ -139,7 +139,7 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int=0)
     if side_to_move == WHITE
         # White wants to maximize score
         if static_eval >= β
-            return β   # cutoff
+            return β   # beta cutoff
         end
         if static_eval > α
             α = static_eval
@@ -147,7 +147,7 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int=0)
     else
         # Black wants to minimize score
         if static_eval <= α
-            return α   # cutoff
+            return α   # alpha cutoff
         end
         if static_eval < β
             β = static_eval
@@ -196,24 +196,31 @@ function is_endgame(board::Board)
     return board.game_phase_value < 5
 end
 
+struct SearchResult
+    score::Union{Nothing, Int}  # nothing if from book
+    move::Union{Nothing, Move}
+    from_book::Bool
+end
+
+
 # Alpha-beta search with quiescence at leaves
 function _search(board::Board, depth::Int;
                  ply::Int = 0,
                  α::Int = -MATE_VALUE,
                  β::Int = MATE_VALUE,
                  opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
-                 stop_time::Int = typemax(Int))
+                 stop_time::Int = typemax(Int))::SearchResult
     
     # Time check
     if (time_ns() ÷ 1_000_000) >= stop_time
-        return 0, nothing
+        return SearchResult(nothing, nothing, false)
     end
 
     # Opening book
     if opening_book !== nothing && ply == 0
         book_mv = book_move(board, opening_book)
         if book_mv !== nothing
-            return 0, book_mv
+            return SearchResult(nothing, book_mv, true)
         end
     end
 
@@ -222,27 +229,26 @@ function _search(board::Board, depth::Int;
     # TT lookup
     val, move, hit = tt_probe(hash_before, depth, α, β)
     if hit
-        return val, move
+        return SearchResult(val, move, false)
     end
 
     # Leaf node: use quiescence search
     if depth == 0
-        return quiescence(board, α, β), nothing
+        return SearchResult(quiescence(board, α, β), nothing, false)
     end
 
     # Null move pruning
     R = 2  # reduction factor for null move pruning
     if depth > R + 1 && !is_endgame(board)
         make_null_move!(board)  # side passes
-        score, _ = _search(board, depth - 1 - R; ply = ply + 1, α = -β, β = -β + 1,
+        result = _search(board, depth - 1 - R; ply = ply + 1, α = -β, β = -β + 1,
                         opening_book = nothing, stop_time = stop_time)
         unmake_null_move!(board)
         
-        score = -score
-        if board.side_to_move == WHITE && score >= β
-            return score, nothing  # beta cutoff
-        elseif board.side_to_move == BLACK && score <= α
-            return score, nothing
+        if board.side_to_move == WHITE && result.score >= β
+            return SearchResult(result.score, nothing, false)  # beta cutoff
+        elseif board.side_to_move == BLACK && result.score <= α
+            return SearchResult(result.score, nothing, false)  # alpha cutoff
         end
     end
 
@@ -250,11 +256,12 @@ function _search(board::Board, depth::Int;
     moves = sort(moves; by = m -> -move_ordering_score(board, m, ply))
 
     if isempty(moves)
-        if in_check(board, board.side_to_move)
-            return board.side_to_move == WHITE ? -MATE_VALUE + ply : MATE_VALUE - ply, nothing
+        val = if in_check(board, board.side_to_move)
+            board.side_to_move == WHITE ? -MATE_VALUE + ply : MATE_VALUE - ply
         else
-            return 0, nothing
+            0
         end
+        return SearchResult(val, nothing, false)
     end
 
     best_score = board.side_to_move == WHITE ? -Inf : Inf
@@ -262,18 +269,19 @@ function _search(board::Board, depth::Int;
 
     for (i, m) in enumerate(moves)
         if (time_ns() ÷ 1_000_000) >= stop_time
-            return best_score == -Inf || best_score == Inf ? 0 : best_score, best_move
+            val = best_score == -Inf || best_score == Inf ? 0 : best_score
+            return SearchResult(val, best_move, false)
         end
 
         make_move!(board, m)
-        score, _ = _search(board, depth - 1; ply = ply + 1, α = α, β = β,
+        result = _search(board, depth - 1; ply = ply + 1, α = α, β = β,
                            opening_book = opening_book, stop_time = stop_time)
         unmake_move!(board, m)
 
         # Alpha-beta update
         if board.side_to_move == WHITE
-            if score > best_score
-                best_score = score
+            if result.score > best_score
+                best_score = result.score
                 best_move = m
                 α = max(α, best_score)
                 if best_score >= β
@@ -282,8 +290,8 @@ function _search(board::Board, depth::Int;
                 end
             end
         else
-            if score < best_score
-                best_score = score
+            if result.score < best_score
+                best_score = result.score
                 best_move = m
                 β = min(β, best_score)
                 if best_score <= α
@@ -303,7 +311,7 @@ function _search(board::Board, depth::Int;
     end
     tt_store(hash_before, best_score, depth, node_type, best_move)
 
-    return best_score, best_move
+    return SearchResult(best_score, best_move, false)
 end
 
 function tt_probe_raw(hash::UInt64)
@@ -312,7 +320,7 @@ function tt_probe_raw(hash::UInt64)
     if entry !== nothing && entry.key == hash
         return entry.value, entry.best_move, true
     else
-        return 0, nothing, false
+        return nothing, nothing, false
     end
 end
 
@@ -339,44 +347,39 @@ end
 function search_root(board::Board, max_depth::Int;
                      stop_time::Int = typemax(Int),
                      opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
-                     verbose::Bool = false)
-    best_move = nothing
-    best_score = 0
+                     verbose::Bool = false)::SearchResult
+    best_result = SearchResult(0.0, nothing, false)
 
-    # Opening book probe once at root
+    # Opening book probe
     if opening_book !== nothing
         book_mv = book_move(board, opening_book)
         if book_mv !== nothing
             if verbose
                 println("Book move found: $book_mv")
             end
-            return 0, book_mv
+            return SearchResult(nothing, book_mv, true)
         end
     end
 
     for depth in 1:max_depth
-        score, move = _search(board, depth; ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
-                              stop_time = stop_time,
-                              opening_book = nothing # disable book after root
-                             )
-        if move !== nothing
-            best_move = move
-            best_score = score
+        result = _search(board, depth; ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
+                         stop_time = stop_time, opening_book = nothing)
+        if result.move !== nothing 
+            best_result = result
         end
 
-        if verbose
+        if verbose 
             pv = extract_pv(board, depth)
             pv_str = join(string.(pv), " ")
-            println("Depth $depth | Score: $best_score | PV: $pv_str")
+            println("Depth $depth | Score: $(best_result.score) | PV: $pv_str")
         end
 
-        # Stop if out of time
         if (time_ns() ÷ 1_000_000) >= stop_time
             break
         end
     end
 
-    return best_score, best_move
+    return best_result
 end
 
 """
@@ -410,7 +413,7 @@ function search(
     opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
     verbose::Bool = false,
     time_budget::Int = typemax(Int)
-)
+)::SearchResult
     tb = min(time_budget, 1_000_000_000)  # cap to 1e9 ms ~ 11 days
     stop_time = Int((time_ns() ÷ 1_000_000) + tb)
     return search_root(board, depth; stop_time=stop_time, opening_book = opening_book,
