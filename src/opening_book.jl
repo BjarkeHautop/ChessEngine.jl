@@ -68,7 +68,7 @@ end
 
 file_of(square::Int)::Int = square % 8
 
-function pawn_in_front(board::Board, file::Int)::Bool
+function has_pawn_for_en_passant(board::Board, file::Int)::Bool
     if board.side_to_move == WHITE
         # White pawns on rank 5 (row 4)
         rank = 4
@@ -115,7 +115,7 @@ function polyglot_hash(board::Board)::UInt64
     # 3. En passant
     if board.en_passant != -1
         file = file_of(board.en_passant)
-        if pawn_in_front(board, file)
+        if has_pawn_for_en_passant(board, file)
             idx = 772 + file
             h ⊻= POLYGLOT_RANDOM_ARRAY[idx + 1]
         end
