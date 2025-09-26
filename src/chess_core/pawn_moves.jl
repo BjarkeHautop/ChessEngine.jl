@@ -1,8 +1,14 @@
 function _generate_pawn_moves_internal(board::Board, push_fn)
-    pawns, start_rank, promotion_rank, direction, enemy_pieces, enemy_pawn, promo_pieces =
-        board.side_to_move == WHITE ? 
-        (board.bitboards[W_PAWN], 2, 7, 8, B_PAWN:B_KING, B_PAWN, (W_QUEEN, W_ROOK, W_BISHOP, W_KNIGHT)) :
-        (board.bitboards[B_PAWN], 7, 2, -8, W_PAWN:W_KING, W_PAWN, (B_QUEEN, B_ROOK, B_BISHOP, B_KNIGHT))
+    pawns, start_rank,
+    promotion_rank,
+    direction,
+    enemy_pieces,
+    enemy_pawn,
+    promo_pieces = board.side_to_move == WHITE ?
+                   (board.bitboards[W_PAWN], 2, 7, 8, B_PAWN:B_KING,
+        B_PAWN, (W_QUEEN, W_ROOK, W_BISHOP, W_KNIGHT)) :
+                   (board.bitboards[B_PAWN], 7, 2, -8, W_PAWN:W_KING,
+        W_PAWN, (B_QUEEN, B_ROOK, B_BISHOP, B_KNIGHT))
 
     for sq in 0:63
         if !testbit(pawns, sq)
@@ -73,7 +79,8 @@ Returns: Vector of Move
 """
 function generate_pawn_moves(board::Board)
     moves = Move[]
-    _generate_pawn_moves_internal(board, (sq,to_sq;kwargs...) -> push!(moves, Move(sq,to_sq;kwargs...)))
+    _generate_pawn_moves_internal(board, (
+        sq, to_sq; kwargs...) -> push!(moves, Move(sq, to_sq; kwargs...)))
     return moves
 end
 
@@ -85,6 +92,7 @@ Returns: number of moves added
 """
 function generate_pawn_moves!(board::Board, moves::Vector{Move})
     len_before = length(moves)
-    _generate_pawn_moves_internal(board, (sq,to_sq;kwargs...) -> push!(moves, Move(sq,to_sq;kwargs...)))
+    _generate_pawn_moves_internal(board, (
+        sq, to_sq; kwargs...) -> push!(moves, Move(sq, to_sq; kwargs...)))
     return length(moves) - len_before
 end

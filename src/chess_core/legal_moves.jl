@@ -83,7 +83,8 @@ function generate_legal_moves!(board::Board, moves::Vector{Move})
         # castling legality (check current board before move)
         if m.castling != 0
             if in_check(board, side)
-                deleteat!(moves, i); continue
+                deleteat!(moves, i);
+                continue
             end
             path = if side == WHITE
                 m.castling == 1 ? (5, 6) : (3, 2)
@@ -91,14 +92,16 @@ function generate_legal_moves!(board::Board, moves::Vector{Move})
                 m.castling == 1 ? (61, 62) : (59, 58)
             end
             if any(sq -> square_attacked(board, sq, opp), path)
-                deleteat!(moves, i); continue
+                deleteat!(moves, i);
+                continue
             end
         end
 
         make_move!(board, m)
         if in_check(board, side)
             unmake_move!(board, m)
-            deleteat!(moves, i); continue
+            deleteat!(moves, i);
+            continue
         end
         unmake_move!(board, m)
 

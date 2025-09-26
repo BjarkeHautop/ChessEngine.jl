@@ -27,7 +27,7 @@ using Test
     black_knight_moves = generate_knight_moves(b)
     @test length(black_knight_moves) == 7
 
-    capture_move = Move("f6", "d5"; capture=W_KNIGHT)
+    capture_move = Move("f6", "d5"; capture = W_KNIGHT)
     @test capture_move in black_knight_moves
 end
 

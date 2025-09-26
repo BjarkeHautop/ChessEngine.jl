@@ -1,9 +1,9 @@
 # Internal helper for sliding moves
 function _generate_sliding_moves_internal(board::Board, bb_piece::UInt64, directions::Vector{Int}, push_fn)
-    friendly_pieces, enemy_pieces =
-        board.side_to_move == WHITE ?
-        (W_PAWN:W_KING, B_PAWN:B_KING) :
-        (B_PAWN:B_KING, W_PAWN:W_KING)
+    friendly_pieces,
+    enemy_pieces = board.side_to_move == WHITE ?
+                   (W_PAWN:W_KING, B_PAWN:B_KING) :
+                   (B_PAWN:B_KING, W_PAWN:W_KING)
 
     # Bitboard of all friendly pieces
     occupied_friendly = zero(UInt64)
@@ -110,7 +110,6 @@ function generate_queen_moves(board::Board)
     directions = [-9, -8, -7, -1, 1, 7, 8, 9]  # all directions
     return generate_sliding_moves(board, bb, directions)
 end
-
 
 # In-place version
 function generate_sliding_moves!(board::Board, bb_piece::UInt64, directions::Vector{Int}, moves::Vector{Move})

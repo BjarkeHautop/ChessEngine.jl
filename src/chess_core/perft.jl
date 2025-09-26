@@ -40,11 +40,11 @@ function _perft_fast!(board::Board, depth::Int, moves::Vector{Move})
     nodes = 0
     generate_legal_moves!(board, moves)
     n = length(moves)
-    
+
     # Preallocate a new buffer for recursion
     moves_child = Vector{Move}(undef, 256)
 
-    for i = 1:n
+    for i in 1:n
         move = moves[i]
         make_move!(board, move)
         nodes += _perft_fast!(board, depth - 1, moves_child)

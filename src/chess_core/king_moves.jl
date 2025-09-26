@@ -103,13 +103,15 @@ end
 # Return a vector
 function generate_king_moves(board::Board)
     moves = Move[]
-    _king_moves_internal(board, (from,to; kwargs...) -> push!(moves, Move(from,to; kwargs...)))
+    _king_moves_internal(board, (
+        from, to; kwargs...) -> push!(moves, Move(from, to; kwargs...)))
     return moves
 end
 
 # Fill an existing vector
 function generate_king_moves!(board::Board, moves::Vector{Move})
     len_before = length(moves)
-    _king_moves_internal(board, (from,to; kwargs...) -> push!(moves, Move(from,to; kwargs...)))
+    _king_moves_internal(board, (
+        from, to; kwargs...) -> push!(moves, Move(from, to; kwargs...)))
     return length(moves) - len_before
 end

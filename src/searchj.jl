@@ -132,7 +132,7 @@ end
 # Quiescence search: only searches captures 
 const MAX_QUIESCENCE_PLY = 4
 
-function quiescence(board::Board, α::Int, β::Int; ply::Int=0)
+function quiescence(board::Board, α::Int, β::Int; ply::Int = 0)
     side_to_move = board.side_to_move
     static_eval = evaluate(board)  # evaluation if we stop here
 
@@ -162,7 +162,7 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int=0)
     best_score = static_eval
     for move in generate_captures(board)
         make_move!(board, move)
-        score = quiescence(board, α, β; ply=ply+1)
+        score = quiescence(board, α, β; ply = ply+1)
         unmake_move!(board, move)
 
         if side_to_move == WHITE
@@ -202,15 +202,14 @@ struct SearchResult
     from_book::Bool
 end
 
-
 # Alpha-beta search with quiescence at leaves
 function _search(board::Board, depth::Int;
-                 ply::Int = 0,
-                 α::Int = -MATE_VALUE,
-                 β::Int = MATE_VALUE,
-                 opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
-                 stop_time::Int = typemax(Int))::SearchResult
-    
+        ply::Int = 0,
+        α::Int = -MATE_VALUE,
+        β::Int = MATE_VALUE,
+        opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
+        stop_time::Int = typemax(Int))::SearchResult
+
     # Time check
     if (time_ns() ÷ 1_000_000) >= stop_time
         return SearchResult(nothing, nothing, false)
@@ -225,7 +224,7 @@ function _search(board::Board, depth::Int;
     end
 
     hash_before = zobrist_hash(board)
-    
+
     # TT lookup
     val, move, hit = tt_probe(hash_before, depth, α, β)
     if hit
@@ -242,9 +241,9 @@ function _search(board::Board, depth::Int;
     if depth > R + 1 && !is_endgame(board)
         make_null_move!(board)  # side passes
         result = _search(board, depth - 1 - R; ply = ply + 1, α = -β, β = -β + 1,
-                        opening_book = nothing, stop_time = stop_time)
+            opening_book = nothing, stop_time = stop_time)
         unmake_null_move!(board)
-        
+
         if board.side_to_move == WHITE && result.score >= β
             return SearchResult(result.score, nothing, false)  # beta cutoff
         elseif board.side_to_move == BLACK && result.score <= α
@@ -275,7 +274,7 @@ function _search(board::Board, depth::Int;
 
         make_move!(board, m)
         result = _search(board, depth - 1; ply = ply + 1, α = α, β = β,
-                           opening_book = opening_book, stop_time = stop_time)
+            opening_book = opening_book, stop_time = stop_time)
         unmake_move!(board, m)
 
         # Alpha-beta update
@@ -324,7 +323,6 @@ function tt_probe_raw(hash::UInt64)
     end
 end
 
-
 "Reconstruct the principal variation (PV) from the transposition table"
 function extract_pv(board::Board, max_depth::Int)
     pv = Move[]
@@ -341,13 +339,11 @@ function extract_pv(board::Board, max_depth::Int)
     return pv
 end
 
-
-
 # Root-level iterative deepening search
 function search_root(board::Board, max_depth::Int;
-                     stop_time::Int = typemax(Int),
-                     opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
-                     verbose::Bool = false)::SearchResult
+        stop_time::Int = typemax(Int),
+        opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
+        verbose::Bool = false)::SearchResult
     best_result = SearchResult(0.0, nothing, false)
 
     # Opening book probe
@@ -363,12 +359,12 @@ function search_root(board::Board, max_depth::Int;
 
     for depth in 1:max_depth
         result = _search(board, depth; ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
-                         stop_time = stop_time, opening_book = nothing)
-        if result.move !== nothing 
+            stop_time = stop_time, opening_book = nothing)
+        if result.move !== nothing
             best_result = result
         end
 
-        if verbose 
+        if verbose
             pv = extract_pv(board, depth)
             pv_str = join(string.(pv), " ")
             println("Depth $depth | Score: $(best_result.score) | PV: $pv_str")
@@ -408,14 +404,14 @@ Returns:
 - `(best_score, best_move)`
 """
 function search(
-    board::Board, 
-    depth::Int;
-    opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
-    verbose::Bool = false,
-    time_budget::Int = typemax(Int)
+        board::Board,
+        depth::Int;
+        opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
+        verbose::Bool = false,
+        time_budget::Int = typemax(Int)
 )::SearchResult
     tb = min(time_budget, 1_000_000_000)  # cap to 1e9 ms ~ 11 days
     stop_time = Int((time_ns() ÷ 1_000_000) + tb)
-    return search_root(board, depth; stop_time=stop_time, opening_book = opening_book,
-                       verbose=verbose)
+    return search_root(board, depth; stop_time = stop_time, opening_book = opening_book,
+        verbose = verbose)
 end

@@ -26,10 +26,10 @@ function allocate_time(game::Game)
 end
 
 function search_with_time(
-    game::Game;
-    max_depth::Int = 64,
-    opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
-    verbose::Bool = false
+        game::Game;
+        max_depth::Int = 64,
+        opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
+        verbose::Bool = false
 )::SearchResult
     allocated = allocate_time(game)
     stop_time = Int(time_ns() ÷ 1_000_000 + allocated)
@@ -64,9 +64,9 @@ function search_with_time(
 end
 
 function make_timed_move!(
-    game::Game; 
-    opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
-    verbose = false
+        game::Game;
+        opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
+        verbose = false
 )
     start_time = time_ns() ÷ 1_000_000
     result = search_with_time(game; opening_book = opening_book, verbose = verbose)
@@ -88,7 +88,8 @@ function make_timed_move!(
         game.black_time += game.increment
     end
     if verbose
-        println("Move made: ", result.move, " Score: ", result.score, " Time used (ms): ", elapsed)
+        println("Move made: ", result.move, " Score: ",
+            result.score, " Time used (ms): ", elapsed)
         println("White time (ms): ", game.white_time, " Black time (ms): ", game.black_time)
     end
 end
