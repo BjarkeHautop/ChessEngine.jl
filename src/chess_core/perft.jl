@@ -4,21 +4,20 @@
 Performance test function: counts the number of leaf nodes reachable
 from the given board position up to `depth`.
 """
-function perft(board::Board, depth::Int, moves::Vector{Move})
+function perft(board::Board, depth::Int)
     if depth == 0
         return 1
     end
+
     nodes = 0
-    n = generate_moves!(board, moves)  # fills `moves[1:n]`
-    @inbounds for i = 1:n
-        move = moves[i]
+    for move in generate_legal_moves(board)
         make_move!(board, move)
-        nodes += perft(board, depth - 1, moves)
-        undo_move!(board)
+        nodes += perft(board, depth - 1)
+        unmake_move!(board, move)
     end
+
     return nodes
 end
-
 
 """
     perft_fast(board::Board, depth::Int) -> Int
@@ -39,13 +38,17 @@ function _perft_fast!(board::Board, depth::Int, moves::Vector{Move})
     end
 
     nodes = 0
-    n = generate_legal_moves!(board, moves)  # fills moves[1:n]
+    generate_legal_moves!(board, moves)
+    n = length(moves)
+    
+    # Preallocate a new buffer for recursion
+    moves_child = Vector{Move}(undef, 256)
 
-    @inbounds for i = 1:n
+    for i = 1:n
         move = moves[i]
         make_move!(board, move)
-        nodes += _perft_fast!(board, depth - 1, moves)
-        undo_move!(board)
+        nodes += _perft_fast!(board, depth - 1, moves_child)
+        unmake_move!(board, move)
     end
 
     return nodes

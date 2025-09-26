@@ -1,11 +1,6 @@
-"""
-Generate pseudo-legal king moves for the given side
-- `board`: Board struct
-Returns: Vector of Move
-"""
-function generate_king_moves(board::Board)
-    moves = Move[]
-
+# Internal helper for king moves
+# `push_fn` is a function used to append a move
+function _king_moves_internal(board::Board, push_fn)
     if board.side_to_move == WHITE
         kings = board.bitboards[W_KING]
         friendly_pieces = W_PAWN:W_KING
@@ -21,7 +16,7 @@ function generate_king_moves(board::Board)
     end
 
     # Build bitboard of all friendly pieces
-    occupied_friendly = 0
+    occupied_friendly = zero(UInt64)
     for p in friendly_pieces
         occupied_friendly |= board.bitboards[p]
     end
@@ -53,16 +48,13 @@ function generate_king_moves(board::Board)
                             break
                         end
                     end
-                    push!(moves, Move(sq, to_sq; capture = capture))
+                    push_fn(sq, to_sq; capture = capture)
                 end
             end
         end
 
-        # --------------------
         # Castling (pseudo-legal)
-        # --------------------
         if board.side_to_move == WHITE
-            # Ensure king is actually on e1
             if testbit(kings, 4)
                 # White kingside (K)
                 if (rights & 0b0001) != 0 &&
@@ -70,7 +62,7 @@ function generate_king_moves(board::Board)
                     testbit(board.bitboards[p], 5) || testbit(board.bitboards[p], 6)
                 for p in ALL_PIECES
                 )
-                    push!(moves, Move(4, 6; castling = 1))
+                    push_fn(4, 6; castling = 1)
                 end
                 # White queenside (Q)
                 if (rights & 0b0010) != 0 &&
@@ -80,11 +72,10 @@ function generate_king_moves(board::Board)
                     testbit(board.bitboards[p], 3)
                 for p in ALL_PIECES
                 )
-                    push!(moves, Move(4, 2; castling = 2))
+                    push_fn(4, 2; castling = 2)
                 end
             end
         else
-            # Ensure king is actually on e8
             if testbit(kings, 60)
                 # Black kingside (k)
                 if (rights & 0b0100) != 0 &&
@@ -92,7 +83,7 @@ function generate_king_moves(board::Board)
                     testbit(board.bitboards[p], 61) || testbit(board.bitboards[p], 62)
                 for p in ALL_PIECES
                 )
-                    push!(moves, Move(60, 62; castling = 1))
+                    push_fn(60, 62; castling = 1)
                 end
                 # Black queenside (q)
                 if (rights & 0b1000) != 0 &&
@@ -102,11 +93,23 @@ function generate_king_moves(board::Board)
                     testbit(board.bitboards[p], 59)
                 for p in ALL_PIECES
                 )
-                    push!(moves, Move(60, 58; castling = 2))
+                    push_fn(60, 58; castling = 2)
                 end
             end
         end
     end
+end
 
+# Return a vector
+function generate_king_moves(board::Board)
+    moves = Move[]
+    _king_moves_internal(board, (from,to; kwargs...) -> push!(moves, Move(from,to; kwargs...)))
     return moves
+end
+
+# Fill an existing vector
+function generate_king_moves!(board::Board, moves::Vector{Move})
+    len_before = length(moves)
+    _king_moves_internal(board, (from,to; kwargs...) -> push!(moves, Move(from,to; kwargs...)))
+    return length(moves) - len_before
 end

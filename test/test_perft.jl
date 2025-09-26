@@ -1,6 +1,7 @@
 using ChessEngine
 using Test
 
+# Takes 10 sec for depth 5 on my machine
 @testset "perft tests" begin
     b = start_position()
     @test perft(b, 0) == 1
@@ -11,7 +12,8 @@ using Test
     @test perft(b, 5) == 4865609
 end
 
-@testset "perft fast tests" begin
+# Takes 5 sec for depth 5 on my machine
+@testset "fast perft tests" begin
     b = start_position()
     @test perft_fast(b, 0) == 1
     @test perft_fast(b, 1) == 20

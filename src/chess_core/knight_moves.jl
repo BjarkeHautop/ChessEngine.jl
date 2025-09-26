@@ -1,23 +1,12 @@
-"""
-Generate pseudo-legal knight moves for the given side
-- `board`: Board struct
-Returns: Vector of Move
-"""
-function generate_knight_moves(board::Board)
-    moves = Move[]
+# Internal helper for knight moves
+function _generate_knight_moves_internal(board::Board, push_fn)
+    knights, friendly_pieces, enemy_pieces =
+        board.side_to_move == WHITE ?
+        (board.bitboards[W_KNIGHT], W_PAWN:W_KING, B_PAWN:B_KING) :
+        (board.bitboards[B_KNIGHT], B_PAWN:B_KING, W_PAWN:W_KING)
 
-    if board.side_to_move == WHITE
-        knights = board.bitboards[W_KNIGHT]
-        enemy_pieces = B_PAWN:B_KING
-        friendly_pieces = W_PAWN:W_KING
-    else
-        knights = board.bitboards[B_KNIGHT]
-        enemy_pieces = W_PAWN:W_KING
-        friendly_pieces = B_PAWN:B_KING
-    end
-
-    # Build bitboard of all friendly pieces
-    occupied_friendly = 0
+    # build bitboard of all friendly pieces
+    occupied_friendly = zero(UInt64)
     for p in friendly_pieces
         occupied_friendly |= board.bitboards[p]
     end
@@ -31,7 +20,6 @@ function generate_knight_moves(board::Board)
         end
 
         f, r = file_rank(sq)
-
         for d in deltas
             to_sq = sq + d
             if !on_board(to_sq)
@@ -42,26 +30,34 @@ function generate_knight_moves(board::Board)
             df = abs(tf - f)
             dr = abs(tr - r)
 
-            # Only keep valid knight moves
+            # Only valid L-shaped moves
             if (df == 2 && dr == 1) || (df == 1 && dr == 2)
-                # Skip squares occupied by friendly pieces
-                if testbit(occupied_friendly, to_sq)
-                    continue
-                end
-
-                # Check for capture
-                capture = 0
-                for p in enemy_pieces
-                    if testbit(board.bitboards[p], to_sq)
-                        capture = p
-                        break
+                if !testbit(occupied_friendly, to_sq)
+                    # capture check
+                    capture = 0
+                    for p in enemy_pieces
+                        if testbit(board.bitboards[p], to_sq)
+                            capture = p
+                            break
+                        end
                     end
+                    push_fn(sq, to_sq; capture = capture)
                 end
-
-                push!(moves, Move(sq, to_sq; capture = capture))
             end
         end
     end
+end
 
+# Returns a vector of moves
+function generate_knight_moves(board::Board)
+    moves = Move[]
+    _generate_knight_moves_internal(board, (sq,to_sq;kwargs...) -> push!(moves, Move(sq,to_sq;kwargs...)))
     return moves
+end
+
+# In-place version
+function generate_knight_moves!(board::Board, moves::Vector{Move})
+    len_before = length(moves)
+    _generate_knight_moves_internal(board, (sq,to_sq;kwargs...) -> push!(moves, Move(sq,to_sq;kwargs...)))
+    return length(moves) - len_before
 end

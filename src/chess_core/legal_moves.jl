@@ -59,3 +59,51 @@ function generate_legal_moves(board::Board)
     return legal
 end
 
+"""
+Generate all legal moves for the given side in place
+- `board`: Board struct
+Returns: Vector of Move
+"""
+function generate_legal_moves!(board::Board, moves::Vector{Move})
+    empty!(moves)
+    ChessEngine.generate_pawn_moves!(board, moves)
+    ChessEngine.generate_knight_moves!(board, moves)
+    ChessEngine.generate_bishop_moves!(board, moves)
+    ChessEngine.generate_rook_moves!(board, moves)
+    ChessEngine.generate_queen_moves!(board, moves)
+    ChessEngine.generate_king_moves!(board, moves)
+
+    side = board.side_to_move
+    opp = opposite(side)
+
+    i = 1
+    while i <= length(moves)
+        m = moves[i]
+
+        # castling legality (check current board before move)
+        if m.castling != 0
+            if in_check(board, side)
+                deleteat!(moves, i); continue
+            end
+            path = if side == WHITE
+                m.castling == 1 ? (5, 6) : (3, 2)
+            else
+                m.castling == 1 ? (61, 62) : (59, 58)
+            end
+            if any(sq -> square_attacked(board, sq, opp), path)
+                deleteat!(moves, i); continue
+            end
+        end
+
+        make_move!(board, m)
+        if in_check(board, side)
+            unmake_move!(board, m)
+            deleteat!(moves, i); continue
+        end
+        unmake_move!(board, m)
+
+        i += 1
+    end
+
+    return moves
+end
