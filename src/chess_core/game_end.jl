@@ -67,7 +67,6 @@ function is_insufficient_material(board::Board)
     return false
 end
 
-
 """
 Check if the game is over (checkmate, stalemate, draw)
 - `board`: Board struct

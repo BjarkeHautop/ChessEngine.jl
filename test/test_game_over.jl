@@ -4,7 +4,7 @@ using Test
 @testset "Game over detection" begin
     b = start_position()
 
-    @test game_over(b) == :ongoing 
+    @test game_over(b) == :ongoing
 
     # Fool's mate position (black wins)
     moves = [

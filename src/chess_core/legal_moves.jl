@@ -1,5 +1,5 @@
 # Internal shared logic for filtering pseudo-legal moves
-function _filter_legal_moves!(board::Board, pseudo::Vector{Move}, moves::Vector{Move}; inplace::Bool=false)
+function _filter_legal_moves!(board::Board, pseudo::Vector{Move}, moves::Vector{Move}; inplace::Bool = false)
     empty!(moves)
     side = board.side_to_move
     opp = opposite(side)
@@ -54,7 +54,7 @@ function generate_legal_moves(board::Board)
         generate_queen_moves(board),
         generate_king_moves(board)
     )
-    _filter_legal_moves!(board, pseudo, Move[]; inplace=false)
+    _filter_legal_moves!(board, pseudo, Move[]; inplace = false)
 end
 
 function generate_legal_moves!(board::Board, moves::Vector{Move})
@@ -65,5 +65,5 @@ function generate_legal_moves!(board::Board, moves::Vector{Move})
     ChessEngine.generate_rook_moves!(board, pseudo)
     ChessEngine.generate_queen_moves!(board, pseudo)
     ChessEngine.generate_king_moves!(board, pseudo)
-    _filter_legal_moves!(board, pseudo, moves; inplace=true)
+    _filter_legal_moves!(board, pseudo, moves; inplace = true)
 end
