@@ -99,7 +99,7 @@ end
     make_move!(b, m1)
     @test b.castling_rights == 0x07
 
-    unmake_move!(b, m1)
+    undo_move!(b, m1)
     @test b.castling_rights == 0x0f
     make_move!(b, m1)
     @test b.castling_rights == 0x07
@@ -107,7 +107,7 @@ end
     m2 = Move("d8", "a1"; capture = W_ROOK)
     make_move!(b, m2)
     @test b.castling_rights == 0x05
-    unmake_move!(b, m2)
+    undo_move!(b, m2)
     @test b.castling_rights == 0x07
     make_move!(b, m2)
     @test b.castling_rights == 0x05
@@ -115,7 +115,7 @@ end
     m3 = Move("a8", "h8"; capture = B_ROOK)
     make_move!(b, m3)
     @test b.castling_rights == 0x01
-    unmake_move!(b, m3)
+    undo_move!(b, m3)
     @test b.castling_rights == 0x05
     make_move!(b, m3)
     @test b.castling_rights == 0x01
@@ -123,7 +123,7 @@ end
     m4 = Move("a1", "h1"; capture = W_ROOK)
     make_move!(b, m4)
     @test b.castling_rights == 0x00
-    unmake_move!(b, m4)
+    undo_move!(b, m4)
     @test b.castling_rights == 0x01
     make_move!(b, m4)
     @test b.castling_rights == 0x00
@@ -140,7 +140,7 @@ end
     @test testbit(b.bitboards[W_KING], square_index(7, 1))  # King on g1
     @test testbit(b.bitboards[W_ROOK], square_index(6, 1))  # Rook on f1
 
-    unmake_move!(b, mv)
+    undo_move!(b, mv)
     @test testbit(b.bitboards[W_KING], square_index(5, 1))  # King back on e1
     @test testbit(b.bitboards[W_ROOK], square_index(8, 1))  # Rook back on h1
 
@@ -151,7 +151,7 @@ end
     make_move!(b, mv)
     @test testbit(b.bitboards[W_KING], square_index(3, 1))  # King on c1
     @test testbit(b.bitboards[W_ROOK], square_index(4, 1))  # Rook on d1
-    unmake_move!(b, mv)
+    undo_move!(b, mv)
     @test testbit(b.bitboards[W_KING], square_index(5, 1))  # King back on e1
     @test testbit(b.bitboards[W_ROOK], square_index(1, 1))  # Rook back on a1
 
@@ -164,7 +164,7 @@ end
     @test testbit(b.bitboards[B_KING], square_index(3, 8))  # King on c8
     @test testbit(b.bitboards[B_ROOK], square_index(4, 8))  # Rook on d8
 
-    unmake_move!(b, mv)
+    undo_move!(b, mv)
     @test testbit(b.bitboards[B_KING], square_index(5, 8))  # King back on e8
     @test testbit(b.bitboards[B_ROOK], square_index(1, 8))  # Rook back on a8
 
@@ -176,7 +176,7 @@ end
     @test testbit(b.bitboards[B_KING], square_index(7, 8))  # King on g8
     @test testbit(b.bitboards[B_ROOK], square_index(6, 8))  # Rook on f8
 
-    unmake_move!(b, mv)
+    undo_move!(b, mv)
     @test testbit(b.bitboards[B_KING], square_index(5, 8))  # King back on e8
     @test testbit(b.bitboards[B_ROOK], square_index(8, 8))  # Rook back on h8
 end

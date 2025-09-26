@@ -4,6 +4,8 @@ using Test
 @testset "Game over detection" begin
     b = start_position()
 
+    @test game_over(b) == :ongoing 
+
     # Fool's mate position (black wins)
     moves = [
         Move(square_index(6, 2), square_index(6, 3)),  # f2 to f3
@@ -94,4 +96,16 @@ using Test
     @test game_over(b) == :draw_fiftymove
     b.side_to_move = BLACK
     @test game_over(b) == :draw_fiftymove
+end
+
+
+@testset "Insufficent material" begin
+    b = board_from_fen("4k3/8/8/8/8/8/8/4K3 w - - 0 1")  # King vs King
+    @test game_over(b) == :draw_insufficient_material
+
+    b = board_from_fen("4k3/8/2b5/8/8/8/2B5/4K3 w - - 0 1") # King and Bishop vs King and Bishop (same color)
+    @test game_over(b) == :draw_insufficient_material
+
+    b = board_from_fen("4k3/8/8/8/8/2N5/8/4K3 w - - 0 1") # King and Knight vs King
+    @test game_over(b) == :draw_insufficient_material
 end
