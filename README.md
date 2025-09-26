@@ -12,8 +12,8 @@ Particularly, *ChessEngine* implements:
 
 - All chess rules
 - Bitboard representation
-- Legal move generation (tested with perft)
-- FEN parsing 
+- Legal move generation (tested with [perft](https://www.chessprogramming.org/Perft))
+- [FEN](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) parsing 
 - Opening book support
 - Minimax search with alpha–beta pruning, iterative deepening, quiescence search, transposition tables, null move pruning, and move ordering heuristics
 - Evaluation function based on piece-square tables
@@ -24,11 +24,7 @@ View the documentation at [https://BjarkeHautop.github.io/ChessEngine.jl/stable/
 
 ## TODO
 
-- Add insufficient material detection
-
 - Add magic bitboards for faster move generation
-
-- Update search to use the faster in place move generation
 
 - Implement into Lichess bot (see https://github.com/lichess-bot-devs/lichess-bot)
 

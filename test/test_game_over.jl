@@ -98,7 +98,6 @@ using Test
     @test game_over(b) == :draw_fiftymove
 end
 
-
 @testset "Insufficent material" begin
     b = board_from_fen("4k3/8/8/8/8/8/8/4K3 w - - 0 1")  # King vs King
     @test game_over(b) == :draw_insufficient_material
