@@ -57,7 +57,7 @@ function move_ordering_score(board::Board, m::Move, ply::Int)
     if m.promotion != 0
         score += abs(PIECE_VALUES[m.promotion]) + promotion_bonus
     end
-    unmake_move!(board, m)
+    undo_move!(board, m)
 
     return score
 end
@@ -163,7 +163,7 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int = 0)
     for move in generate_captures(board)
         make_move!(board, move)
         score = quiescence(board, α, β; ply = ply+1)
-        unmake_move!(board, move)
+        undo_move!(board, move)
 
         if side_to_move == WHITE
             if score > best_score
@@ -251,7 +251,8 @@ function _search(board::Board, depth::Int;
         end
     end
 
-    moves = generate_legal_moves(board)
+    moves = Vector{Move}(undef, 0)
+    generate_legal_moves!(board, moves)
     moves = sort(moves; by = m -> -move_ordering_score(board, m, ply))
 
     if isempty(moves)
@@ -275,7 +276,7 @@ function _search(board::Board, depth::Int;
         make_move!(board, m)
         result = _search(board, depth - 1; ply = ply + 1, α = α, β = β,
             opening_book = opening_book, stop_time = stop_time)
-        unmake_move!(board, m)
+        undo_move!(board, m)
 
         # Alpha-beta update
         if board.side_to_move == WHITE

@@ -8,7 +8,7 @@ using Test
     original_hash = zobrist_hash(b)
     m1 = Move("e2", "e4")
     make_move!(b, m1)
-    unmake_move!(b, m1)
+    undo_move!(b, m1)
     @test b == original_board
     @test zobrist_hash(b) == original_hash
 end
@@ -24,7 +24,7 @@ end
 
     original_hash = zobrist_hash(b)
     make_move!(b, m_capture)
-    unmake_move!(b, m_capture)
+    undo_move!(b, m_capture)
     @test b == original_board
     @test zobrist_hash(b) == original_hash
 end
@@ -49,7 +49,7 @@ end
     original_hash = zobrist_hash(b)
     m_promo = Move("b7", "b8"; promotion = W_QUEEN)
     make_move!(b, m_promo)
-    unmake_move!(b, m_promo)
+    undo_move!(b, m_promo)
     @test b == original_board
     @test zobrist_hash(b) == original_hash
 end
@@ -74,7 +74,7 @@ end
     original_hash = zobrist_hash(b)
     m_promo = Move("b7", "a8"; capture = B_ROOK, promotion = W_QUEEN)
     make_move!(b, m_promo)
-    unmake_move!(b, m_promo)
+    undo_move!(b, m_promo)
     @test b == original_board
     @test zobrist_hash(b) == original_hash
 end
@@ -88,7 +88,7 @@ end
     original_board = deepcopy(b)
     original_hash = zobrist_hash(b)
     make_move!(b, m_castle)
-    unmake_move!(b, m_castle)
+    undo_move!(b, m_castle)
     @test b == original_board
     @test zobrist_hash(b) == original_hash
 end
@@ -102,7 +102,7 @@ end
     original_board = deepcopy(b)
     original_hash = zobrist_hash(b)
     make_move!(b, m_ep)
-    unmake_move!(b, m_ep)
+    undo_move!(b, m_ep)
     @test b == original_board
     @test zobrist_hash(b) == original_hash
 end

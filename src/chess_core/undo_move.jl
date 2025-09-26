@@ -2,7 +2,7 @@
 Undo move `m` on `board`, restoring previous state.
 Relies on the UndoInfo pushed during make_move!.
 """
-function unmake_move!(board::Board, m::Move)
+function undo_move!(board::Board, m::Move)
     # --- 1. Flip side back ---
     board.side_to_move = board.side_to_move == WHITE ? BLACK : WHITE
 

@@ -72,7 +72,7 @@ end
     @test eval_score == b.eval_score
 
     make_move!(b, Move("d1", "c4"; capture = B_PAWN))
-    unmake_move!(b, Move("d1", "c4"; capture = B_PAWN))
+    undo_move!(b, Move("d1", "c4"; capture = B_PAWN))
     @test game_phase_value == b.game_phase_value
     @test eval_score == b.eval_score
 end

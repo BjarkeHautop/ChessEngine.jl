@@ -13,7 +13,7 @@ function perft(board::Board, depth::Int)
     for move in generate_legal_moves(board)
         make_move!(board, move)
         nodes += perft(board, depth - 1)
-        unmake_move!(board, move)
+        undo_move!(board, move)
     end
 
     return nodes
@@ -26,7 +26,6 @@ Fast perft function using a preallocated moves buffer
 to avoid repeated allocations. Ideal for benchmarking.
 """
 function perft_fast(board::Board, depth::Int)
-    # preallocate a moves buffer large enough for any node
     moves = Vector{Move}(undef, 256)  # 256 is safely larger than max legal moves
     return _perft_fast!(board, depth, moves)
 end
@@ -48,7 +47,7 @@ function _perft_fast!(board::Board, depth::Int, moves::Vector{Move})
         move = moves[i]
         make_move!(board, move)
         nodes += _perft_fast!(board, depth - 1, moves_child)
-        unmake_move!(board, move)
+        undo_move!(board, move)
     end
 
     return nodes
