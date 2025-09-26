@@ -17,6 +17,7 @@ export square_attacked, king_square, piece_at, generate_captures
 export display_board
 export zobrist_hash
 export unmake_move!
+export perft, perft_fast, generate_legal_moves!
 
 export make_null_move!, unmake_null_move!
 include("piece_square_tables.jl")

@@ -58,3 +58,4 @@ function generate_legal_moves(board::Board)
 
     return legal
 end
+

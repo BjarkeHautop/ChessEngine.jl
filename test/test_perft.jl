@@ -1,0 +1,22 @@
+using ChessEngine
+using Test
+
+@testset "perft tests" begin
+    b = start_position()
+    @test perft(b, 0) == 1
+    @test perft(b, 1) == 20
+    @test perft(b, 2) == 400
+    @test perft(b, 3) == 8902
+    @test perft(b, 4) == 197281
+    @test perft(b, 5) == 4865609
+end
+
+@testset "perft fast tests" begin
+    b = start_position()
+    @test perft_fast(b, 0) == 1
+    @test perft_fast(b, 1) == 20
+    @test perft_fast(b, 2) == 400
+    @test perft_fast(b, 3) == 8902
+    @test perft_fast(b, 4) == 197281
+    @test perft_fast(b, 5) == 4865609
+end
