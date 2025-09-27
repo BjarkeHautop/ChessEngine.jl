@@ -36,16 +36,11 @@ end
     @test count_ones(variations[end]) == n_bits
 end
 
-function bishop_attack_naive(sq)
-    # full board, no blockers
-    return ChessEngine.bishop_attack_from_occupancy(sq, 0)
-end
-
 @testset "BISHOP_ATTACKS basic sanity" begin
     # Example: bishop on a1 (0) on empty board
     sq = 0
     expected = UInt64(0x8040201008040200)  # a1-h8 diagonal
-    attacks = bishop_attack_naive(sq)
+    attacks = ChessEngine.bishop_attack_from_occupancy(sq, 0)
     @test attacks == expected
 
     # Example: bishop on a1 with blocker on c3
@@ -56,6 +51,28 @@ end
     
     # a1 bishop can move b2 (index 9) and c3 (index 18), but stops at c3
     expected = (UInt64(1) << 9) | (UInt64(1) << 18)
+    
+    @test attacks == expected
+end
+
+@testset "ROOK_ATTACKS basic sanity" begin
+    # Example: rook on a1 (0) on empty board
+    sq = 0
+    expected = UInt64(0x01010101010101FE)  # a-file and 1st rank
+    attacks = ChessEngine.rook_attack_from_occupancy(sq, 0)
+    @test attacks == expected
+
+    # Example: rook on a1 with blocker on a4
+    # a4 = file 1, rank 4 → square_index = (4-1)*8 + (1-1) = 3*8 + 0 = 24
+    blocker = UInt64(1) << 24
+    occ = blocker
+    attacks = ChessEngine.rook_attack_from_occupancy(sq, occ)
+    
+    # a1 rook can move a2 (index 8), a3 (index 16), and a4 (index 24), but stops at a4
+    # and can move along the 1st rank to b1..h1 (indexes 1..7)
+    expected = expected = ((UInt64(1) << 1) | (UInt64(1) << 2) | (UInt64(1) << 3) |
+                (UInt64(1) << 4) | (UInt64(1) << 5) | (UInt64(1) << 6) | (UInt64(1) << 7)) |  # b1–h1
+               ((UInt64(1) << 8) | (UInt64(1) << 16) | (UInt64(1) << 24))
     
     @test attacks == expected
 end
