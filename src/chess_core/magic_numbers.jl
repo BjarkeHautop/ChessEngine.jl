@@ -11,8 +11,7 @@ using Serialization
 # serialize(joinpath(ChessEngine.ASSET_DIR, "rook_magics.bin"), ROOK_MAGICS)
 # serialize(joinpath(ChessEngine.ASSET_DIR, "queen_magics.bin"), QUEEN_MAGICS)
 
-
 # Load them
 const BISHOP_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR, "bishop_magics.bin"))
-const ROOK_MAGICS   = deserialize(joinpath(ChessEngine.ASSET_DIR, "rook_magics.bin"))
-const QUEEN_MAGICS  = deserialize(joinpath(ChessEngine.ASSET_DIR, "queen_magics.bin"))
+const ROOK_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR, "rook_magics.bin"))
+const QUEEN_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR, "queen_magics.bin"))

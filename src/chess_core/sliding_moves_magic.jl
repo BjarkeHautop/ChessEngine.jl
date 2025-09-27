@@ -1,5 +1,7 @@
 # Utility to iterate over set bits in a UInt64
-_iter_bits(bb::UInt64) = Iterators.flatten((trailing_zeros(bb & (-bb)) for _ in 1:count_ones(bb)))
+function _iter_bits(bb::UInt64)
+    Iterators.flatten((trailing_zeros(bb & (-bb)) for _ in 1:count_ones(bb)))
+end
 
 function occupied_bb(board::Board)
     occ = UInt64(0)
@@ -9,7 +11,6 @@ function occupied_bb(board::Board)
     return occ
 end
 
-
 """
 Generate pseudo-legal moves for a sliding piece using magic bitboards.
 - bb_piece: bitboard of the moving piece
@@ -17,7 +18,7 @@ Generate pseudo-legal moves for a sliding piece using magic bitboards.
 - friendly_pieces, enemy_pieces: arrays of piece indices
 """
 function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
-                                      mask_table, attack_table, magic_table)
+        mask_table, attack_table, magic_table)
     moves = Move[]
 
     # Define friendly and enemy pieces
@@ -25,9 +26,9 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
                       [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING] :
                       [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING]
 
-    enemy_pieces    = board.side_to_move == WHITE ?
-                      [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING] :
-                      [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING]
+    enemy_pieces = board.side_to_move == WHITE ?
+                   [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING] :
+                   [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING]
 
     # Compute friendly occupancy
     friendly_bb = UInt64(0)
@@ -42,13 +43,13 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
         end
 
         # Occupancy restricted to mask
-        mask = mask_table[sq+1]
+        mask = mask_table[sq + 1]
         occ = occupied_bb(board) & mask
 
         # Magic lookup
         shift = 64 - count_bits(mask)
-        index = Int((occ * magic_table[sq+1]) >> shift) + 1
-        attacks = attack_table[sq+1][index]
+        index = Int((occ * magic_table[sq + 1]) >> shift) + 1
+        attacks = attack_table[sq + 1][index]
 
         # Iterate over attack squares, stop at blockers
         attack_sq = attacks
@@ -69,7 +70,7 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
                 end
             end
 
-            push!(moves, Move(sq, to_sq; capture=capture))
+            push!(moves, Move(sq, to_sq; capture = capture))
 
             # Stop if square had any piece (friendly already handled, enemy capture stops ray)
             if capture != 0
@@ -86,7 +87,7 @@ end
 
 # In-place variant
 function generate_sliding_moves_magic!(board::Board, bb_piece::UInt64,
-                                       mask_table, attack_table, magic_table, moves::Vector{Move})
+        mask_table, attack_table, magic_table, moves::Vector{Move})
     len_before = length(moves)
 
     # Define friendly and enemy pieces
@@ -94,9 +95,9 @@ function generate_sliding_moves_magic!(board::Board, bb_piece::UInt64,
                       [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING] :
                       [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING]
 
-    enemy_pieces    = board.side_to_move == WHITE ?
-                      [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING] :
-                      [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING]
+    enemy_pieces = board.side_to_move == WHITE ?
+                   [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING] :
+                   [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING]
 
     # Compute friendly occupancy
     friendly_bb = UInt64(0)
@@ -111,13 +112,13 @@ function generate_sliding_moves_magic!(board::Board, bb_piece::UInt64,
         end
 
         # Occupancy restricted to mask
-        mask = mask_table[sq+1]
+        mask = mask_table[sq + 1]
         occ = occupied_bb(board) & mask
 
         # Magic lookup
         shift = 64 - count_bits(mask)
-        index = Int((occ * magic_table[sq+1]) >> shift) + 1
-        attacks = attack_table[sq+1][index]
+        index = Int((occ * magic_table[sq + 1]) >> shift) + 1
+        attacks = attack_table[sq + 1][index]
 
         # Iterate over attack squares, stop at blockers
         attack_sq = attacks
@@ -138,7 +139,7 @@ function generate_sliding_moves_magic!(board::Board, bb_piece::UInt64,
                 end
             end
 
-            push!(moves, Move(sq, to_sq; capture=capture))
+            push!(moves, Move(sq, to_sq; capture = capture))
 
             # Stop if square had any piece (friendly already handled, enemy capture stops ray)
             if capture != 0
@@ -158,12 +159,14 @@ end
 # ========================
 function generate_bishop_moves_magic(board::Board)
     bb = board.side_to_move == WHITE ? board.bitboards[W_BISHOP] : board.bitboards[B_BISHOP]
-    return generate_sliding_moves_magic(board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS)
+    return generate_sliding_moves_magic(
+        board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS)
 end
 
 function generate_bishop_moves_magic!(board::Board, moves::Vector{Move})
     bb = board.side_to_move == WHITE ? board.bitboards[W_BISHOP] : board.bitboards[B_BISHOP]
-    return generate_sliding_moves_magic!(board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS, moves)
+    return generate_sliding_moves_magic!(
+        board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS, moves)
 end
 
 # ========================
@@ -176,7 +179,8 @@ end
 
 function generate_rook_moves_magic!(board::Board, moves::Vector{Move})
     bb = board.side_to_move == WHITE ? board.bitboards[W_ROOK] : board.bitboards[B_ROOK]
-    return generate_sliding_moves_magic!(board, bb, ROOK_MASKS, ROOK_ATTACKS, ROOK_MAGICS, moves)
+    return generate_sliding_moves_magic!(
+        board, bb, ROOK_MASKS, ROOK_ATTACKS, ROOK_MAGICS, moves)
 end
 
 # ========================
@@ -189,5 +193,6 @@ end
 
 function generate_queen_moves_magic!(board::Board, moves::Vector{Move})
     bb = board.side_to_move == WHITE ? board.bitboards[W_QUEEN] : board.bitboards[B_QUEEN]
-    return generate_sliding_moves_magic!(board, bb, QUEEN_MASKS, QUEEN_ATTACKS, QUEEN_MAGICS, moves)
+    return generate_sliding_moves_magic!(
+        board, bb, QUEEN_MASKS, QUEEN_ATTACKS, QUEEN_MAGICS, moves)
 end

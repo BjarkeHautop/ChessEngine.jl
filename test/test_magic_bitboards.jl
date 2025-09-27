@@ -22,10 +22,10 @@ end
 
 @testset "Occupancy variations" begin
     # Bishop on a1: mask = b2..g7 (6 bits)
-    mask = ChessEngine.bishop_mask(0)  
+    mask = ChessEngine.bishop_mask(0)
     variations = ChessEngine.occupancy_variations(mask)
     n_bits = count_ones(mask)
-    
+
     # Number of variations = 2^n
     @test length(variations) == 2^n_bits
 
@@ -48,10 +48,10 @@ end
     blocker = UInt64(1) << 18
     occ = blocker
     attacks = ChessEngine.bishop_attack_from_occupancy(sq, occ)
-    
+
     # a1 bishop can move b2 (index 9) and c3 (index 18), but stops at c3
     expected = (UInt64(1) << 9) | (UInt64(1) << 18)
-    
+
     @test attacks == expected
 end
 
@@ -67,12 +67,13 @@ end
     blocker = UInt64(1) << 24
     occ = blocker
     attacks = ChessEngine.rook_attack_from_occupancy(sq, occ)
-    
+
     # a1 rook can move a2 (index 8), a3 (index 16), and a4 (index 24), but stops at a4
     # and can move along the 1st rank to b1..h1 (indexes 1..7)
     expected = expected = ((UInt64(1) << 1) | (UInt64(1) << 2) | (UInt64(1) << 3) |
-                (UInt64(1) << 4) | (UInt64(1) << 5) | (UInt64(1) << 6) | (UInt64(1) << 7)) |  # b1–h1
-               ((UInt64(1) << 8) | (UInt64(1) << 16) | (UInt64(1) << 24))
-    
+                           (UInt64(1) << 4) | (UInt64(1) << 5) | (UInt64(1) << 6) |
+                           (UInt64(1) << 7)) |  # b1–h1
+                          ((UInt64(1) << 8) | (UInt64(1) << 16) | (UInt64(1) << 24))
+
     @test attacks == expected
 end
