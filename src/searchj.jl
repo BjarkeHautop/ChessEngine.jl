@@ -203,7 +203,8 @@ struct SearchResult
 end
 
 # Alpha-beta search with quiescence at leaves
-function _search(board::Board, depth::Int;
+function _search(board::Board;
+        depth::Int,
         ply::Int = 0,
         α::Int = -MATE_VALUE,
         β::Int = MATE_VALUE,
@@ -240,7 +241,7 @@ function _search(board::Board, depth::Int;
     R = 2  # reduction factor for null move pruning
     if depth > R + 1 && !is_endgame(board)
         make_null_move!(board)  # side passes
-        result = _search(board, depth - 1 - R; ply = ply + 1, α = -β, β = -β + 1,
+        result = _search(board; depth = depth - 1 - R, ply = ply + 1, α = -β, β = -β + 1,
             opening_book = nothing, stop_time = stop_time)
         unmake_null_move!(board)
 
@@ -274,7 +275,7 @@ function _search(board::Board, depth::Int;
         end
 
         make_move!(board, m)
-        result = _search(board, depth - 1; ply = ply + 1, α = α, β = β,
+        result = _search(board; depth = depth - 1, ply = ply + 1, α = α, β = β,
             opening_book = opening_book, stop_time = stop_time)
         undo_move!(board, m)
 
@@ -359,7 +360,7 @@ function search_root(board::Board, max_depth::Int;
     end
 
     for depth in 1:max_depth
-        result = _search(board, depth; ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
+        result = _search(board; depth = depth, ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
             stop_time = stop_time, opening_book = nothing)
         if result.move !== nothing
             best_result = result
@@ -405,8 +406,8 @@ Returns:
 - `(best_score, best_move)`
 """
 function search(
-        board::Board,
-        depth::Int;
+        board::Board;
+        depth::Int,
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose::Bool = false,
         time_budget::Int = typemax(Int)

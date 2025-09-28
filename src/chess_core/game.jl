@@ -41,7 +41,7 @@ function search_with_time(
             break
         end
 
-        result = _search(game.board, depth;
+        result = _search(game.board; depth,
             ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
             opening_book = depth == 1 ? opening_book : nothing,  # book only at root
             stop_time = stop_time)
@@ -93,6 +93,18 @@ function make_timed_move!(
         println("White time (ms): ", game.white_time, " Black time (ms): ", game.black_time)
     end
 end
+
+# Non-mutating version
+function make_timed_move(
+        game::Game;
+        opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
+        verbose = false
+)
+    game_copy = deepcopy(game)
+    make_timed_move!(game_copy; opening_book = opening_book, verbose = verbose)
+    return game_copy
+end
+
 
 """
 Check for threefold repetition

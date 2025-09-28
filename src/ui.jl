@@ -31,12 +31,12 @@ function display_board(board::Board)
     fig = Figure(; size = (600, 600))
     ax = CairoMakie.Axis(
         fig[1, 1];
-        aspect = CairoMakie.DataAspect(),
-        xticksvisible = false,
-        yticksvisible = false,
-        xgridvisible = false,
-        ygridvisible = false
+        aspect = DataAspect()
     )
+
+    ax.xticks = (collect(0.5:1:7.5), ["a","b","c","d","e","f","g","h"])
+    ax.yticks = (collect(0.5:1:7.5), ["1","2","3","4","5","6","7","8"])
+
 
     # Colors
     light = RGB(0.93, 0.81, 0.65)
@@ -44,7 +44,6 @@ function display_board(board::Board)
 
     # Squares
     for rank in 1:8, file in 1:8
-
         color = isodd(rank + file) ? dark : light
         poly!(ax, Rect(file-1, rank-1, 1, 1); color = color)
     end
@@ -54,7 +53,7 @@ function display_board(board::Board)
         for sq in 0:63
             if testbit(bb, sq)
                 file = (sq % 8) + 1
-                rank = (sq ÷ 8) + 1   # rank 1 at bottom
+                rank = (sq ÷ 8) + 1
                 img = PIECE_PIXELS[ptype]
                 image!(ax, file-1 .. file, rank-1 .. rank, img)
             end
@@ -65,4 +64,12 @@ function display_board(board::Board)
     fig
 end
 
-display_board(game::Game) = display_board(game.board)
+import Base: display
+
+function display(board::Board)
+    display_board(board)
+end
+
+function display(game::Game)
+    display_board(game.board)
+end
