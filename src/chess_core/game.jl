@@ -232,7 +232,7 @@ end
     game_over(game::Game)
 
 Check if the game is over (checkmate, stalemate, draw)
-- `board`: Board struct
+- `game`: Game struct
 Returns: Symbol (:checkmate_white, :checkmate_black, :stalemate, :draw_threefold, :draw_fiftymove, 
 :draw_insufficient_material, :ongoing)
 """

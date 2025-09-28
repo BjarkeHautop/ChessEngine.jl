@@ -51,6 +51,14 @@ We can undo a move using `undo_move` or the in-place version `undo_move!`:
 undo_move!(board, mv)
 ```
 
+Note, that `make_move` allows for illegal moves. (Add a check for legality later)?
+
+You can check if the game is over using `game_over`:
+
+```julia
+game_over(board)
+```
+
 ## Using the Engine
 
 We can generate a move using the chess engine:

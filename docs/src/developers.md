@@ -1,8 +1,8 @@
-# Internal API Reference
-
-```@index
-Pages = ["developers.md"]
+```@meta
+CollapsedDocStrings = true
 ```
+
+# Internal API Reference
 
 ```@autodocs
 Modules = [ChessEngine]

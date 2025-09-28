@@ -27,9 +27,3 @@ View the documentation at [https://BjarkeHautop.github.io/ChessEngine.jl/stable/
 - Add magic bitboards for faster move generation
 
 - Implement into Lichess bot (see https://github.com/lichess-bot-devs/lichess-bot)
-
-- Improve API
-
-- Improve documentation
-
-- Implement UCI?
