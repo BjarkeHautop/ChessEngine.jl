@@ -3,7 +3,10 @@
 #########################
 
 """
+    Move
+
 A chess move.
+
 - `from` and `to` are square indices 0..63
 - `promotion` is the piece type promoted to (0 if none)
 - `capture` is captured piece type (0 if none)

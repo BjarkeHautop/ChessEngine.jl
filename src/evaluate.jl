@@ -1,25 +1,25 @@
 # Piece values for move ordering
 const PIECE_VALUES = Dict(
-    W_PAWN => 100,
-    B_PAWN => -100,
-    W_KNIGHT => 300,
-    B_KNIGHT => -300,
-    W_BISHOP => 300,
-    B_BISHOP => -300,
-    W_ROOK => 500,
-    B_ROOK => -500,
-    W_QUEEN => 1000,
-    B_QUEEN => -1000,
-    W_KING => 0,
-    B_KING => 0
+    Piece.W_PAWN => 100,
+    Piece.B_PAWN => -100,
+    Piece.W_KNIGHT => 300,
+    Piece.B_KNIGHT => -300,
+    Piece.W_BISHOP => 300,
+    Piece.B_BISHOP => -300,
+    Piece.W_ROOK => 500,
+    Piece.B_ROOK => -500,
+    Piece.W_QUEEN => 1000,
+    Piece.B_QUEEN => -1000,
+    Piece.W_KING => 0,
+    Piece.B_KING => 0
 )
 
 # material weight used for phase calculation
 function phase_weight(p)
-    (p == W_QUEEN || p == B_QUEEN) ? 4 :
-    (p == W_ROOK || p == B_ROOK) ? 2 :
-    (p == W_BISHOP||p == B_BISHOP ||
-     p == W_KNIGHT||p == B_KNIGHT) ? 1 : 0
+    (p == Piece.W_QUEEN || p == Piece.B_QUEEN) ? 4 :
+    (p == Piece.W_ROOK || p == Piece.B_ROOK) ? 2 :
+    (p == Piece.W_BISHOP||p == Piece.B_BISHOP ||
+     p == Piece.W_KNIGHT||p == Piece.B_KNIGHT) ? 1 : 0
 end
 
 # convert Board's phase counter into float

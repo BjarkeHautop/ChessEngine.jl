@@ -1,4 +1,5 @@
 """
+    make_move!(board, m)
 Apply move `m` to board, modifying it in place.
 - `board`: Board struct
 - `m`: Move
@@ -7,14 +8,14 @@ function make_move!(board::Board, m::Move)
     # --- Identify moving piece ---
     piece_type = 0
     if board.side_to_move == WHITE
-        for p in W_PAWN:W_KING
+        for p in Piece.W_PAWN:Piece.W_KING
             if testbit(board.bitboards[p], m.from)
                 piece_type = p
                 break
             end
         end
     else
-        for p in B_PAWN:B_KING
+        for p in Piece.B_PAWN:Piece.B_KING
             if testbit(board.bitboards[p], m.from)
                 piece_type = p
                 break
@@ -25,7 +26,7 @@ function make_move!(board::Board, m::Move)
 
     # --- Detect en passant capture ---
     is_ep = false
-    if piece_type in (W_PAWN, B_PAWN) && m.to == board.en_passant
+    if piece_type in (Piece.W_PAWN, Piece.B_PAWN) && m.to == board.en_passant
         is_ep = true
     end
 
@@ -59,14 +60,14 @@ function make_move!(board::Board, m::Move)
     elseif is_ep
         if board.side_to_move == WHITE
             captured_sq = m.to - 8
-            board.bitboards[B_PAWN] = clearbit(board.bitboards[B_PAWN], captured_sq)
-            board.eval_score -= piece_square_value(B_PAWN, captured_sq, game_phase(board))
-            board.game_phase_value -= phase_weight(B_PAWN)
+            board.bitboards[Piece.B_PAWN] = clearbit(board.bitboards[Piece.B_PAWN], captured_sq)
+            board.eval_score -= piece_square_value(Piece.B_PAWN, captured_sq, game_phase(board))
+            board.game_phase_value -= phase_weight(Piece.B_PAWN)
         else
             captured_sq = m.to + 8
-            board.bitboards[W_PAWN] = clearbit(board.bitboards[W_PAWN], captured_sq)
-            board.eval_score -= piece_square_value(W_PAWN, captured_sq, game_phase(board))
-            board.game_phase_value -= phase_weight(W_PAWN)
+            board.bitboards[Piece.W_PAWN] = clearbit(board.bitboards[Piece.W_PAWN], captured_sq)
+            board.eval_score -= piece_square_value(Piece.W_PAWN, captured_sq, game_phase(board))
+            board.game_phase_value -= phase_weight(Piece.W_PAWN)
         end
     end
 
@@ -82,51 +83,51 @@ function make_move!(board::Board, m::Move)
     end
 
     # --- Castling rook moves ---
-    if piece_type == W_KING && m.from == 4 && abs(m.to - m.from) == 2
+    if piece_type == Piece.W_KING && m.from == 4 && abs(m.to - m.from) == 2
         if m.to == 6      # short castle (e1 → g1)
-            board.bitboards[W_ROOK] = clearbit(board.bitboards[W_ROOK], 7)
-            board.bitboards[W_ROOK] = setbit(board.bitboards[W_ROOK], 5)
-            board.eval_score -= piece_square_value(W_ROOK, 7, game_phase(board))
-            board.eval_score += piece_square_value(W_ROOK, 5, game_phase(board))
+            board.bitboards[Piece.W_ROOK] = clearbit(board.bitboards[Piece.W_ROOK], 7)
+            board.bitboards[Piece.W_ROOK] = setbit(board.bitboards[Piece.W_ROOK], 5)
+            board.eval_score -= piece_square_value(Piece.W_ROOK, 7, game_phase(board))
+            board.eval_score += piece_square_value(Piece.W_ROOK, 5, game_phase(board))
         elseif m.to == 2  # long castle (e1 → c1)
-            board.bitboards[W_ROOK] = clearbit(board.bitboards[W_ROOK], 0)
-            board.bitboards[W_ROOK] = setbit(board.bitboards[W_ROOK], 3)
-            board.eval_score -= piece_square_value(W_ROOK, 0, game_phase(board))
-            board.eval_score += piece_square_value(W_ROOK, 3, game_phase(board))
+            board.bitboards[Piece.W_ROOK] = clearbit(board.bitboards[Piece.W_ROOK], 0)
+            board.bitboards[Piece.W_ROOK] = setbit(board.bitboards[Piece.W_ROOK], 3)
+            board.eval_score -= piece_square_value(Piece.W_ROOK, 0, game_phase(board))
+            board.eval_score += piece_square_value(Piece.W_ROOK, 3, game_phase(board))
         end
-    elseif piece_type == B_KING && m.from == 60 && abs(m.to - m.from) == 2
+    elseif piece_type == Piece.B_KING && m.from == 60 && abs(m.to - m.from) == 2
         if m.to == 62     # short castle (e8 → g8)
-            board.bitboards[B_ROOK] = clearbit(board.bitboards[B_ROOK], 63)
-            board.bitboards[B_ROOK] = setbit(board.bitboards[B_ROOK], 61)
-            board.eval_score -= piece_square_value(B_ROOK, 63, game_phase(board))
-            board.eval_score += piece_square_value(B_ROOK, 61, game_phase(board))
+            board.bitboards[Piece.B_ROOK] = clearbit(board.bitboards[Piece.B_ROOK], 63)
+            board.bitboards[Piece.B_ROOK] = setbit(board.bitboards[Piece.B_ROOK], 61)
+            board.eval_score -= piece_square_value(Piece.B_ROOK, 63, game_phase(board))
+            board.eval_score += piece_square_value(Piece.B_ROOK, 61, game_phase(board))
         elseif m.to == 58 # long castle (e8 → c8)
-            board.bitboards[B_ROOK] = clearbit(board.bitboards[B_ROOK], 56)
-            board.bitboards[B_ROOK] = setbit(board.bitboards[B_ROOK], 59)
-            board.eval_score -= piece_square_value(B_ROOK, 56, game_phase(board))
-            board.eval_score += piece_square_value(B_ROOK, 59, game_phase(board))
+            board.bitboards[Piece.B_ROOK] = clearbit(board.bitboards[Piece.B_ROOK], 56)
+            board.bitboards[Piece.B_ROOK] = setbit(board.bitboards[Piece.B_ROOK], 59)
+            board.eval_score -= piece_square_value(Piece.B_ROOK, 56, game_phase(board))
+            board.eval_score += piece_square_value(Piece.B_ROOK, 59, game_phase(board))
         end
     end
 
     # --- Update en passant target square ---
     board.en_passant = -1
-    if piece_type == W_PAWN && (m.to - m.from) == 16
+    if piece_type == Piece.W_PAWN && (m.to - m.from) == 16
         board.en_passant = m.from + 8
-    elseif piece_type == B_PAWN && (m.from - m.to) == 16
+    elseif piece_type == Piece.B_PAWN && (m.from - m.to) == 16
         board.en_passant = m.from - 8
     end
 
     # --- Update castling rights ---
 
     # If a king moved, clear both its castling bits
-    if piece_type == W_KING
+    if piece_type == Piece.W_KING
         board.castling_rights &= 0x0c   # clear 0x01 and 0x02 -> keep only 0x0c (1100)
-    elseif piece_type == B_KING
+    elseif piece_type == Piece.B_KING
         board.castling_rights &= 0x03   # clear 0x04 and 0x08 -> keep only 0x03 (0011)
     end
 
     # If a rook moved FROM its original square, clear that side's right.
-    if piece_type == W_ROOK
+    if piece_type == Piece.W_ROOK
         if m.from == 0                   # a1
             board.castling_rights &= 0x0d   # clear White Q (0x02) -> 0x0f & ~0x02 = 0x0d
         elseif m.from == 7               # h1
@@ -134,7 +135,7 @@ function make_move!(board::Board, m::Move)
         end
     end
 
-    if piece_type == B_ROOK
+    if piece_type == Piece.B_ROOK
         if m.from == 56                  # a8
             board.castling_rights &= 0x07   # clear Black q (0x08) -> 0x0f & ~0x08 = 0x07
         elseif m.from == 63              # h8
@@ -143,13 +144,13 @@ function make_move!(board::Board, m::Move)
     end
 
     # If a rook was captured ON its original square, clear that side's right.
-    if m.capture == W_ROOK
+    if m.capture == Piece.W_ROOK
         if m.to == 0
             board.castling_rights &= 0x0d   # clear White Q
         elseif m.to == 7
             board.castling_rights &= 0x0e   # clear White K
         end
-    elseif m.capture == B_ROOK
+    elseif m.capture == Piece.B_ROOK
         if m.to == 56
             board.castling_rights &= 0x07   # clear Black q
         elseif m.to == 63
@@ -158,7 +159,7 @@ function make_move!(board::Board, m::Move)
     end
 
     # --- Halfmove clock (50-move rule) ---
-    if piece_type in (W_PAWN, B_PAWN) || m.capture != 0 || m.promotion != 0
+    if piece_type in (Piece.W_PAWN, Piece.B_PAWN) || m.capture != 0 || m.promotion != 0
         board.halfmove_clock = 0
     else
         board.halfmove_clock += 1
@@ -170,6 +171,8 @@ function make_move!(board::Board, m::Move)
 end
 
 """
+    make_move(board, m) -> Board
+
 Return a new board with move `m` applied, leaving the original board unchanged.
 - `board`: Board struct
 - `m`: Move

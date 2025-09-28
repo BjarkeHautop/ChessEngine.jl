@@ -22,43 +22,43 @@ end
     idx = ChessEngine.psqt_index(square)
 
     # Pawns
-    @test ChessEngine.piece_square_value(W_PAWN, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.W_PAWN, square, 1.0) ==
           ChessEngine.PAWN_TABLE_W[idx]
-    @test ChessEngine.piece_square_value(B_PAWN, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.B_PAWN, square, 1.0) ==
           -ChessEngine.PAWN_TABLE_B[idx]
 
     # Knights
-    @test ChessEngine.piece_square_value(W_KNIGHT, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.W_KNIGHT, square, 1.0) ==
           ChessEngine.KNIGHT_TABLE_W[idx]
-    @test ChessEngine.piece_square_value(B_KNIGHT, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.B_KNIGHT, square, 1.0) ==
           -ChessEngine.KNIGHT_TABLE_B[idx]
 
     # Bishops
-    @test ChessEngine.piece_square_value(W_BISHOP, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.W_BISHOP, square, 1.0) ==
           ChessEngine.BISHOP_TABLE_W[idx]
-    @test ChessEngine.piece_square_value(B_BISHOP, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.B_BISHOP, square, 1.0) ==
           -ChessEngine.BISHOP_TABLE_B[idx]
 
     # Rooks
-    @test ChessEngine.piece_square_value(W_ROOK, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.W_ROOK, square, 1.0) ==
           ChessEngine.ROOK_TABLE_W[idx]
-    @test ChessEngine.piece_square_value(B_ROOK, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.B_ROOK, square, 1.0) ==
           -ChessEngine.ROOK_TABLE_B[idx]
 
     # Queens
-    @test ChessEngine.piece_square_value(W_QUEEN, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.W_QUEEN, square, 1.0) ==
           ChessEngine.QUEEN_TABLE_W[idx]
-    @test ChessEngine.piece_square_value(B_QUEEN, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.B_QUEEN, square, 1.0) ==
           -ChessEngine.QUEEN_TABLE_B[idx]
 
     # Kings
-    @test ChessEngine.piece_square_value(W_KING, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.W_KING, square, 1.0) ==
           ChessEngine.KING_TABLE_W[idx]
-    @test ChessEngine.piece_square_value(W_KING, square, 0.0) ==
+    @test ChessEngine.piece_square_value(Piece.W_KING, square, 0.0) ==
           ChessEngine.KING_TABLE_END_W[idx]
-    @test ChessEngine.piece_square_value(B_KING, square, 1.0) ==
+    @test ChessEngine.piece_square_value(Piece.B_KING, square, 1.0) ==
           -ChessEngine.KING_TABLE_B[idx]
-    @test ChessEngine.piece_square_value(B_KING, square, 0.0) ==
+    @test ChessEngine.piece_square_value(Piece.B_KING, square, 0.0) ==
           -ChessEngine.KING_TABLE_END_B[idx]
 
     # Interpolation check (mid-phase)
@@ -68,8 +68,8 @@ end
     expected_black = round(
         Int, -(0.5 * ChessEngine.KING_TABLE_B[idx] +
                0.5 * ChessEngine.KING_TABLE_END_B[idx]))
-    @test ChessEngine.piece_square_value(W_KING, square, phase) == expected_white
-    @test ChessEngine.piece_square_value(B_KING, square, phase) == expected_black
+    @test ChessEngine.piece_square_value(Piece.W_KING, square, phase) == expected_white
+    @test ChessEngine.piece_square_value(Piece.B_KING, square, phase) == expected_black
 
     # Invalid piece should throw
     @test_throws ErrorException ChessEngine.piece_square_value(999, square, 1.0)

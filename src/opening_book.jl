@@ -48,8 +48,8 @@ const BLACK_QUEEN = 0x8  # q
 
 # Map board piece constants to Polyglot piece indices (0..11)
 const POLYGLOT_PIECE_INDEX = Dict(
-    B_PAWN => 0, W_PAWN => 1, B_KNIGHT => 2, W_KNIGHT => 3, B_BISHOP => 4, W_BISHOP => 5,
-    B_ROOK => 6, W_ROOK => 7, B_QUEEN => 8, W_QUEEN => 9, B_KING => 10, W_KING => 11
+    Piece.B_PAWN => 0, Piece.W_PAWN => 1, Piece.B_KNIGHT => 2, Piece.W_KNIGHT => 3, Piece.B_BISHOP => 4, Piece.W_BISHOP => 5,
+    Piece.B_ROOK => 6, Piece.W_ROOK => 7, Piece.B_QUEEN => 8, Piece.W_QUEEN => 9, Piece.B_KING => 10, Piece.W_KING => 11
 )
 
 # Map castling flag to 0..3 index for Polyglot
@@ -72,11 +72,11 @@ function has_pawn_for_en_passant(board::Board, file::Int)::Bool
     if board.side_to_move == WHITE
         # White pawns on rank 5 (row 4)
         rank = 4
-        side_pawn = W_PAWN
+        side_pawn = Piece.W_PAWN
     else
         # Black pawns on rank 4 (row 3)
         rank = 3
-        side_pawn = B_PAWN
+        side_pawn = Piece.B_PAWN
     end
 
     for df in (-1, 1)
@@ -157,15 +157,15 @@ function decode_polyglot_move(code::UInt16, board::Board)
     else
         print("promotion detected")
         if board.side_to_move == WHITE
-            promotion = (prom == 1 ? W_KNIGHT :
-                         prom == 2 ? W_BISHOP :
-                         prom == 3 ? W_ROOK :
-                         W_QUEEN)
+            promotion = (prom == 1 ? Piece.W_KNIGHT :
+                         prom == 2 ? Piece.W_BISHOP :
+                         prom == 3 ? Piece.W_ROOK :
+                         Piece.W_QUEEN)
         else
-            promotion = (prom == 1 ? B_KNIGHT :
-                         prom == 2 ? B_BISHOP :
-                         prom == 3 ? B_ROOK :
-                         B_QUEEN)
+            promotion = (prom == 1 ? Piece.B_KNIGHT :
+                         prom == 2 ? Piece.B_BISHOP :
+                         prom == 3 ? Piece.B_ROOK :
+                         Piece.B_QUEEN)
         end
     end
 
@@ -174,14 +174,14 @@ function decode_polyglot_move(code::UInt16, board::Board)
 
     # en passant detection
     enp = false
-    if piece_at(board, from) in (W_PAWN, B_PAWN) &&
+    if piece_at(board, from) in (Piece.W_PAWN, Piece.B_PAWN) &&
        to == board.en_passant
         enp = true
-        capture = board.side_to_move == WHITE ? B_PAWN : W_PAWN
+        capture = board.side_to_move == WHITE ? Piece.B_PAWN : Piece.W_PAWN
     end
 
     # Castling (Polyglot encodes as king→rook square)
-    if piece_at(board, from) in (W_KING, B_KING)
+    if piece_at(board, from) in (Piece.W_KING, Piece.B_KING)
         if board.side_to_move == WHITE
             if from == 4 && to == 7   # e1 -> h1
                 return Move(4, 6; castling = 1)  # kingside

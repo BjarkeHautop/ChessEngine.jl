@@ -22,12 +22,12 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
     moves = Move[]
 
     friendly_pieces = board.side_to_move == WHITE ?
-                      [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING] :
-                      [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING]
+                      [Piece.W_PAWN, Piece.W_KNIGHT, Piece.W_BISHOP, Piece.W_ROOK, Piece.W_QUEEN, Piece.W_KING] :
+                      [Piece.B_PAWN, Piece.B_KNIGHT, Piece.B_BISHOP, Piece.B_ROOK, Piece.B_QUEEN, Piece.B_KING]
 
     enemy_pieces = board.side_to_move == WHITE ?
-                   [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING] :
-                   [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING]
+                   [Piece.B_PAWN, Piece.B_KNIGHT, Piece.B_BISHOP, Piece.B_ROOK, Piece.B_QUEEN, Piece.B_KING] :
+                   [Piece.W_PAWN, Piece.W_KNIGHT, Piece.W_BISHOP, Piece.W_ROOK, Piece.W_QUEEN, Piece.W_KING]
 
     friendly_bb = UInt64(0)
     for p in friendly_pieces
@@ -100,12 +100,12 @@ function generate_sliding_moves_magic!(board::Board, bb_piece::UInt64,
 
     # Define friendly and enemy pieces
     friendly_pieces = board.side_to_move == WHITE ?
-                      [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING] :
-                      [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING]
+                      [Piece.W_PAWN, Piece.W_KNIGHT, Piece.W_BISHOP, Piece.W_ROOK, Piece.W_QUEEN, Piece.W_KING] :
+                      [Piece.B_PAWN, Piece.B_KNIGHT, Piece.B_BISHOP, Piece.B_ROOK, Piece.B_QUEEN, Piece.B_KING]
 
     enemy_pieces = board.side_to_move == WHITE ?
-                   [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING] :
-                   [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING]
+                   [Piece.B_PAWN, Piece.B_KNIGHT, Piece.B_BISHOP, Piece.B_ROOK, Piece.B_QUEEN, Piece.B_KING] :
+                   [Piece.W_PAWN, Piece.W_KNIGHT, Piece.W_BISHOP, Piece.W_ROOK, Piece.W_QUEEN, Piece.W_KING]
 
     # Compute friendly occupancy
     friendly_bb = UInt64(0)
@@ -166,13 +166,13 @@ end
 # Bishop moves
 # ========================
 function generate_bishop_moves_magic(board::Board)
-    bb = board.side_to_move == WHITE ? board.bitboards[W_BISHOP] : board.bitboards[B_BISHOP]
+    bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_BISHOP] : board.bitboards[Piece.B_BISHOP]
     return generate_sliding_moves_magic(
         board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS)
 end
 
 function generate_bishop_moves_magic!(board::Board, moves::Vector{Move})
-    bb = board.side_to_move == WHITE ? board.bitboards[W_BISHOP] : board.bitboards[B_BISHOP]
+    bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_BISHOP] : board.bitboards[Piece.B_BISHOP]
     return generate_sliding_moves_magic!(
         board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS, moves)
 end
@@ -181,12 +181,12 @@ end
 # Rook moves
 # ========================
 function generate_rook_moves_magic(board::Board)
-    bb = board.side_to_move == WHITE ? board.bitboards[W_ROOK] : board.bitboards[B_ROOK]
+    bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_ROOK] : board.bitboards[Piece.B_ROOK]
     return generate_sliding_moves_magic(board, bb, ROOK_MASKS, ROOK_ATTACKS, ROOK_MAGICS)
 end
 
 function generate_rook_moves_magic!(board::Board, moves::Vector{Move})
-    bb = board.side_to_move == WHITE ? board.bitboards[W_ROOK] : board.bitboards[B_ROOK]
+    bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_ROOK] : board.bitboards[Piece.B_ROOK]
     return generate_sliding_moves_magic!(
         board, bb, ROOK_MASKS, ROOK_ATTACKS, ROOK_MAGICS, moves)
 end
@@ -195,12 +195,12 @@ end
 # Queen moves
 # ========================
 function generate_queen_moves_magic(board::Board)
-    bb = board.side_to_move == WHITE ? board.bitboards[W_QUEEN] : board.bitboards[B_QUEEN]
+    bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_QUEEN] : board.bitboards[Piece.B_QUEEN]
     return generate_sliding_moves_magic(board, bb, QUEEN_MASKS, QUEEN_ATTACKS, QUEEN_MAGICS)
 end
 
 function generate_queen_moves_magic!(board::Board, moves::Vector{Move})
-    bb = board.side_to_move == WHITE ? board.bitboards[W_QUEEN] : board.bitboards[B_QUEEN]
+    bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_QUEEN] : board.bitboards[Piece.B_QUEEN]
     return generate_sliding_moves_magic!(
         board, bb, QUEEN_MASKS, QUEEN_ATTACKS, QUEEN_MAGICS, moves)
 end

@@ -31,19 +31,19 @@ function undo_move!(board::Board, m::Move)
     end
 
     # --- 5. Undo castling rook move if necessary ---
-    if abs(m.to - m.from) == 2 && (moved_piece == W_KING || moved_piece == B_KING)
+    if abs(m.to - m.from) == 2 && (moved_piece == Piece.W_KING || moved_piece == Piece.B_KING)
         if m.to == 6 # White short castle
-            board.bitboards[W_ROOK] = clearbit(board.bitboards[W_ROOK], 5)
-            board.bitboards[W_ROOK] = setbit(board.bitboards[W_ROOK], 7)
+            board.bitboards[Piece.W_ROOK] = clearbit(board.bitboards[Piece.W_ROOK], 5)
+            board.bitboards[Piece.W_ROOK] = setbit(board.bitboards[Piece.W_ROOK], 7)
         elseif m.to == 2 # White long castle
-            board.bitboards[W_ROOK] = clearbit(board.bitboards[W_ROOK], 3)
-            board.bitboards[W_ROOK] = setbit(board.bitboards[W_ROOK], 0)
+            board.bitboards[Piece.W_ROOK] = clearbit(board.bitboards[Piece.W_ROOK], 3)
+            board.bitboards[Piece.W_ROOK] = setbit(board.bitboards[Piece.W_ROOK], 0)
         elseif m.to == 62 # Black short castle
-            board.bitboards[B_ROOK] = clearbit(board.bitboards[B_ROOK], 61)
-            board.bitboards[B_ROOK] = setbit(board.bitboards[B_ROOK], 63)
+            board.bitboards[Piece.B_ROOK] = clearbit(board.bitboards[Piece.B_ROOK], 61)
+            board.bitboards[Piece.B_ROOK] = setbit(board.bitboards[Piece.B_ROOK], 63)
         elseif m.to == 58 # Black long castle
-            board.bitboards[B_ROOK] = clearbit(board.bitboards[B_ROOK], 59)
-            board.bitboards[B_ROOK] = setbit(board.bitboards[B_ROOK], 56)
+            board.bitboards[Piece.B_ROOK] = clearbit(board.bitboards[Piece.B_ROOK], 59)
+            board.bitboards[Piece.B_ROOK] = setbit(board.bitboards[Piece.B_ROOK], 56)
         end
     end
 

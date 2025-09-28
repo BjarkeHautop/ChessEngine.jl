@@ -2,8 +2,8 @@
 function _generate_knight_moves_internal(board::Board, push_fn)
     knights, friendly_pieces,
     enemy_pieces = board.side_to_move == WHITE ?
-                   (board.bitboards[W_KNIGHT], W_PAWN:W_KING, B_PAWN:B_KING) :
-                   (board.bitboards[B_KNIGHT], B_PAWN:B_KING, W_PAWN:W_KING)
+                   (board.bitboards[Piece.W_KNIGHT], Piece.W_PAWN:Piece.W_KING, Piece.B_PAWN:Piece.B_KING) :
+                   (board.bitboards[Piece.B_KNIGHT], Piece.B_PAWN:Piece.B_KING, Piece.W_PAWN:Piece.W_KING)
 
     # build bitboard of all friendly pieces
     occupied_friendly = zero(UInt64)

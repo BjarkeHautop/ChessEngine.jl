@@ -6,30 +6,38 @@
 
 opposite(side::Side)::Side = side == WHITE ? BLACK : WHITE
 
-# White pieces
-const W_PAWN = 1
-const W_KNIGHT = 2
-const W_BISHOP = 3
-const W_ROOK = 4
-const W_QUEEN = 5
-const W_KING = 6
+"""
+    Piece
 
-# Black pieces
-const B_PAWN = 7
-const B_KNIGHT = 8
-const B_BISHOP = 9
-const B_ROOK = 10
-const B_QUEEN = 11
-const B_KING = 12
+Container for chess piece constants. Use `Piece.W_PAWN`, `Piece.B_KING`, etc.
+"""
 
-# Convenience: all piece types
-const ALL_PIECES = W_PAWN:B_KING
+const Piece = (
+    W_PAWN   = 1,
+    W_KNIGHT = 2,
+    W_BISHOP = 3,
+    W_ROOK   = 4,
+    W_QUEEN  = 5,
+    W_KING   = 6,
+    B_PAWN   = 7,
+    B_KNIGHT = 8,
+    B_BISHOP = 9,
+    B_ROOK   = 10,
+    B_QUEEN  = 11,
+    B_KING   = 12
+)
+
+# Convenience: all piece types as a range
+const ALL_PIECES = Piece.W_PAWN:Piece.B_KING
 
 #########################
 # Board representation  #
 #########################
 """
+    UndoInfo
+
 Information needed to undo a move
+
 - `captured_piece`: The piece type that was captured, or 0 if none.
 - `en_passant`: The previous en passant square.
 - `castling_rights`: The previous castling rights.
@@ -51,7 +59,10 @@ struct UndoInfo
 end
 
 """
+    Board
+
 A chess board representation using bitboards.
+
 - `bitboards`: A dictionary mapping piece types to their corresponding bitboards.
 - `side_to_move`: The side to move.
 - `castling_rights`: A 4-bit integer representing castling rights (KQkq).

@@ -9,18 +9,18 @@ const ASSET_DIR = abspath(joinpath(@__DIR__, "..", "assets"))
 # Changes: none
 
 const PIECE_IMAGES = Dict(
-    W_PAWN => joinpath(ASSET_DIR, "w_pawn.png"),
-    W_KNIGHT => joinpath(ASSET_DIR, "w_knight.png"),
-    W_BISHOP => joinpath(ASSET_DIR, "w_bishop.png"),
-    W_ROOK => joinpath(ASSET_DIR, "w_rook.png"),
-    W_QUEEN => joinpath(ASSET_DIR, "w_queen.png"),
-    W_KING => joinpath(ASSET_DIR, "w_king.png"),
-    B_PAWN => joinpath(ASSET_DIR, "b_pawn.png"),
-    B_KNIGHT => joinpath(ASSET_DIR, "b_knight.png"),
-    B_BISHOP => joinpath(ASSET_DIR, "b_bishop.png"),
-    B_ROOK => joinpath(ASSET_DIR, "b_rook.png"),
-    B_QUEEN => joinpath(ASSET_DIR, "b_queen.png"),
-    B_KING => joinpath(ASSET_DIR, "b_king.png")
+    Piece.W_PAWN => joinpath(ASSET_DIR, "w_pawn.png"),
+    Piece.W_KNIGHT => joinpath(ASSET_DIR, "w_knight.png"),
+    Piece.W_BISHOP => joinpath(ASSET_DIR, "w_bishop.png"),
+    Piece.W_ROOK => joinpath(ASSET_DIR, "w_rook.png"),
+    Piece.W_QUEEN => joinpath(ASSET_DIR, "w_queen.png"),
+    Piece.W_KING => joinpath(ASSET_DIR, "w_king.png"),
+    Piece.B_PAWN => joinpath(ASSET_DIR, "b_pawn.png"),
+    Piece.B_KNIGHT => joinpath(ASSET_DIR, "b_knight.png"),
+    Piece.B_BISHOP => joinpath(ASSET_DIR, "b_bishop.png"),
+    Piece.B_ROOK => joinpath(ASSET_DIR, "b_rook.png"),
+    Piece.B_QUEEN => joinpath(ASSET_DIR, "b_queen.png"),
+    Piece.B_KING => joinpath(ASSET_DIR, "b_king.png")
 )
 
 # (rotr90 to rotate images to match board orientation with rank 1 at bottom)

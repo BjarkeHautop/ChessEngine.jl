@@ -1,7 +1,10 @@
 # Game struct used for games with time control
 
 """
+    Game
+
 A struct representing a chess game with time control.
+
 - board: The current state of the chess board.
 - white_time: Time remaining for White in milliseconds.
 - black_time: Time remaining for Black in milliseconds.
@@ -63,6 +66,14 @@ function search_with_time(
     return best_result
 end
 
+"""
+    make_timed_move!(game::Game; opening_book::Union{Nothing, PolyglotBook}=KOMODO_OPENING_BOOK, verbose=false)
+
+Make a move for the current player, updating the game state and time control.
+- `game`: Game struct
+- `opening_book`: Optional PolyglotBook for opening moves
+- `verbose`: If true, print move details and time used
+"""
 function make_timed_move!(
         game::Game;
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
@@ -95,6 +106,14 @@ function make_timed_move!(
 end
 
 # Non-mutating version
+"""
+    make_timed_move(game::Game; opening_book::Union{Nothing, PolyglotBook}=KOMODO_OPENING_BOOK, verbose=false)
+
+Make a move for the current player, returning a new Game state.
+- `game`: Game struct
+- `opening_book`: Optional PolyglotBook for opening moves
+- `verbose`: If true, print move details and time used
+"""
 function make_timed_move(
         game::Game;
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
@@ -141,15 +160,15 @@ function is_insufficient_material(board::Board)
     end
 
     # Quick check: any pawns, rooks, or queens → material is sufficient
-    if count_bits(board.bitboards[W_PAWN]) > 0 || count_bits(board.bitboards[B_PAWN]) > 0 ||
-       count_bits(board.bitboards[W_ROOK]) > 0 || count_bits(board.bitboards[B_ROOK]) > 0 ||
-       count_bits(board.bitboards[W_QUEEN]) > 0 || count_bits(board.bitboards[B_QUEEN]) > 0
+    if count_bits(board.bitboards[Piece.W_PAWN]) > 0 || count_bits(board.bitboards[Piece.B_PAWN]) > 0 ||
+       count_bits(board.bitboards[Piece.W_ROOK]) > 0 || count_bits(board.bitboards[Piece.B_ROOK]) > 0 ||
+       count_bits(board.bitboards[Piece.W_QUEEN]) > 0 || count_bits(board.bitboards[Piece.B_QUEEN]) > 0
         return false
     end
 
     # Count minor pieces
-    w_minors = count_bits(board.bitboards[W_BISHOP]) + count_bits(board.bitboards[W_KNIGHT])
-    b_minors = count_bits(board.bitboards[B_BISHOP]) + count_bits(board.bitboards[B_KNIGHT])
+    w_minors = count_bits(board.bitboards[Piece.W_BISHOP]) + count_bits(board.bitboards[Piece.W_KNIGHT])
+    b_minors = count_bits(board.bitboards[Piece.B_BISHOP]) + count_bits(board.bitboards[Piece.B_KNIGHT])
 
     # Only kings
     if w_minors == 0 && b_minors == 0
@@ -164,8 +183,8 @@ function is_insufficient_material(board::Board)
     # King + bishop vs king + bishop (same color squares)
     if w_minors == 1 && b_minors == 1
         # Get bishop squares
-        wb_sq = trailing_zeros(board.bitboards[W_BISHOP])
-        bb_sq = trailing_zeros(board.bitboards[B_BISHOP])
+        wb_sq = trailing_zeros(board.bitboards[Piece.W_BISHOP])
+        bb_sq = trailing_zeros(board.bitboards[Piece.B_BISHOP])
         # Check square color: light=0, dark=1
         if (wb_sq % 8 + wb_sq ÷ 8) % 2 == (bb_sq % 8 + bb_sq ÷ 8) % 2
             return true

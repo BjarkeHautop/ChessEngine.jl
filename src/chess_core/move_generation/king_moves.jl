@@ -2,15 +2,15 @@
 # `push_fn` is a function used to append a move
 function _king_moves_internal(board::Board, push_fn)
     if board.side_to_move == WHITE
-        kings = board.bitboards[W_KING]
-        friendly_pieces = W_PAWN:W_KING
-        enemy_pieces = B_PAWN:B_KING
+        kings = board.bitboards[Piece.W_KING]
+        friendly_pieces = Piece.W_PAWN:Piece.W_KING
+        enemy_pieces = Piece.B_PAWN:Piece.B_KING
         rights = board.castling_rights
         king_sq = 4   # e1
     else
-        kings = board.bitboards[B_KING]
-        friendly_pieces = B_PAWN:B_KING
-        enemy_pieces = W_PAWN:W_KING
+        kings = board.bitboards[Piece.B_KING]
+        friendly_pieces = Piece.B_PAWN:Piece.B_KING
+        enemy_pieces = Piece.W_PAWN:Piece.W_KING
         rights = board.castling_rights
         king_sq = 60  # e8
     end

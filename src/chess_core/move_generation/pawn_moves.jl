@@ -5,10 +5,10 @@ function _generate_pawn_moves_internal(board::Board, push_fn)
     enemy_pieces,
     enemy_pawn,
     promo_pieces = board.side_to_move == WHITE ?
-                   (board.bitboards[W_PAWN], 2, 7, 8, B_PAWN:B_KING,
-        B_PAWN, (W_QUEEN, W_ROOK, W_BISHOP, W_KNIGHT)) :
-                   (board.bitboards[B_PAWN], 7, 2, -8, W_PAWN:W_KING,
-        W_PAWN, (B_QUEEN, B_ROOK, B_BISHOP, B_KNIGHT))
+                   (board.bitboards[Piece.W_PAWN], 2, 7, 8, Piece.B_PAWN:Piece.B_KING,
+        Piece.B_PAWN, (Piece.W_QUEEN, Piece.W_ROOK, Piece.W_BISHOP, Piece.W_KNIGHT)) :
+                   (board.bitboards[Piece.B_PAWN], 7, 2, -8, Piece.W_PAWN:Piece.W_KING,
+        Piece.W_PAWN, (Piece.B_QUEEN, Piece.B_ROOK, Piece.B_BISHOP, Piece.B_KNIGHT))
 
     for sq in 0:63
         if !testbit(pawns, sq)
@@ -18,7 +18,7 @@ function _generate_pawn_moves_internal(board::Board, push_fn)
 
         # single push
         to_sq = sq + direction
-        if on_board(to_sq) && !any(testbit(board.bitboards[p], to_sq) for p in ALL_PIECES)
+        if on_board(to_sq) && !any(testbit(board.bitboards[p], to_sq) for p in ChessEngine.ALL_PIECES)
             if rank == promotion_rank
                 for promo in promo_pieces
                     push_fn(sq, to_sq; promotion = promo)
@@ -28,7 +28,7 @@ function _generate_pawn_moves_internal(board::Board, push_fn)
                 # double push
                 if rank == start_rank
                     to_sq2 = sq + 2*direction
-                    if !any(testbit(board.bitboards[p], to_sq2) for p in ALL_PIECES)
+                    if !any(testbit(board.bitboards[p], to_sq2) for p in ChessEngine.ALL_PIECES)
                         push_fn(sq, to_sq2)
                     end
                 end

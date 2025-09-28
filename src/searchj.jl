@@ -196,6 +196,15 @@ function is_endgame(board::Board)
     return board.game_phase_value < 5
 end
 
+"""
+    SearchResult
+
+Result of a search operation.
+
+- `score`: The evaluation score of the position (nothing if from book).
+- `move`: The best move found (nothing if from book).
+- `from_book`: Boolean indicating if the move was from the opening book.
+"""
 struct SearchResult
     score::Union{Nothing, Int}  # nothing if from book
     move::Union{Nothing, Move}

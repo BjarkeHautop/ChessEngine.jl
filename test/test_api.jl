@@ -21,7 +21,7 @@ end
     m2 = Move(b, "e7e8=Q")
     @test m2.from == 52
     @test m2.to == 60
-    @test m2.promotion == W_QUEEN
+    @test m2.promotion == Piece.B_QUEEN
     @test string(m2) == "e7e8=Q"
 
     m3 = Move(b, "O-O")
@@ -44,6 +44,6 @@ end
     m = Move(b, "e2e4")
     new_b = make_move(b, m)
     make_move!(b, m)
-    @test ChessEngine.piece_at(b, 28) == ChessEngine.piece_at(new_b, 28) == W_PAWN
+    @test ChessEngine.piece_at(b, 28) == ChessEngine.piece_at(new_b, 28) == Piece.W_PAWN
     @test ChessEngine.piece_at(b, 12) == ChessEngine.piece_at(new_b, 12) == 0
 end

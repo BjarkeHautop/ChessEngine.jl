@@ -33,35 +33,38 @@ function Base.show(io::IO, m::Move)
 end
 
 function piece_symbol(piece::Int)
-    if piece == W_QUEEN || piece == B_QUEEN
+    if piece == Piece.W_QUEEN || piece == Piece.B_QUEEN
         return "Q"
-    elseif piece == W_ROOK || piece == B_ROOK
+    elseif piece == Piece.W_ROOK || piece == Piece.B_ROOK
         return "R"
-    elseif piece == W_BISHOP || piece == B_BISHOP
+    elseif piece == Piece.W_BISHOP || piece == Piece.B_BISHOP
         return "B"
-    elseif piece == W_KNIGHT || piece == B_KNIGHT
+    elseif piece == Piece.W_KNIGHT || piece == Piece.B_KNIGHT
         return "N"
     else
         return ""
     end
 end
 
-function piece_from_symbol(c::AbstractChar)
+"""
+    piece_from_symbol(c::AbstractChar, side::Symbol)
+
+Return the piece constant corresponding to promotion symbol `c` and the moving side (`:white` or `:black`).
+"""
+function piece_from_symbol(c::AbstractChar,  side::Side)
+    piece = nothing
     if c == 'Q'
-        ;
-        return W_QUEEN  # you may want to make this color-agnostic
+        piece = side == :white ? Piece.W_QUEEN : Piece.B_QUEEN
     elseif c == 'R'
-        ;
-        return W_ROOK
+        piece = side == :white ? Piece.W_ROOK : Piece.B_ROOK
     elseif c == 'B'
-        ;
-        return W_BISHOP
+        piece = side == :white ? Piece.W_BISHOP : Piece.B_BISHOP
     elseif c == 'N'
-        ;
-        return W_KNIGHT
+        piece = side == :white ? Piece.W_KNIGHT : Piece.B_KNIGHT
     else
         error("Invalid promotion piece: $c")
     end
+    return piece
 end
 
 """
@@ -84,7 +87,7 @@ function Move(board::Board, str::AbstractString)
     promotion = 0
     if length(str) > 4 && str[5] == '='
         piece_char = uppercase(str[6])
-        promotion = piece_from_symbol(piece_char)
+        promotion = piece_from_symbol(piece_char, board.side_to_move)
     end
 
     # Infer capture from board
@@ -99,20 +102,20 @@ function Move(board::Board, str::AbstractString)
     # Infer en passant
     is_ep = false
     moving_piece = 0
-    for p in (board.side_to_move == WHITE ? (W_PAWN:W_KING) : (B_PAWN:B_KING))
+    for p in (board.side_to_move == WHITE ? (Piece.W_PAWN:Piece.W_KING) : (Piece.B_PAWN:Piece.B_KING))
         if testbit(board.bitboards[p], from)
             moving_piece = p
             break
         end
     end
-    if moving_piece in (W_PAWN, B_PAWN) && to == board.en_passant
+    if moving_piece in (Piece.W_PAWN, Piece.B_PAWN) && to == board.en_passant
         is_ep = true
-        captured_piece = board.side_to_move == WHITE ? B_PAWN : W_PAWN
+        captured_piece = board.side_to_move == WHITE ? Piece.B_PAWN : Piece.W_PAWN
     end
 
     # Infer castling
     castling_type = 0
-    if moving_piece in (W_KING, B_KING) && abs(to - from) == 2
+    if moving_piece in (Piece.W_KING, Piece.B_KING) && abs(to - from) == 2
         castling_type = to > from ? 1 : 2
     end
 

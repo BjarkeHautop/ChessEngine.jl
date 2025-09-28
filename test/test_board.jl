@@ -15,11 +15,11 @@ using Test
 
     # white pawns bitboard should match second rank
     expected_white_pawns = 0x000000000000FF00
-    @test b.bitboards[W_PAWN] == expected_white_pawns
+    @test b.bitboards[Piece.W_PAWN] == expected_white_pawns
 
     # black rooks on a8 and h8
     expected_black_rooks = 0x8100000000000000
-    @test b.bitboards[B_ROOK] == expected_black_rooks
+    @test b.bitboards[Piece.B_ROOK] == expected_black_rooks
 
     # Move e2 to e4
     m_square_index = Move(ChessEngine.square_index(5, 2), ChessEngine.square_index(5, 4))
@@ -62,7 +62,7 @@ end
     make_move!(b, Move("e2", "e3"))
     make_move!(b, Move("d7", "d5"))
     make_move!(b, Move("f1", "c4"))
-    make_move!(b, Move("d5", "c4"; capture = W_BISHOP))
+    make_move!(b, Move("d5", "c4"; capture = Piece.W_BISHOP))
 
     @test b.game_phase_value == 23
     @test b.eval_score < 0
@@ -71,8 +71,8 @@ end
     @test game_phase_value == b.game_phase_value
     @test eval_score == b.eval_score
 
-    make_move!(b, Move("d1", "c4"; capture = B_PAWN))
-    undo_move!(b, Move("d1", "c4"; capture = B_PAWN))
+    make_move!(b, Move("d1", "c4"; capture = Piece.B_PAWN))
+    undo_move!(b, Move("d1", "c4"; capture = Piece.B_PAWN))
     @test game_phase_value == b.game_phase_value
     @test eval_score == b.eval_score
 end

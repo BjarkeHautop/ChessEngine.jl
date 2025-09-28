@@ -14,10 +14,10 @@ function board_from_fen(fen::String)
 
     # Map FEN chars to piece types
     PIECE_MAP = Dict(
-        'P' => W_PAWN, 'N' => W_KNIGHT, 'B' => W_BISHOP,
-        'R' => W_ROOK, 'Q' => W_QUEEN, 'K' => W_KING,
-        'p' => B_PAWN, 'n' => B_KNIGHT, 'b' => B_BISHOP,
-        'r' => B_ROOK, 'q' => B_QUEEN, 'k' => B_KING
+        'P' => Piece.W_PAWN, 'N' => Piece.W_KNIGHT, 'B' => Piece.W_BISHOP,
+        'R' => Piece.W_ROOK, 'Q' => Piece.W_QUEEN, 'K' => Piece.W_KING,
+        'p' => Piece.B_PAWN, 'n' => Piece.B_KNIGHT, 'b' => Piece.B_BISHOP,
+        'r' => Piece.B_ROOK, 'q' => Piece.B_QUEEN, 'k' => Piece.B_KING
     )
 
     for (rank_idx, row) in enumerate(rows)

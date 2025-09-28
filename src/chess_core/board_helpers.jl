@@ -19,7 +19,7 @@ Get the square index of the king for the given side
 Returns: Int (square index 0..63)
 """
 function king_square(board::Board, side::Side)
-    bb = (side == WHITE) ? board.bitboards[W_KING] : board.bitboards[B_KING]
+    bb = (side == WHITE) ? board.bitboards[Piece.W_KING] : board.bitboards[Piece.B_KING]
     for sq in 0:63
         if testbit(bb, sq)
             return sq
@@ -54,10 +54,10 @@ function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
     ########################
     if attacker == WHITE
         pawn_attacks = [-9, -7]   # white pawns attack up-left / up-right
-        pawns = board.bitboards[W_PAWN]
+        pawns = board.bitboards[Piece.W_PAWN]
     else
         pawn_attacks = [7, 9]     # black pawns attack down-left / down-right
-        pawns = board.bitboards[B_PAWN]
+        pawns = board.bitboards[Piece.B_PAWN]
     end
     for d in pawn_attacks
         from = sq + d
@@ -70,7 +70,7 @@ function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
     # 2) Knight attacks
     ########################
     knight_deltas = [-17, -15, -10, -6, 6, 10, 15, 17]
-    knights = (attacker == WHITE) ? board.bitboards[W_KNIGHT] : board.bitboards[B_KNIGHT]
+    knights = (attacker == WHITE) ? board.bitboards[Piece.W_KNIGHT] : board.bitboards[Piece.B_KNIGHT]
     for d in knight_deltas
         from = sq + d
         if on_board(from)
@@ -121,9 +121,9 @@ function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
     if attacked_by_sliders(
         [-9, -7, 7, 9],
         if (attacker == WHITE)
-            (board.bitboards[W_BISHOP] | board.bitboards[W_QUEEN])
+            (board.bitboards[Piece.W_BISHOP] | board.bitboards[Piece.W_QUEEN])
         else
-            (board.bitboards[B_BISHOP] | board.bitboards[B_QUEEN])
+            (board.bitboards[Piece.B_BISHOP] | board.bitboards[Piece.B_QUEEN])
         end
     )
         return true
@@ -133,9 +133,9 @@ function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
     if attacked_by_sliders(
         [-8, -1, 1, 8],
         if (attacker == WHITE)
-            (board.bitboards[W_ROOK] | board.bitboards[W_QUEEN])
+            (board.bitboards[Piece.W_ROOK] | board.bitboards[Piece.W_QUEEN])
         else
-            (board.bitboards[B_ROOK] | board.bitboards[B_QUEEN])
+            (board.bitboards[Piece.B_ROOK] | board.bitboards[Piece.B_QUEEN])
         end
     )
         return true
@@ -145,7 +145,7 @@ function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
     # 4) King attacks
     ########################
     king_deltas = [-9, -8, -7, -1, 1, 7, 8, 9]
-    kings = (attacker == WHITE) ? board.bitboards[W_KING] : board.bitboards[B_KING]
+    kings = (attacker == WHITE) ? board.bitboards[Piece.W_KING] : board.bitboards[Piece.B_KING]
     for d in king_deltas
         from = sq + d
         if on_board(from) && testbit(kings, from)
