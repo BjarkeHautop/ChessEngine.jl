@@ -45,7 +45,7 @@ We can make a move using by `make_move` or the in-place version `make_move!`:
 make_move!(board, mv)
 ```
 
-We can undo a move using `undo_move!`:
+We can undo a move using `undo_move` or the in-place version `undo_move!`:
 
 ```julia
 undo_move!(board, mv)

@@ -3,4 +3,5 @@
 
 ```@autodocs
 Modules = [ChessEngine]
+Private = false
 ```

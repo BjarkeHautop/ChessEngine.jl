@@ -108,3 +108,11 @@ end
     b = Board(fen = "4k3/8/8/8/8/2N5/8/4K3 w - - 0 1") # King and Knight vs King
     @test game_over(b) == :draw_insufficient_material
 end
+
+@testset "Not insufficent material" begin
+    b = Board()
+    @test ChessEngine.is_insufficient_material(b) == false
+
+    g = Game()
+    @test game_over(g) == :ongoing
+end

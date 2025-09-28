@@ -70,8 +70,3 @@ function Base.:(==)(a::Move, b::Move)
         a.castling == b.castling &&
         a.en_passant == b.en_passant
 end
-
-# allow Move to be used in Set or Dict
-function Base.hash(m::Move, h::UInt)
-    hash((m.from, m.to, m.promotion, m.capture, m.castling, m.en_passant), h)
-end

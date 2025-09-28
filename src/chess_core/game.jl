@@ -199,6 +199,8 @@ function is_insufficient_material(board::Board)
 end
 
 """
+    game_over(board::Board)
+
 Check if the game is over (checkmate, stalemate, draw)
 - `board`: Board struct
 Returns: Symbol (:checkmate_white, :checkmate_black, :stalemate, :draw_threefold, :draw_fiftymove, 
@@ -224,4 +226,16 @@ function game_over(board::Board)
     end
 
     return :ongoing
+end
+
+"""
+    game_over(game::Game)
+
+Check if the game is over (checkmate, stalemate, draw)
+- `board`: Board struct
+Returns: Symbol (:checkmate_white, :checkmate_black, :stalemate, :draw_threefold, :draw_fiftymove, 
+:draw_insufficient_material, :ongoing)
+"""
+function game_over(game::Game)
+    return game_over(game.board)
 end

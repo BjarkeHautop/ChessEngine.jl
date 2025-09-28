@@ -68,8 +68,14 @@ function piece_from_symbol(c::AbstractChar, side::Side)
 end
 
 """
+    Move(board::Board, str::AbstractString)
 Construct a Move from a long algebraic string like "e2e4" or "e7e8=Q", 
 using the board to infer capture, en passant, and castling.
+- `board`: current Board state
+- `str`: move string in long algebraic notation
+
+Castling can be specified with "O-O" (kingside) or "O-O-O" (queenside). 
+Also accepts "o-o", "0-0", "o-o-o", "0-0-0".
 """
 function Move(board::Board, str::AbstractString)
     # Castling shortcuts
@@ -114,12 +120,6 @@ function Move(board::Board, str::AbstractString)
         captured_piece = board.side_to_move == WHITE ? Piece.B_PAWN : Piece.W_PAWN
     end
 
-    # Infer castling
-    castling_type = 0
-    if moving_piece in (Piece.W_KING, Piece.B_KING) && abs(to - from) == 2
-        castling_type = to > from ? 1 : 2
-    end
-
     return Move(from, to; promotion = promotion, capture = captured_piece,
-        castling = castling_type, en_passant = is_ep)
+        castling = 0, en_passant = is_ep)
 end

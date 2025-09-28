@@ -38,3 +38,35 @@ end
     @test game.white_time <= 57000
     @test game.white_time > 56000
 end
+
+@testset "Search with time opening book move" begin
+    game = Game(minutes = 1, increment = 0)
+    make_timed_move!(game)
+
+    # Should have played an opening book move and not spent any time
+    @test game.white_time > 59000
+    @test game.board.side_to_move == BLACK
+end
+
+@testset "Search with time Fools mate" begin
+    # Fool's mate position after 1. f3 e5 2. g4 Qh4#
+    game = Game(fen = "rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 1")
+    make_timed_move!(game; opening_book = nothing)
+
+    # Should have played Qh4#
+    @test game_over(game.board) == :checkmate_black
+end
+
+@testset "Search with time verbose works" begin
+    game = Game(minutes = 1, increment = 0)
+    make_timed_move!(game; opening_book = nothing, verbose = true)
+    @test game.board.side_to_move == BLACK
+end
+
+@testset "Search with time non mutating" begin
+    game = Game(minutes = 1, increment = 0)
+    result = search_with_time(game; max_depth = 4, opening_book = nothing, verbose = false)
+    @test isa(result, SearchResult)
+    @test result.move !== nothing
+    @test game.board.side_to_move == WHITE  # game not mutated
+end

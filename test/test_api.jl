@@ -24,19 +24,48 @@ end
     @test m2.promotion == Piece.B_QUEEN
     @test string(m2) == "e7e8=Q"
 
-    m3 = Move(b, "O-O")
-    @test m3.from == 4
-    @test m3.to == 6
-    @test m3.castling == 1
-    @test string(m3) == "O-O"
+    m3 = Move(b, "e7e8=R")
+    @test m3.from == 52
+    @test m3.to == 60
+    @test m3.promotion == Piece.B_ROOK
+    @test string(m3) == "e7e8=R"
 
-    m4 = Move(b, "O-O-O")
-    @test m4.from == 4
-    @test m4.to == 2
-    @test m4.castling == 2
-    @test string(m4) == "O-O-O"
+    m4 = Move(b, "e7e8=B")
+    @test m4.from == 52
+    @test m4.to == 60
+    @test m4.promotion == Piece.B_BISHOP
+    @test string(m4) == "e7e8=B"
+
+    m5 = Move(b, "e7e8=N")
+    @test m5.from == 52
+    @test m5.to == 60
+    @test m5.promotion == Piece.B_KNIGHT
+    @test string(m5) == "e7e8=N"
+
+    m6 = Move(b, "O-O")
+    @test m6.from == 4
+    @test m6.to == 6
+    @test m6.castling == 1
+    @test string(m6) == "O-O"
+
+    m7 = Move(b, "O-O-O")
+    @test m7.from == 4
+    @test m7.to == 2
+    @test m7.castling == 2
+    @test string(m7) == "O-O-O"
 
     @test_throws ErrorException Move(b, "e7e8=Z")
+
+    # En passant move
+    make_move!(b, Move(b, "e2e4"))
+    make_move!(b, Move(b, "a7a6"))
+    make_move!(b, Move(b, "e4e5"))
+    make_move!(b, Move(b, "d7d5"))
+    m_ep = Move(b, "e5d6")
+    @test m_ep.from == 36
+    @test m_ep.to == 43
+    @test m_ep.en_passant == true
+    @test string(m_ep) == "e5d6"
 end
 
 @testset "Move api works with make_move" begin
