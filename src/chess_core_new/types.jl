@@ -1,0 +1,97 @@
+########################
+# Piece type constants #
+########################
+
+@enum Side WHITE=0 BLACK=1
+
+opposite(side::Side)::Side = side == WHITE ? BLACK : WHITE
+
+# White pieces
+const W_PAWN = 1
+const W_KNIGHT = 2
+const W_BISHOP = 3
+const W_ROOK = 4
+const W_QUEEN = 5
+const W_KING = 6
+
+# Black pieces
+const B_PAWN = 7
+const B_KNIGHT = 8
+const B_BISHOP = 9
+const B_ROOK = 10
+const B_QUEEN = 11
+const B_KING = 12
+
+# Convenience: all piece types
+const ALL_PIECES = W_PAWN:B_KING
+
+#########################
+# Board representation  #
+#########################
+"""
+Information needed to undo a move
+- `captured_piece`: The piece type that was captured, or 0 if none.
+- `en_passant`: The previous en passant square.
+- `castling_rights`: The previous castling rights.
+- `halfmove_clock`: The previous halfmove clock.
+- `moved_piece`: The piece type that was moved.
+- `promotion`: The piece type if the move was a promotion, or 0 otherwise.
+- `is_en_passant`: A boolean indicating if the move was an en passant capture.
+"""
+struct UndoInfo
+    captured_piece::Int
+    en_passant::Int
+    castling_rights::Int
+    halfmove_clock::Int
+    moved_piece::Int
+    promotion::Int
+    is_en_passant::Bool
+    prev_eval_score::Int
+    prev_game_phase_value::Int
+end
+
+"""
+A chess board representation using bitboards.
+- `bitboards`: A dictionary mapping piece types to their corresponding bitboards.
+- `side_to_move`: The side to move.
+- `castling_rights`: A 4-bit integer representing castling rights (KQkq).
+- `en_passant`: The square index (0-63) for en passant target, or -1 if none.
+- `halfmove_clock`: The number of halfmoves since the last capture or pawn move (for the 50-move rule).
+- `position_history`: A vector of position Zobrist hashes for detecting threefold repetition.
+- `undo_stack`: A stack of `UndoInfo` structs for unmaking moves.
+- `eval_score`: Cached evaluation score from White's point of view.
+- `game_phase_value`: Cached phase numerator (sum of weights) for evaluation scaling.
+"""
+mutable struct Board
+    bitboards::Dict{Int, UInt64} # piece type → bitboard
+    side_to_move::Side
+    castling_rights::UInt8      # four bits: KQkq
+    en_passant::Int             # square index 0..63, or -1 if none
+    halfmove_clock::Int          # for 50-move rule
+    position_history::Vector{UInt64}  # for threefold repetition
+    undo_stack::Vector{UndoInfo} # stack of UndoInfo for unmaking moves
+    eval_score::Int           # cached evaluation from White’s POV
+    game_phase_value::Int     # cached phase numerator (sum of weights)
+end
+
+function Base.:(==)(a::Board, b::Board)
+    a.bitboards == b.bitboards &&
+        a.side_to_move == b.side_to_move &&
+        a.castling_rights == b.castling_rights &&
+        a.en_passant == b.en_passant &&
+        a.halfmove_clock == b.halfmove_clock &&
+        a.position_history == b.position_history &&
+        a.undo_stack == b.undo_stack &&
+        a.eval_score == b.eval_score &&
+        a.game_phase_value == b.game_phase_value
+end
+
+function position_equal(a::Board, b::Board)
+    a.bitboards == b.bitboards &&
+        a.side_to_move == b.side_to_move &&
+        a.castling_rights == b.castling_rights &&
+        a.en_passant == b.en_passant &&
+        a.halfmove_clock == b.halfmove_clock &&
+        a.eval_score == b.eval_score &&
+        a.game_phase_value == b.game_phase_value
+end
