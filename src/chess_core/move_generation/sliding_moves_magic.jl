@@ -22,12 +22,12 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
     moves = Move[]
 
     friendly_pieces = board.side_to_move == WHITE ?
-        [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING] :
-        [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING]
+                      [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING] :
+                      [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING]
 
     enemy_pieces = board.side_to_move == WHITE ?
-        [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING] :
-        [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING]
+                   [B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING] :
+                   [W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING]
 
     friendly_bb = UInt64(0)
     for p in friendly_pieces
@@ -42,12 +42,12 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
         end
 
         println("\n=== square $sq ===")
-        println("full_occ (hex)   = ", string(full_occ, base=16))
+        println("full_occ (hex)   = ", string(full_occ, base = 16))
 
         mask = mask_table[sq + 1]
         relevant_bits = count_bits(mask)
         shift = 64 - relevant_bits
-        println("mask (hex)       = ", string(mask, base=16))
+        println("mask (hex)       = ", string(mask, base = 16))
         println("relevant_bits    = $relevant_bits  shift = $shift")
 
         table = attack_table[sq + 1]
@@ -58,18 +58,18 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
         index_mask = (UInt64(1) << relevant_bits) - UInt64(1)
         idx = Int((raw_index & index_mask) + 1)
 
-        println("magic (hex)      = ", string(magic_table[sq + 1], base=16))
-        println("masked occ (hex) = ", string(full_occ & mask, base=16))
-        println("raw_index (hex)  = ", string(raw_index, base=16))
+        println("magic (hex)      = ", string(magic_table[sq + 1], base = 16))
+        println("masked occ (hex) = ", string(full_occ & mask, base = 16))
+        println("raw_index (hex)  = ", string(raw_index, base = 16))
         println("idx (1-based)    = $idx")
 
         @assert 1 <= idx <= length(table)
 
         attacks = table[idx]
-        println("attacks (hex)    = ", string(attacks, base=16))
+        println("attacks (hex)    = ", string(attacks, base = 16))
 
         attacks &= ~friendly_bb
-        println("after removing friendly (hex) = ", string(attacks, base=16))
+        println("after removing friendly (hex) = ", string(attacks, base = 16))
 
         while attacks != 0
             to_sq = trailing_zeros(attacks)
@@ -84,7 +84,7 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
 
             println("  -> move $sq → $to_sq capture=$capture")
 
-            push!(moves, Move(sq, to_sq; capture=capture))
+            push!(moves, Move(sq, to_sq; capture = capture))
 
             attacks &= attacks - 1
         end

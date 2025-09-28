@@ -35,7 +35,7 @@ end
 end
 
 @testset "Search works in random position" begin
-    b = Board(fen="rnbq1rk1/pp4bp/2pp1np1/3Ppp2/2P5/2N2NP1/PP2PPBP/R1BQ1RK1 w KQkq e6 0 1")
+    b = Board(fen = "rnbq1rk1/pp4bp/2pp1np1/3Ppp2/2P5/2N2NP1/PP2PPBP/R1BQ1RK1 w KQkq e6 0 1")
 
     result = search(b, 4; opening_book = nothing)
     @test true  # Just ensure it completes without error

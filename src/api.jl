@@ -1,16 +1,17 @@
 const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-Board(; fen::String=START_FEN) = board_from_fen(fen)
+Board(; fen::String = START_FEN) = board_from_fen(fen)
 
-Game(; minutes=3, increment=2, fen::String=START_FEN) =
-    Game(Board(fen=fen),
-         minutes * 60 * 1000,
-         minutes * 60 * 1000,
-         increment * 1000)
+function Game(; minutes = 3, increment = 2, fen::String = START_FEN)
+    Game(Board(fen = fen),
+        minutes * 60 * 1000,
+        minutes * 60 * 1000,
+        increment * 1000)
+end
 
-Game(tc::AbstractString; fen::String=START_FEN) = begin
+function Game(tc::AbstractString; fen::String = START_FEN)
     m, inc = split(tc, "+")
-    Game(minutes=parse(Int, m), increment=parse(Int, inc), fen=fen)
+    Game(minutes = parse(Int, m), increment = parse(Int, inc), fen = fen)
 end
 
 function Base.show(io::IO, m::Move)
@@ -45,17 +46,23 @@ function piece_symbol(piece::Int)
     end
 end
 
-
 function piece_from_symbol(c::AbstractChar)
-    if c == 'Q'; return W_QUEEN  # you may want to make this color-agnostic
-    elseif c == 'R'; return W_ROOK
-    elseif c == 'B'; return W_BISHOP
-    elseif c == 'N'; return W_KNIGHT
+    if c == 'Q'
+        ;
+        return W_QUEEN  # you may want to make this color-agnostic
+    elseif c == 'R'
+        ;
+        return W_ROOK
+    elseif c == 'B'
+        ;
+        return W_BISHOP
+    elseif c == 'N'
+        ;
+        return W_KNIGHT
     else
         error("Invalid promotion piece: $c")
     end
 end
-
 
 """
 Construct a Move from a long algebraic string like "e2e4" or "e7e8=Q", 
@@ -64,14 +71,14 @@ using the board to infer capture, en passant, and castling.
 function Move(board::Board, str::AbstractString)
     # Castling shortcuts
     if str in ["O-O", "o-o", "0-0"]
-        return Move(4, 6; castling=1)
+        return Move(4, 6; castling = 1)
     elseif str in ["O-O-O", "o-o-o", "0-0-0"]
-        return Move(4, 2; castling=2)
+        return Move(4, 2; castling = 2)
     end
 
     # Parse squares
     from = square_from_name(str[1:2])
-    to   = square_from_name(str[3:4])
+    to = square_from_name(str[3:4])
 
     # Parse promotion from string if present
     promotion = 0
@@ -109,7 +116,6 @@ function Move(board::Board, str::AbstractString)
         castling_type = to > from ? 1 : 2
     end
 
-    return Move(from, to; promotion=promotion, capture=captured_piece, 
-                castling=castling_type, en_passant=is_ep)
+    return Move(from, to; promotion = promotion, capture = captured_piece,
+        castling = castling_type, en_passant = is_ep)
 end
-

@@ -99,12 +99,12 @@ using Test
 end
 
 @testset "Insufficent material" begin
-    b = Board(fen="4k3/8/8/8/8/8/8/4K3 w - - 0 1")  # King vs King
+    b = Board(fen = "4k3/8/8/8/8/8/8/4K3 w - - 0 1")  # King vs King
     @test game_over(b) == :draw_insufficient_material
 
-    b = Board(fen="4k3/8/2b5/8/8/8/2B5/4K3 w - - 0 1") # King and Bishop vs King and Bishop (same color)
+    b = Board(fen = "4k3/8/2b5/8/8/8/2B5/4K3 w - - 0 1") # King and Bishop vs King and Bishop (same color)
     @test game_over(b) == :draw_insufficient_material
 
-    b = Board(fen="4k3/8/8/8/8/2N5/8/4K3 w - - 0 1") # King and Knight vs King
+    b = Board(fen = "4k3/8/8/8/8/2N5/8/4K3 w - - 0 1") # King and Knight vs King
     @test game_over(b) == :draw_insufficient_material
 end

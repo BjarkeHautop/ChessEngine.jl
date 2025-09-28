@@ -2,7 +2,7 @@ using ChessEngine
 using Test
 
 @testset "Doesn't use opening book in endgame" begin
-    b = Board(fen="4k3/8/8/8/8/8/4P3/4K3 w - - 0 1")
+    b = Board(fen = "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1")
     time_before = time_ns() ÷ 1_000_000
     result = search(b, 10; opening_book = KOMODO_OPENING_BOOK)
     time_after = time_ns() ÷ 1_000_000

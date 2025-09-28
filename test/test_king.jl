@@ -130,7 +130,7 @@ end
 end
 
 @testset "All castling works correctly" begin
-    b = Board(fen="r3k2r/3p1p2/8/8/8/8/8/R3K2R w KQkq - 0 1")
+    b = Board(fen = "r3k2r/3p1p2/8/8/8/8/8/R3K2R w KQkq - 0 1")
 
     # White short
     mv = Move("e1", "g1"; castling = 1)
