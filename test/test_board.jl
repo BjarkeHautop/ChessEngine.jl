@@ -2,7 +2,7 @@ using ChessEngine
 using Test
 
 @testset "Board basics" begin
-    b = start_position()
+    b = Board()
 
     # side to move should be white
     @test b.side_to_move == WHITE
@@ -22,40 +22,40 @@ using Test
     @test b.bitboards[B_ROOK] == expected_black_rooks
 
     # Move e2 to e4
-    m_square_index = Move(square_index(5, 2), square_index(5, 4))
+    m_square_index = Move(ChessEngine.square_index(5, 2), ChessEngine.square_index(5, 4))
     m_chess_notation = Move("e2", "e4")
     @test m_square_index == m_chess_notation
 end
 
 @testset "Square indexing" begin
     # a1 → 0
-    @test square_index(1, 1) == 0
+    @test ChessEngine.square_index(1, 1) == 0
 
     # h1 → 7
-    @test square_index(8, 1) == 7
+    @test ChessEngine.square_index(8, 1) == 7
 
     # a8 → 56
-    @test square_index(1, 8) == 56
+    @test ChessEngine.square_index(1, 8) == 56
 
     # h8 → 63
-    @test square_index(8, 8) == 63
+    @test ChessEngine.square_index(8, 8) == 63
 end
 
 @testset "Bit operations" begin
-    sq = square_index(5, 2)  # e2
+    sq = ChessEngine.square_index(5, 2)  # e2
     bb = UInt64(0)
 
     # set bit
-    bb = setbit(bb, sq)
-    @test testbit(bb, sq)
+    bb = ChessEngine.setbit(bb, sq)
+    @test ChessEngine.testbit(bb, sq)
 
     # clear bit
-    bb = clearbit(bb, sq)
-    @test !testbit(bb, sq)
+    bb = ChessEngine.clearbit(bb, sq)
+    @test !ChessEngine.testbit(bb, sq)
 end
 
 @testset "Phase value calculated correctly" begin
-    b = start_position()
+    b = Board()
     @test b.game_phase_value == 24
     @test b.eval_score == 0
 
@@ -67,7 +67,7 @@ end
     @test b.game_phase_value == 23
     @test b.eval_score < 0
 
-    eval_score, game_phase_value = compute_eval_and_phase(b)
+    eval_score, game_phase_value = ChessEngine.compute_eval_and_phase(b)
     @test game_phase_value == b.game_phase_value
     @test eval_score == b.eval_score
 

@@ -94,9 +94,3 @@ function make_timed_move!(
     end
 end
 
-# Start a 5 min + 2 sec increment game
-function start_game(; minutes = 5, increment = 2)
-    initial_time = minutes * 60 * 1000  # convert to milliseconds
-    board = start_position()
-    return Game(board, initial_time, initial_time, increment * 1000)
-end

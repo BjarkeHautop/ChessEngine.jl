@@ -2,7 +2,7 @@ using ChessEngine
 using Test
 
 @testset "Game Time Management" begin
-    game = start_game(minutes = 0.5, increment = 2)
+    game = Game(minutes = 0.5, increment = 2)
 
     @test isa(game, Game)
     @test game.white_time == 0.5*60*1000
@@ -31,7 +31,7 @@ end
 end
 
 @testset "Search with time respects allocation" begin
-    game = start_game(minutes = 1, increment = 0)
+    game = Game(minutes = 1, increment = 0)
     make_timed_move!(game; opening_book = nothing)
 
     # Should have spent 60000 ms / 20 = 3000ms on first move and then some overhead thus, 56000 < game.white_time < 57000

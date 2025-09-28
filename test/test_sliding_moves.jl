@@ -2,17 +2,17 @@ using ChessEngine
 using Test
 
 @testset "Bishop move generation" begin
-    b = start_position()
+    b = Board()
 
     # White bishops at c1 and f1, blocked by pawns → no moves
-    white_bishop_moves = generate_bishop_moves(b)
+    white_bishop_moves = ChessEngine.generate_bishop_moves(b)
     @test length(white_bishop_moves) == 0
 
     # Unblock c1 bishop by moving pawn d2 → d3
-    b.bitboards[W_PAWN] = clearbit(b.bitboards[W_PAWN], square_index(4, 2))
-    b.bitboards[W_PAWN] = setbit(b.bitboards[W_PAWN], square_index(4, 3))
+    b.bitboards[W_PAWN] = ChessEngine.clearbit(b.bitboards[W_PAWN], ChessEngine.square_index(4, 2))
+    b.bitboards[W_PAWN] = ChessEngine.setbit(b.bitboards[W_PAWN], ChessEngine.square_index(4, 3))
 
-    white_bishop_moves = generate_bishop_moves(b)
+    white_bishop_moves = ChessEngine.generate_bishop_moves(b)
     expected_moves = [
         Move("c1", "d2"),
         Move("c1", "e3"),
@@ -27,17 +27,17 @@ using Test
 end
 
 @testset "Rook move generation" begin
-    b = start_position()
+    b = Board()
 
     # Unblock a1 rook by moving pawn a2 → a4
-    b.bitboards[W_PAWN] = clearbit(b.bitboards[W_PAWN], square_index(1, 2))
-    b.bitboards[W_PAWN] = setbit(b.bitboards[W_PAWN], square_index(1, 4))
+    b.bitboards[W_PAWN] = ChessEngine.clearbit(b.bitboards[W_PAWN], ChessEngine.square_index(1, 2))
+    b.bitboards[W_PAWN] = ChessEngine.setbit(b.bitboards[W_PAWN], ChessEngine.square_index(1, 4))
 
-    white_rook_moves = generate_rook_moves(b)
+    white_rook_moves = ChessEngine.generate_rook_moves(b)
 
     expected_moves = [
-        Move(square_index(1, 1), square_index(1, 2)),  # a1 → a2
-        Move(square_index(1, 1), square_index(1, 3))  # a1 → a3
+        Move(ChessEngine.square_index(1, 1), ChessEngine.square_index(1, 2)),  # a1 → a2
+        Move(ChessEngine.square_index(1, 1), ChessEngine.square_index(1, 3))  # a1 → a3
     ]
 
     for em in expected_moves
@@ -46,20 +46,20 @@ end
 end
 
 @testset "Rook move disables castling" begin
-    b = start_position()
+    b = Board()
 
     # Clear pieces between king and rook for white kingside castling
-    b.bitboards[W_KNIGHT] = clearbit(b.bitboards[W_KNIGHT], square_index(2, 1))
-    b.bitboards[W_BISHOP] = clearbit(b.bitboards[W_BISHOP], square_index(3, 1))
-    b.bitboards[W_QUEEN] = clearbit(b.bitboards[W_QUEEN], square_index(4, 1))
-    b.bitboards[W_BISHOP] = clearbit(b.bitboards[W_BISHOP], square_index(6, 1))
-    b.bitboards[W_KNIGHT] = clearbit(b.bitboards[W_KNIGHT], square_index(7, 1))
+    b.bitboards[W_KNIGHT] = ChessEngine.clearbit(b.bitboards[W_KNIGHT], ChessEngine.square_index(2, 1))
+    b.bitboards[W_BISHOP] = ChessEngine.clearbit(b.bitboards[W_BISHOP], ChessEngine.square_index(3, 1))
+    b.bitboards[W_QUEEN] = ChessEngine.clearbit(b.bitboards[W_QUEEN], ChessEngine.square_index(4, 1))
+    b.bitboards[W_BISHOP] = ChessEngine.clearbit(b.bitboards[W_BISHOP], ChessEngine.square_index(6, 1))
+    b.bitboards[W_KNIGHT] = ChessEngine.clearbit(b.bitboards[W_KNIGHT], ChessEngine.square_index(7, 1))
 
     # Clear all white pawns 
     b.bitboards[W_PAWN] = UInt64(0)
     # Add black pawn on a2 and h2
-    b.bitboards[B_PAWN] = setbit(b.bitboards[B_PAWN], square_index(1, 2))
-    b.bitboards[B_PAWN] = setbit(b.bitboards[B_PAWN], square_index(8, 2))
+    b.bitboards[B_PAWN] = ChessEngine.setbit(b.bitboards[B_PAWN], ChessEngine.square_index(1, 2))
+    b.bitboards[B_PAWN] = ChessEngine.setbit(b.bitboards[B_PAWN], ChessEngine.square_index(8, 2))
 
     # Step 1: move rook to f1
     m1 = Move("h1", "f1")
@@ -89,23 +89,23 @@ end
 end
 
 @testset "Queen move generation" begin
-    b = start_position()
+    b = Board()
 
     # Unblock d1 queen by moving pawn d2 → d4 and e2 → e4
-    b.bitboards[W_PAWN] = clearbit(b.bitboards[W_PAWN], square_index(4, 2))
-    b.bitboards[W_PAWN] = setbit(b.bitboards[W_PAWN], square_index(4, 4))
-    b.bitboards[W_PAWN] = clearbit(b.bitboards[W_PAWN], square_index(5, 2))
-    b.bitboards[W_PAWN] = setbit(b.bitboards[W_PAWN], square_index(5, 4))
+    b.bitboards[W_PAWN] = ChessEngine.clearbit(b.bitboards[W_PAWN], ChessEngine.square_index(4, 2))
+    b.bitboards[W_PAWN] = ChessEngine.setbit(b.bitboards[W_PAWN], ChessEngine.square_index(4, 4))
+    b.bitboards[W_PAWN] = ChessEngine.clearbit(b.bitboards[W_PAWN], ChessEngine.square_index(5, 2))
+    b.bitboards[W_PAWN] = ChessEngine.setbit(b.bitboards[W_PAWN], ChessEngine.square_index(5, 4))
 
-    white_queen_moves = generate_queen_moves(b)
+    white_queen_moves = ChessEngine.generate_queen_moves(b)
 
     expected_moves = [
-        Move(square_index(4, 1), square_index(4, 2)),  # d1 → d2
-        Move(square_index(4, 1), square_index(4, 3)),  # d1 → d3
-        Move(square_index(4, 1), square_index(5, 2)),  # d1 → e2
-        Move(square_index(4, 1), square_index(6, 3)),  # d1 → f3
-        Move(square_index(4, 1), square_index(7, 4)),  # d1 → g4
-        Move(square_index(4, 1), square_index(8, 5))  # d1 → h5
+        Move(ChessEngine.square_index(4, 1), ChessEngine.square_index(4, 2)),  # d1 → d2
+        Move(ChessEngine.square_index(4, 1), ChessEngine.square_index(4, 3)),  # d1 → d3
+        Move(ChessEngine.square_index(4, 1), ChessEngine.square_index(5, 2)),  # d1 → e2
+        Move(ChessEngine.square_index(4, 1), ChessEngine.square_index(6, 3)),  # d1 → f3
+        Move(ChessEngine.square_index(4, 1), ChessEngine.square_index(7, 4)),  # d1 → g4
+        Move(ChessEngine.square_index(4, 1), ChessEngine.square_index(8, 5))  # d1 → h5
     ]
 
     for em in expected_moves

@@ -168,3 +168,14 @@ function make_move!(board::Board, m::Move)
     push!(board.position_history, zobrist_hash(board))
     board.side_to_move = (board.side_to_move == WHITE ? BLACK : WHITE)
 end
+
+"""
+Return a new board with move `m` applied, leaving the original board unchanged.
+- `board`: Board struct
+- `m`: Move
+"""
+function make_move(board::Board, m::Move)
+    new_board = deepcopy(board)
+    make_move!(new_board, m)
+    return new_board
+end

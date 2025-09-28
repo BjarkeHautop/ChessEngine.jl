@@ -64,3 +64,5 @@ function display_board(board::Board)
     hidespines!(ax)
     fig
 end
+
+display_board(game::Game) = display_board(game.board)

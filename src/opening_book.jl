@@ -100,7 +100,7 @@ function polyglot_hash(board::Board)::UInt64
         piece = piece_at(board, sq)    # returns 0..12
         if piece != 0
             index = polyglot_piece_index(piece, sq)
-            h ⊻= POLYGLOT_RANDOM_ARRAY[index + 1]   # +1 for Julia 1-based indexing
+            h ⊻= POLYGLOT_RANDOM_ARRAY[index + 1]
         end
     end
 

@@ -2,16 +2,16 @@ using ChessEngine
 using Test
 
 @testset "Game over detection" begin
-    b = start_position()
+    b = Board()
 
     @test game_over(b) == :ongoing
 
     # Fool's mate position (black wins)
     moves = [
-        Move(square_index(6, 2), square_index(6, 3)),  # f2 to f3
-        Move(square_index(5, 7), square_index(5, 5)),  # e7 to e5
-        Move(square_index(7, 2), square_index(7, 4)),  # g2 to g4
-        Move(square_index(4, 8), square_index(8, 4))  # d8 to h4 (checkmate)
+        Move(ChessEngine.square_index(6, 2), ChessEngine.square_index(6, 3)),  # f2 to f3
+        Move(ChessEngine.square_index(5, 7), ChessEngine.square_index(5, 5)),  # e7 to e5
+        Move(ChessEngine.square_index(7, 2), ChessEngine.square_index(7, 4)),  # g2 to g4
+        Move(ChessEngine.square_index(4, 8), ChessEngine.square_index(8, 4))  # d8 to h4 (checkmate)
     ]
 
     for m in moves
@@ -35,9 +35,9 @@ using Test
     end
 
     # Place the pieces
-    bitboards[W_KING] = setbit(UInt64(0), square_index(2, 6))  # b6
-    bitboards[W_PAWN] = setbit(UInt64(0), square_index(2, 7))  # b7
-    bitboards[B_KING] = setbit(UInt64(0), square_index(2, 8))  # b8
+    bitboards[W_KING] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(2, 6))  # b6
+    bitboards[W_PAWN] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(2, 7))  # b7
+    bitboards[B_KING] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(2, 8))  # b8
 
     # Black to move, no castling rights, no en passant
     b = Board(bitboards, BLACK, 0x0, -1, 0, UInt64[], UndoInfo[], 0, 0)
@@ -49,12 +49,12 @@ using Test
     # Threefold repetition example
     # -----------------------------
     # Shuffle knights back and forth from starting position
-    b = start_position()
+    b = Board()
     moves = [
-        Move(square_index(2, 1), square_index(3, 3)),  # b1 to c3
-        Move(square_index(7, 8), square_index(6, 6)),  # g8 to f6
-        Move(square_index(3, 3), square_index(2, 1)),  # c3 to b1
-        Move(square_index(6, 6), square_index(7, 8))  # f6 to g8
+        Move(ChessEngine.square_index(2, 1), ChessEngine.square_index(3, 3)),  # b1 to c3
+        Move(ChessEngine.square_index(7, 8), ChessEngine.square_index(6, 6)),  # g8 to f6
+        Move(ChessEngine.square_index(3, 3), ChessEngine.square_index(2, 1)),  # c3 to b1
+        Move(ChessEngine.square_index(6, 6), ChessEngine.square_index(7, 8))  # f6 to g8
     ]
     for i in 1:3
         for m in moves
@@ -73,9 +73,9 @@ using Test
     for p in W_PAWN:B_KING
         bitboards[p] = UInt64(0)
     end
-    bitboards[W_KING] = setbit(UInt64(0), square_index(5, 1))  # e1
-    bitboards[B_KING] = setbit(UInt64(0), square_index(5, 8))  # e8
-    bitboards[W_ROOK] = setbit(UInt64(0), square_index(1, 1))  # a1
+    bitboards[W_KING] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(5, 1))  # e1
+    bitboards[B_KING] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(5, 8))  # e8
+    bitboards[W_ROOK] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(1, 1))  # a1
 
     # Make a board with 98 halfmoves (49 full moves) without pawn moves or captures
     b = Board(bitboards, WHITE, 0x0, -1, 98, UInt64[], UndoInfo[], 0, 0)
@@ -87,8 +87,8 @@ using Test
 
     # Now make the 99th and 100th halfmove
     moves = [
-        Move(square_index(5, 1), square_index(5, 2)),  # e1 to e2
-        Move(square_index(5, 8), square_index(5, 7))  # e8 to e7
+        Move(ChessEngine.square_index(5, 1), ChessEngine.square_index(5, 2)),  # e1 to e2
+        Move(ChessEngine.square_index(5, 8), ChessEngine.square_index(5, 7))  # e8 to e7
     ]
     for m in moves
         make_move!(b, m)
@@ -99,12 +99,12 @@ using Test
 end
 
 @testset "Insufficent material" begin
-    b = board_from_fen("4k3/8/8/8/8/8/8/4K3 w - - 0 1")  # King vs King
+    b = Board(fen="4k3/8/8/8/8/8/8/4K3 w - - 0 1")  # King vs King
     @test game_over(b) == :draw_insufficient_material
 
-    b = board_from_fen("4k3/8/2b5/8/8/8/2B5/4K3 w - - 0 1") # King and Bishop vs King and Bishop (same color)
+    b = Board(fen="4k3/8/2b5/8/8/8/2B5/4K3 w - - 0 1") # King and Bishop vs King and Bishop (same color)
     @test game_over(b) == :draw_insufficient_material
 
-    b = board_from_fen("4k3/8/8/8/8/2N5/8/4K3 w - - 0 1") # King and Knight vs King
+    b = Board(fen="4k3/8/8/8/8/2N5/8/4K3 w - - 0 1") # King and Knight vs King
     @test game_over(b) == :draw_insufficient_material
 end

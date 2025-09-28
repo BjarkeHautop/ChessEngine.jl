@@ -2,7 +2,7 @@ using ChessEngine
 using Test
 
 @testset "Search Finds Scholar Mate" begin
-    b = start_position()
+    b = Board()
     moves = [Move("f2", "f3"), Move("e7", "e5"), Move("g2", "g4")]
 
     for m in moves
@@ -14,7 +14,7 @@ using Test
 end
 
 @testset "Search with time constraint" begin
-    b = start_position()
+    b = Board()
 
     m1 = Move("e2", "e4")
     make_move!(b, m1)
@@ -28,14 +28,14 @@ end
 end
 
 @testset "Search verbose works" begin
-    b = start_position()
+    b = Board()
 
     result = search(b, 2; opening_book = nothing, verbose = true)
     @test result.move !== nothing
 end
 
 @testset "Search works in random position" begin
-    b = board_from_fen("rnbq1rk1/pp4bp/2pp1np1/3Ppp2/2P5/2N2NP1/PP2PPBP/R1BQ1RK1 w KQkq e6 0 1")
+    b = Board(fen="rnbq1rk1/pp4bp/2pp1np1/3Ppp2/2P5/2N2NP1/PP2PPBP/R1BQ1RK1 w KQkq e6 0 1")
 
     result = search(b, 4; opening_book = nothing)
     @test true  # Just ensure it completes without error

@@ -3,7 +3,7 @@ using Test
 
 @testset "Evaluation" begin
     # Starting position should be balanced
-    b = start_position()
+    b = Board()
     @test evaluate(b) == 0
 
     m1 = Move("e2", "e4")

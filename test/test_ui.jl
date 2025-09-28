@@ -2,7 +2,7 @@ using ChessEngine
 using Test
 
 @testset "display_board" begin
-    b = start_position()
+    b = Board()
 
     # Expect no error
     display = display_board(b)

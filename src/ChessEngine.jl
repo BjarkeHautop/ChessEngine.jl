@@ -1,40 +1,36 @@
 module ChessEngine
 
+include("types.jl")
+include("opening_book.jl")
 include("chess_core.jl")
+include("evaluate_position.jl")
+include("piece_square_tables.jl")
+include("searchj.jl")
 
-export UndoInfo, Board, start_position, square_index, setbit, clearbit, testbit,
-       position_equal
+# Core types
+export Board, UndoInfo, Move, Game, SearchResult
+
+# Board setup & utility
+export display_board
+
+# Piece constants & colors
 export W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING
 export B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING
-export ALL_PIECES
-export WHITE, BLACK
-export board_from_fen
+export WHITE, BLACK, ALL_PIECES
 
-export Move, generate_pawn_moves, generate_knight_moves, generate_bishop_moves
-export generate_rook_moves, generate_queen_moves, generate_king_moves
-export generate_legal_moves, make_move!, game_over, in_check
-export square_attacked, king_square, piece_at, generate_captures
-export display_board
-export zobrist_hash
-export undo_move!
-export perft, perft_fast, generate_legal_moves!
+# Move generation & game state
+export generate_legal_moves, generate_legal_moves!
+export make_move!, make_move, undo_move!, undo_move, make_timed_move!
+export in_check, game_over
 
-export make_null_move!, unmake_null_move!
-include("piece_square_tables.jl")
-export flip_table
-export piece_square_value
+# Evaluation & search
+export evaluate, search, search_with_time
 
-include("evaluate_position.jl")
-export evaluate, search, compute_eval_and_phase
+# Perft & testing
+export perft, perft_fast
 
-include("opening_book.jl")
-export book_move, polyglot_hash, polyglot_piece_index, KOMODO_OPENING_BOOK
-export POLYGLOT_RANDOM_ARRAY, WHITE_KING, WHITE_QUEEN, BLACK_KING, BLACK_QUEEN
-
-include("searchj.jl")
-include("game.jl")
-export Game, make_timed_move!, search_with_time, start_game, MATE_VALUE, MATE_THRESHOLD
-
+# Opening book
 export PolyglotBook, load_polyglot_book
-export SearchResult
+export book_move, polyglot_hash, KOMODO_OPENING_BOOK
+
 end

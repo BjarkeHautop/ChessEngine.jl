@@ -1,6 +1,6 @@
 """
-Undo move `m` on `board`, restoring previous state.
-Relies on the UndoInfo pushed during make_move!.
+    undo_move!(board::Board, m::Move)
+Undo move `m` on `board` in place, restoring previous state.
 """
 function undo_move!(board::Board, m::Move)
     # --- 1. Flip side back ---
@@ -53,4 +53,14 @@ function undo_move!(board::Board, m::Move)
     board.halfmove_clock = u.halfmove_clock
     board.eval_score = u.prev_eval_score
     board.game_phase_value = u.prev_game_phase_value
+end
+
+"""
+    undo_move(board::Board, m::Move)
+Return a new board with move `m` undone, leaving the original board unchanged.
+"""
+function undo_move(board::Board, m::Move)
+    board_copy = deepcopy(board)
+    undo_move!(board_copy, m)
+    return board_copy
 end
