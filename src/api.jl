@@ -51,7 +51,7 @@ end
 
 Return the piece constant corresponding to promotion symbol `c` and the moving side (`:white` or `:black`).
 """
-function piece_from_symbol(c::AbstractChar,  side::Side)
+function piece_from_symbol(c::AbstractChar, side::Side)
     piece = nothing
     if c == 'Q'
         piece = side == :white ? Piece.W_QUEEN : Piece.B_QUEEN
@@ -102,7 +102,8 @@ function Move(board::Board, str::AbstractString)
     # Infer en passant
     is_ep = false
     moving_piece = 0
-    for p in (board.side_to_move == WHITE ? (Piece.W_PAWN:Piece.W_KING) : (Piece.B_PAWN:Piece.B_KING))
+    for p in (board.side_to_move == WHITE ? (Piece.W_PAWN:Piece.W_KING) :
+         (Piece.B_PAWN:Piece.B_KING))
         if testbit(board.bitboards[p], from)
             moving_piece = p
             break

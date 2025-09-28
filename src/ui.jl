@@ -34,9 +34,8 @@ function display_board(board::Board)
         aspect = DataAspect()
     )
 
-    ax.xticks = (collect(0.5:1:7.5), ["a","b","c","d","e","f","g","h"])
-    ax.yticks = (collect(0.5:1:7.5), ["1","2","3","4","5","6","7","8"])
-
+    ax.xticks = (collect(0.5:1:7.5), ["a", "b", "c", "d", "e", "f", "g", "h"])
+    ax.yticks = (collect(0.5:1:7.5), ["1", "2", "3", "4", "5", "6", "7", "8"])
 
     # Colors
     light = RGB(0.93, 0.81, 0.65)
@@ -44,6 +43,7 @@ function display_board(board::Board)
 
     # Squares
     for rank in 1:8, file in 1:8
+
         color = isodd(rank + file) ? dark : light
         poly!(ax, Rect(file-1, rank-1, 1, 1); color = color)
     end

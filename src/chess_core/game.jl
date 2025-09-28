@@ -124,7 +124,6 @@ function make_timed_move(
     return game_copy
 end
 
-
 """
 Check for threefold repetition
 - `board`: Board struct
@@ -160,15 +159,20 @@ function is_insufficient_material(board::Board)
     end
 
     # Quick check: any pawns, rooks, or queens → material is sufficient
-    if count_bits(board.bitboards[Piece.W_PAWN]) > 0 || count_bits(board.bitboards[Piece.B_PAWN]) > 0 ||
-       count_bits(board.bitboards[Piece.W_ROOK]) > 0 || count_bits(board.bitboards[Piece.B_ROOK]) > 0 ||
-       count_bits(board.bitboards[Piece.W_QUEEN]) > 0 || count_bits(board.bitboards[Piece.B_QUEEN]) > 0
+    if count_bits(board.bitboards[Piece.W_PAWN]) > 0 ||
+       count_bits(board.bitboards[Piece.B_PAWN]) > 0 ||
+       count_bits(board.bitboards[Piece.W_ROOK]) > 0 ||
+       count_bits(board.bitboards[Piece.B_ROOK]) > 0 ||
+       count_bits(board.bitboards[Piece.W_QUEEN]) > 0 ||
+       count_bits(board.bitboards[Piece.B_QUEEN]) > 0
         return false
     end
 
     # Count minor pieces
-    w_minors = count_bits(board.bitboards[Piece.W_BISHOP]) + count_bits(board.bitboards[Piece.W_KNIGHT])
-    b_minors = count_bits(board.bitboards[Piece.B_BISHOP]) + count_bits(board.bitboards[Piece.B_KNIGHT])
+    w_minors = count_bits(board.bitboards[Piece.W_BISHOP]) +
+               count_bits(board.bitboards[Piece.W_KNIGHT])
+    b_minors = count_bits(board.bitboards[Piece.B_BISHOP]) +
+               count_bits(board.bitboards[Piece.B_KNIGHT])
 
     # Only kings
     if w_minors == 0 && b_minors == 0

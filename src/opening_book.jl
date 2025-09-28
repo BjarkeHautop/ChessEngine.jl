@@ -48,8 +48,10 @@ const BLACK_QUEEN = 0x8  # q
 
 # Map board piece constants to Polyglot piece indices (0..11)
 const POLYGLOT_PIECE_INDEX = Dict(
-    Piece.B_PAWN => 0, Piece.W_PAWN => 1, Piece.B_KNIGHT => 2, Piece.W_KNIGHT => 3, Piece.B_BISHOP => 4, Piece.W_BISHOP => 5,
-    Piece.B_ROOK => 6, Piece.W_ROOK => 7, Piece.B_QUEEN => 8, Piece.W_QUEEN => 9, Piece.B_KING => 10, Piece.W_KING => 11
+    Piece.B_PAWN => 0, Piece.W_PAWN => 1, Piece.B_KNIGHT => 2, Piece.W_KNIGHT => 3,
+    Piece.B_BISHOP => 4, Piece.W_BISHOP => 5,
+    Piece.B_ROOK => 6, Piece.W_ROOK => 7, Piece.B_QUEEN => 8, Piece.W_QUEEN => 9,
+    Piece.B_KING => 10, Piece.W_KING => 11
 )
 
 # Map castling flag to 0..3 index for Polyglot

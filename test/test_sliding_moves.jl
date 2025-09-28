@@ -49,11 +49,16 @@ end
     b = Board()
 
     # Clear pieces between king and rook for white kingside castling
-    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(2, 1))
-    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(3, 1))
-    b.bitboards[Piece.W_QUEEN] = ChessEngine.clearbit(b.bitboards[Piece.W_QUEEN], ChessEngine.square_index(4, 1))
-    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
-    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
+    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(2, 1))
+    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(3, 1))
+    b.bitboards[Piece.W_QUEEN] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_QUEEN], ChessEngine.square_index(4, 1))
+    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
+    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
 
     # Clear all white pawns 
     b.bitboards[Piece.W_PAWN] = UInt64(0)

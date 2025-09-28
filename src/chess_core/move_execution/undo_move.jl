@@ -31,7 +31,8 @@ function undo_move!(board::Board, m::Move)
     end
 
     # --- 5. Undo castling rook move if necessary ---
-    if abs(m.to - m.from) == 2 && (moved_piece == Piece.W_KING || moved_piece == Piece.B_KING)
+    if abs(m.to - m.from) == 2 &&
+       (moved_piece == Piece.W_KING || moved_piece == Piece.B_KING)
         if m.to == 6 # White short castle
             board.bitboards[Piece.W_ROOK] = clearbit(board.bitboards[Piece.W_ROOK], 5)
             board.bitboards[Piece.W_ROOK] = setbit(board.bitboards[Piece.W_ROOK], 7)

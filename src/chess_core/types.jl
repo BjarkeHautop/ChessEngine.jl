@@ -13,18 +13,18 @@ Container for chess piece constants. Use `Piece.W_PAWN`, `Piece.B_KING`, etc.
 """
 
 const Piece = (
-    W_PAWN   = 1,
+    W_PAWN = 1,
     W_KNIGHT = 2,
     W_BISHOP = 3,
-    W_ROOK   = 4,
-    W_QUEEN  = 5,
-    W_KING   = 6,
-    B_PAWN   = 7,
+    W_ROOK = 4,
+    W_QUEEN = 5,
+    W_KING = 6,
+    B_PAWN = 7,
     B_KNIGHT = 8,
     B_BISHOP = 9,
-    B_ROOK   = 10,
-    B_QUEEN  = 11,
-    B_KING   = 12
+    B_ROOK = 10,
+    B_QUEEN = 11,
+    B_KING = 12
 )
 
 # Convenience: all piece types as a range

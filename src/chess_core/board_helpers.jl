@@ -70,7 +70,8 @@ function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
     # 2) Knight attacks
     ########################
     knight_deltas = [-17, -15, -10, -6, 6, 10, 15, 17]
-    knights = (attacker == WHITE) ? board.bitboards[Piece.W_KNIGHT] : board.bitboards[Piece.B_KNIGHT]
+    knights = (attacker == WHITE) ? board.bitboards[Piece.W_KNIGHT] :
+              board.bitboards[Piece.B_KNIGHT]
     for d in knight_deltas
         from = sq + d
         if on_board(from)
@@ -145,7 +146,8 @@ function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
     # 4) King attacks
     ########################
     king_deltas = [-9, -8, -7, -1, 1, 7, 8, 9]
-    kings = (attacker == WHITE) ? board.bitboards[Piece.W_KING] : board.bitboards[Piece.B_KING]
+    kings = (attacker == WHITE) ? board.bitboards[Piece.W_KING] :
+            board.bitboards[Piece.B_KING]
     for d in king_deltas
         from = sq + d
         if on_board(from) && testbit(kings, from)

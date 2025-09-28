@@ -82,8 +82,10 @@ end
 @testset "Unmake castling" begin
     b = Board()
     # Clear squares between king and rook for kingside castling
-    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
-    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
+    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
+    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
     m_castle = Move("e1", "g1"; castling = 1)  # kingside castle
     original_board = deepcopy(b)
     original_hash = ChessEngine.zobrist_hash(b)

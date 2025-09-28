@@ -5,8 +5,10 @@ using Test
     b = Board()
 
     # Clear pieces between king and rook for castling
-    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
-    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
+    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
+    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
 
     # Generate legal moves for white
     legal_moves = generate_legal_moves(b)
@@ -29,11 +31,16 @@ end
     # Remove e2, f2 pawn, and pieces for castling
     b.bitboards[Piece.W_PAWN] = ChessEngine.clearbit(b.bitboards[Piece.W_PAWN], ChessEngine.square_index(5, 2))
     b.bitboards[Piece.W_PAWN] = ChessEngine.clearbit(b.bitboards[Piece.W_PAWN], ChessEngine.square_index(6, 2))
-    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(2, 1))
-    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(3, 1))
-    b.bitboards[Piece.W_QUEEN] = ChessEngine.clearbit(b.bitboards[Piece.W_QUEEN], ChessEngine.square_index(4, 1))
-    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
-    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
+    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(2, 1))
+    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(3, 1))
+    b.bitboards[Piece.W_QUEEN] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_QUEEN], ChessEngine.square_index(4, 1))
+    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
+    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
 
     king_moves = ChessEngine.generate_king_moves(b)
 
@@ -65,8 +72,10 @@ end
     b = Board()
 
     # Clear pieces between king and rook for castling
-    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
-    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
+    b.bitboards[Piece.W_BISHOP] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_BISHOP], ChessEngine.square_index(6, 1))
+    b.bitboards[Piece.W_KNIGHT] = ChessEngine.clearbit(
+        b.bitboards[Piece.W_KNIGHT], ChessEngine.square_index(7, 1))
 
     # Step 1: move king to f1
     m1 = Move("e1", "f1")

@@ -18,7 +18,8 @@ function _generate_pawn_moves_internal(board::Board, push_fn)
 
         # single push
         to_sq = sq + direction
-        if on_board(to_sq) && !any(testbit(board.bitboards[p], to_sq) for p in ChessEngine.ALL_PIECES)
+        if on_board(to_sq) &&
+           !any(testbit(board.bitboards[p], to_sq) for p in ChessEngine.ALL_PIECES)
             if rank == promotion_rank
                 for promo in promo_pieces
                     push_fn(sq, to_sq; promotion = promo)
@@ -28,7 +29,8 @@ function _generate_pawn_moves_internal(board::Board, push_fn)
                 # double push
                 if rank == start_rank
                     to_sq2 = sq + 2*direction
-                    if !any(testbit(board.bitboards[p], to_sq2) for p in ChessEngine.ALL_PIECES)
+                    if !any(testbit(board.bitboards[p], to_sq2)
+                    for p in ChessEngine.ALL_PIECES)
                         push_fn(sq, to_sq2)
                     end
                 end
