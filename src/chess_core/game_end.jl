@@ -77,7 +77,7 @@ function game_over(board::Board)
     legal = generate_legal_moves(board)
     if isempty(legal)
         if in_check(board, board.side_to_move)
-            return (board.side_to_move == WHITE) ? :checkmate_white : :checkmate_black
+            return (board.side_to_move == WHITE) ? :checkmate_black : :checkmate_white
         else
             return :stalemate
         end

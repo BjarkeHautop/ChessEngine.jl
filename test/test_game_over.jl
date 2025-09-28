@@ -19,7 +19,7 @@ using Test
     end
 
     # Check game over status
-    @test game_over(b) == :checkmate_white  # white is checkmated
+    @test game_over(b) == :checkmate_black  # white is checkmated
     b.side_to_move = BLACK  # switch to black
     @test game_over(b) == :ongoing  # black is not checkmated
 
