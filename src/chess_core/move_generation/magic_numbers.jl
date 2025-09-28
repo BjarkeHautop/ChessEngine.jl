@@ -6,15 +6,14 @@ using Serialization
 # ROOK_MAGICS = ChessEngine.generate_magics(ChessEngine.ROOK_MASKS, ChessEngine.rook_attack_from_occupancy)
 # QUEEN_MAGICS = ChessEngine.generate_magics(ChessEngine.QUEEN_MASKS, ChessEngine.queen_attack_from_occupancy)
 
-# Fix path
-
+const ASSET_DIR_new = abspath(joinpath(@__DIR__, "..", "..", "..", "assets"))
 
 # Save them
-# serialize(joinpath(ChessEngine.ASSET_DIR, "bishop_magics.bin"), BISHOP_MAGICS)
-# serialize(joinpath(ChessEngine.ASSET_DIR, "rook_magics.bin"), ROOK_MAGICS)
-# serialize(joinpath(ChessEngine.ASSET_DIR, "queen_magics.bin"), QUEEN_MAGICS)
+# serialize(joinpath(ChessEngine.ASSET_DIR_new, "bishop_magics.bin"), BISHOP_MAGICS)
+# serialize(joinpath(ChessEngine.ASSET_DIR_new, "rook_magics.bin"), ROOK_MAGICS)
+# serialize(joinpath(ChessEngine.ASSET_DIR_new, "queen_magics.bin"), QUEEN_MAGICS)
 
 # Load them
-const BISHOP_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR, "bishop_magics.bin"))
-const ROOK_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR, "rook_magics.bin"))
-const QUEEN_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR, "queen_magics.bin"))
+const BISHOP_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR_new, "bishop_magics.bin"))
+const ROOK_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR_new, "rook_magics.bin"))
+const QUEEN_MAGICS = deserialize(joinpath(ChessEngine.ASSET_DIR_new, "queen_magics.bin"))

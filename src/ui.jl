@@ -1,7 +1,7 @@
 using CairoMakie, Images, FileIO
 
 # Path relative to this source file
-const ASSET_DIR = abspath(joinpath(@__DIR__, "..", "..", "assets"))
+const ASSET_DIR = abspath(joinpath(@__DIR__, "..", "assets"))
 
 # Piece images used under CC BY-SA 3.0 license:
 # Original source: https://commons.wikimedia.org/wiki/Category:PNG_chess_pieces/Standard_transparent

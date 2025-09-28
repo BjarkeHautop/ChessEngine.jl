@@ -72,17 +72,3 @@ end
 function Base.hash(m::Move, h::UInt)
     hash((m.from, m.to, m.promotion, m.capture, m.castling, m.en_passant), h)
 end
-
-#########################
-# Move helpers          #
-#########################
-
-"""
-Check if a square index is on the board
-"""
-on_board(sq::Int) = 0 <= sq <= 63
-
-"""
-Return file (1..8) and rank (1..8) for a square index
-"""
-file_rank(sq::Int) = (sq % 8 + 1, sq ÷ 8 + 1)
