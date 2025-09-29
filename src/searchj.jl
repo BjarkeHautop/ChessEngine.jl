@@ -401,18 +401,19 @@ end
         time_budget::Int = typemax(Int)
     )
 
-Search for the best move using minimax with alpha-beta pruning, quiescence search,
-null move pruning, and transposition tables.
+Search for the best move using minimax with iterative deepening, alpha-beta pruning,
+quiescence search, null move pruning, and transposition tables.
 
 Arguments:
 - `board`: current board position
 - `depth`: search depth
 - `opening_book`: if provided, uses a opening book. Default is `KOMODO_OPENING_BOOK` 
-taken from https://github.com/gmcheems-org/free-opening-books. Set to `nothing` to disable. 
-- `verbose`: if true, prints a single-line progress indicator (only at root)
+taken from [free-opening-books](https://github.com/gmcheems-org/free-opening-books). 
+Set to `nothing` to disable. 
+- `verbose`: if true, prints search information and principal variation (PV) at each depth
 - `time_budget`: time in milliseconds to stop the search (if depth not reached)
 Returns:
-- `(best_score, best_move)`
+- `SearchResult` containing the best move and its evaluation score.
 """
 function search(
         board::Board;

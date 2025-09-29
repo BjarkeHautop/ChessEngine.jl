@@ -51,7 +51,11 @@ We can undo a move using `undo_move` or the in-place version `undo_move!`:
 undo_move!(board, mv)
 ```
 
-Note, that `make_move` allows for illegal moves. (Add a check for legality later)?
+Note, that `make_move` allows for illegal moves. You can get all legal moves using `generate_legal_moves`:
+
+```julia
+legal_moves = generate_legal_moves(board)
+```
 
 You can check if the game is over using `game_over`:
 
