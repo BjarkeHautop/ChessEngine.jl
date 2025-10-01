@@ -1,7 +1,7 @@
 # Getting Started
 
 ## Installation
-Can not yet be installed using the Julia package manager. Clone the repository and use `] dev /path/to/ChessEngine` to install it.
+The ChessEngine package is available through the Julia package system by running Pkg.add("ChessEngine"). Throughout, we assume that you have installed the package.
 
 ## Playing Chess
 
@@ -91,5 +91,25 @@ The engine will then automatically allocate how much time to use for each move. 
 
 ```julia
 make_timed_move!(game)
+```
+
+Combining everything we can let the engine play against itself in a 1 minute game:
+
+```julia
+game = Game("1+0")
+plots = []
+while game_over(game.board) == :ongoing
+    make_timed_move!(game)
+    push!(plots, display(game))
+end
+```
+
+And display the game:
+
+```julia
+for i in eachindex(plots)
+    sleep(0.5)
+    display(plots[i])
+end
 ```
 
