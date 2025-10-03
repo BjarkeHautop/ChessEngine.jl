@@ -59,11 +59,11 @@ end
 
 function generate_legal_moves!(board::Board, moves::Vector{Move})
     pseudo = Move[]
-    ChessEngine.generate_pawn_moves!(board, pseudo)
-    ChessEngine.generate_knight_moves!(board, pseudo)
-    ChessEngine.generate_bishop_moves!(board, pseudo)
-    ChessEngine.generate_rook_moves!(board, pseudo)
-    ChessEngine.generate_queen_moves!(board, pseudo)
-    ChessEngine.generate_king_moves!(board, pseudo)
+    OrbisChessEngine.generate_pawn_moves!(board, pseudo)
+    OrbisChessEngine.generate_knight_moves!(board, pseudo)
+    OrbisChessEngine.generate_bishop_moves!(board, pseudo)
+    OrbisChessEngine.generate_rook_moves!(board, pseudo)
+    OrbisChessEngine.generate_queen_moves!(board, pseudo)
+    OrbisChessEngine.generate_king_moves!(board, pseudo)
     _filter_legal_moves!(board, pseudo, moves; inplace = true)
 end

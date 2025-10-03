@@ -1,4 +1,4 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 # Takes 10 sec for depth 5 on my machine

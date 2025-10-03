@@ -1,4 +1,4 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 @testset "Board basics" begin
@@ -22,35 +22,35 @@ using Test
     @test b.bitboards[Piece.B_ROOK] == expected_black_rooks
 
     # Move e2 to e4
-    m_square_index = Move(ChessEngine.square_index(5, 2), ChessEngine.square_index(5, 4))
+    m_square_index = Move(OrbisChessEngine.square_index(5, 2), OrbisChessEngine.square_index(5, 4))
     m_chess_notation = Move("e2", "e4")
     @test m_square_index == m_chess_notation
 end
 
 @testset "Square indexing" begin
     # a1 → 0
-    @test ChessEngine.square_index(1, 1) == 0
+    @test OrbisChessEngine.square_index(1, 1) == 0
 
     # h1 → 7
-    @test ChessEngine.square_index(8, 1) == 7
+    @test OrbisChessEngine.square_index(8, 1) == 7
 
     # a8 → 56
-    @test ChessEngine.square_index(1, 8) == 56
+    @test OrbisChessEngine.square_index(1, 8) == 56
 
     # h8 → 63
-    @test ChessEngine.square_index(8, 8) == 63
+    @test OrbisChessEngine.square_index(8, 8) == 63
 end
 
 @testset "Bit operations" begin
-    sq = ChessEngine.square_index(5, 2)  # e2
+    sq = OrbisChessEngine.square_index(5, 2)  # e2
     bb = UInt64(0)
 
     # set bit
-    bb = ChessEngine.setbit(bb, sq)
-    @test ChessEngine.testbit(bb, sq)
+    bb = OrbisChessEngine.setbit(bb, sq)
+    @test OrbisChessEngine.testbit(bb, sq)
 
     # clear bit
-    bb = ChessEngine.clearbit(bb, sq)
+    bb = OrbisChessEngine.clearbit(bb, sq)
     @test !ChessEngine.testbit(bb, sq)
 end
 
@@ -67,7 +67,7 @@ end
     @test b.game_phase_value == 23
     @test b.eval_score < 0
 
-    eval_score, game_phase_value = ChessEngine.compute_eval_and_phase(b)
+    eval_score, game_phase_value = OrbisChessEngine.compute_eval_and_phase(b)
     @test game_phase_value == b.game_phase_value
     @test eval_score == b.eval_score
 
@@ -78,20 +78,20 @@ end
 end
 
 @testset "init_zobrist!" begin
-    ChessEngine.init_zobrist!()
+    OrbisChessEngine.init_zobrist!()
 
     # Check that side is a UInt64
-    @test isa(ChessEngine.ZOBRIST_SIDE[], UInt64)
+    @test isa(OrbisChessEngine.ZOBRIST_SIDE[], UInt64)
 
     # Check pieces array dimensions and type
-    @test size(ChessEngine.ZOBRIST_PIECES) == (12, 64)
-    @test all(isa.(ChessEngine.ZOBRIST_PIECES, UInt64))
+    @test size(OrbisChessEngine.ZOBRIST_PIECES) == (12, 64)
+    @test all(isa.(OrbisChessEngine.ZOBRIST_PIECES, UInt64))
 
     # Check castling array
-    @test length(ChessEngine.ZOBRIST_CASTLING) == 16
-    @test all(isa.(ChessEngine.ZOBRIST_CASTLING, UInt64))
+    @test length(OrbisChessEngine.ZOBRIST_CASTLING) == 16
+    @test all(isa.(OrbisChessEngine.ZOBRIST_CASTLING, UInt64))
 
     # Check en passant array
-    @test length(ChessEngine.ZOBRIST_EP) == 8
-    @test all(isa.(ChessEngine.ZOBRIST_EP, UInt64))
+    @test length(OrbisChessEngine.ZOBRIST_EP) == 8
+    @test all(isa.(OrbisChessEngine.ZOBRIST_EP, UInt64))
 end

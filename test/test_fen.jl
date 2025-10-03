@@ -1,4 +1,4 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 @testset "FEN start positon" begin
@@ -30,5 +30,5 @@ end
     make_move!(b, Move("a7", "a6"))
     make_move!(b, Move("e4", "e5"))
     make_move!(b, Move("d7", "d5"))
-    @test ChessEngine.position_equal(board_fen, b)
+    @test OrbisChessEngine.position_equal(board_fen, b)
 end

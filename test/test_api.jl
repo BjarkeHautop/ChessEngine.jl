@@ -1,4 +1,4 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 @testset "Game api" begin
@@ -73,6 +73,6 @@ end
     m = Move(b, "e2e4")
     new_b = make_move(b, m)
     make_move!(b, m)
-    @test ChessEngine.piece_at(b, 28) == ChessEngine.piece_at(new_b, 28) == Piece.W_PAWN
-    @test ChessEngine.piece_at(b, 12) == ChessEngine.piece_at(new_b, 12) == 0
+    @test OrbisChessEngine.piece_at(b, 28) == OrbisChessEngine.piece_at(new_b, 28) == Piece.W_PAWN
+    @test OrbisChessEngine.piece_at(b, 12) == OrbisChessEngine.piece_at(new_b, 12) == 0
 end

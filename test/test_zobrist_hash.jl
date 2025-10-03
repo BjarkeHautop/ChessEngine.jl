@@ -1,9 +1,9 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
-@testset "ChessEngine.zobrist_hash" begin
+@testset "OrbisChessEngine.zobrist_hash" begin
     b = Board()
-    hash_start = ChessEngine.zobrist_hash(b)
+    hash_start = OrbisChessEngine.zobrist_hash(b)
 
     moves = [Move("g1", "f3"), Move("b8", "c6"), Move("f3", "g1"), Move("c6", "b8")]
 
@@ -11,14 +11,14 @@ using Test
         make_move!(b, m)
     end
 
-    new_hash = ChessEngine.zobrist_hash(b)
+    new_hash = OrbisChessEngine.zobrist_hash(b)
     @test hash_start == new_hash
 
     b_copy = deepcopy(b)
 
     m1 = Move("e2", "e4")
     make_move!(b, m1)
-    hash_after_move = ChessEngine.zobrist_hash(b)
+    hash_after_move = OrbisChessEngine.zobrist_hash(b)
 
     m1 = Move("e2", "e3")
     m2 = Move("e3", "e4")
@@ -26,7 +26,7 @@ using Test
     make_move!(b_copy, m1)
     b_copy.side_to_move = WHITE
     make_move!(b_copy, m2)
-    hash_after_two_moves = ChessEngine.zobrist_hash(b_copy)
+    hash_after_two_moves = OrbisChessEngine.zobrist_hash(b_copy)
 
     @test hash_after_move != hash_after_two_moves
 end

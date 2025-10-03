@@ -1,4 +1,4 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 @testset "Game Time Management" begin
@@ -9,7 +9,7 @@ using Test
     @test game.black_time == 0.5*60*1000
     @test game.increment == 2000
 
-    allocated = ChessEngine.allocate_time(game)
+    allocated = OrbisChessEngine.allocate_time(game)
     @test isa(allocated, Int)
     @test allocated > 0
 
@@ -26,8 +26,8 @@ using Test
 end
 
 @testset "Time management heuristic" begin
-    @test ChessEngine.time_mangement(20000, 2000) == 20000 ÷ 20 + 2000 ÷ 2
-    @test ChessEngine.time_mangement(1000, 0) == 1000 ÷ 20
+    @test OrbisChessEngine.time_mangement(20000, 2000) == 20000 ÷ 20 + 2000 ÷ 2
+    @test OrbisChessEngine.time_mangement(1000, 0) == 1000 ÷ 20
 end
 
 @testset "Search with time respects allocation" begin

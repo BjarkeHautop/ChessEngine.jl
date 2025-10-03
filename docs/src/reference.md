@@ -5,6 +5,6 @@ Pages = ["reference.md"]
 ```
 
 ```@autodocs
-Modules = [ChessEngine]
+Modules = [OrbisChessEngine]
 Private = false
 ```

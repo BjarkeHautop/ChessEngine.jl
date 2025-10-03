@@ -1,4 +1,4 @@
-module ChessEngine
+module OrbisChessEngine
 
 # === Core types and basic utilities ===
 include("chess_core/types.jl") # Board struct and related 

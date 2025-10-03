@@ -1,14 +1,14 @@
-using ChessEngine
+using OrbisChessEngine
 using Documenter
 
-DocMeta.setdocmeta!(ChessEngine, :DocTestSetup, :(using ChessEngine); recursive = true)
+DocMeta.setdocmeta!(OrbisChessEngine, :DocTestSetup, :(using OrbisChessEngine); recursive = true)
 
 makedocs(;
-    modules = [ChessEngine],
+    modules = [OrbisChessEngine],
     authors = "Bjarke Hautop <bjarke.hautop@gmail.com> and contributors",
-    sitename = "ChessEngine.jl",
+    sitename = "OrbisChessEngine.jl",
     format = Documenter.HTML(;
-        canonical = "https://BjarkeHautop.github.io/ChessEngine.jl",
+        canonical = "https://BjarkeHautop.github.io/OrbisChessEngine.jl",
         edit_link = "main",
         assets = String[]
     ),
@@ -21,6 +21,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/BjarkeHautop/ChessEngine.jl",
+    repo = "github.com/BjarkeHautop/OrbisChessEngine.jl",
     devbranch = "main"
 )

@@ -1,8 +1,8 @@
 # Generate magic numbers once and save them to a file.
 
-# BISHOP_MAGICS = ChessEngine.generate_magics(ChessEngine.BISHOP_MASKS, ChessEngine.bishop_attack_from_occupancy)
-# ROOK_MAGICS = ChessEngine.generate_magics(ChessEngine.ROOK_MASKS, ChessEngine.rook_attack_from_occupancy)
-# QUEEN_MAGICS = ChessEngine.generate_magics(ChessEngine.QUEEN_MASKS, ChessEngine.queen_attack_from_occupancy)
+# BISHOP_MAGICS = OrbisChessEngine.generate_magics(OrbisChessEngine.BISHOP_MASKS, OrbisChessEngine.bishop_attack_from_occupancy)
+# ROOK_MAGICS = OrbisChessEngine.generate_magics(OrbisChessEngine.ROOK_MASKS, OrbisChessEngine.rook_attack_from_occupancy)
+# QUEEN_MAGICS = OrbisChessEngine.generate_magics(OrbisChessEngine.QUEEN_MASKS, OrbisChessEngine.queen_attack_from_occupancy)
 
 const BISHOP_MAGICS = UInt64[
 0x2000090202054000,

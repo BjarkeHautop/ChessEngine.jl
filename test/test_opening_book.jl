@@ -1,4 +1,4 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 @testset "Doesn't use opening book in endgame" begin
@@ -23,10 +23,10 @@ end
     make_move!(b, Move("e2", "e5"))
     make_move!(b, Move("d7", "d5"))
 
-    @test ChessEngine.has_pawn_for_en_passant(b, 3) == true
+    @test OrbisChessEngine.has_pawn_for_en_passant(b, 3) == true
     make_move!(b, Move("a2", "a3"))
-    @test ChessEngine.has_pawn_for_en_passant(b, 3) == false
+    @test OrbisChessEngine.has_pawn_for_en_passant(b, 3) == false
     make_move!(b, Move("d5", "d4"))
     make_move!(b, Move("c2", "c4"))
-    @test ChessEngine.has_pawn_for_en_passant(b, 2) == true
+    @test OrbisChessEngine.has_pawn_for_en_passant(b, 2) == true
 end

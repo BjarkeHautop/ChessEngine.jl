@@ -1,4 +1,4 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 @testset "Game over detection" begin
@@ -8,10 +8,10 @@ using Test
 
     # Fool's mate position (black wins)
     moves = [
-        Move(ChessEngine.square_index(6, 2), ChessEngine.square_index(6, 3)),  # f2 to f3
-        Move(ChessEngine.square_index(5, 7), ChessEngine.square_index(5, 5)),  # e7 to e5
-        Move(ChessEngine.square_index(7, 2), ChessEngine.square_index(7, 4)),  # g2 to g4
-        Move(ChessEngine.square_index(4, 8), ChessEngine.square_index(8, 4))  # d8 to h4 (checkmate)
+        Move(OrbisChessEngine.square_index(6, 2), OrbisChessEngine.square_index(6, 3)),  # f2 to f3
+        Move(OrbisChessEngine.square_index(5, 7), OrbisChessEngine.square_index(5, 5)),  # e7 to e5
+        Move(OrbisChessEngine.square_index(7, 2), OrbisChessEngine.square_index(7, 4)),  # g2 to g4
+        Move(OrbisChessEngine.square_index(4, 8), OrbisChessEngine.square_index(8, 4))  # d8 to h4 (checkmate)
     ]
 
     for m in moves
@@ -35,9 +35,9 @@ using Test
     end
 
     # Place the pieces
-    bitboards[Piece.W_KING] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(2, 6))  # b6
-    bitboards[Piece.W_PAWN] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(2, 7))  # b7
-    bitboards[Piece.B_KING] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(2, 8))  # b8
+    bitboards[Piece.W_KING] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(2, 6))  # b6
+    bitboards[Piece.W_PAWN] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(2, 7))  # b7
+    bitboards[Piece.B_KING] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(2, 8))  # b8
 
     # Black to move, no castling rights, no en passant
     b = Board(bitboards, BLACK, 0x0, -1, 0, UInt64[], UndoInfo[], 0, 0)
@@ -51,10 +51,10 @@ using Test
     # Shuffle knights back and forth from starting position
     b = Board()
     moves = [
-        Move(ChessEngine.square_index(2, 1), ChessEngine.square_index(3, 3)),  # b1 to c3
-        Move(ChessEngine.square_index(7, 8), ChessEngine.square_index(6, 6)),  # g8 to f6
-        Move(ChessEngine.square_index(3, 3), ChessEngine.square_index(2, 1)),  # c3 to b1
-        Move(ChessEngine.square_index(6, 6), ChessEngine.square_index(7, 8))  # f6 to g8
+        Move(OrbisChessEngine.square_index(2, 1), OrbisChessEngine.square_index(3, 3)),  # b1 to c3
+        Move(OrbisChessEngine.square_index(7, 8), OrbisChessEngine.square_index(6, 6)),  # g8 to f6
+        Move(OrbisChessEngine.square_index(3, 3), OrbisChessEngine.square_index(2, 1)),  # c3 to b1
+        Move(OrbisChessEngine.square_index(6, 6), OrbisChessEngine.square_index(7, 8))  # f6 to g8
     ]
     for i in 1:3
         for m in moves
@@ -73,9 +73,9 @@ using Test
     for p in Piece.W_PAWN:Piece.B_KING
         bitboards[p] = UInt64(0)
     end
-    bitboards[Piece.W_KING] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(5, 1))  # e1
-    bitboards[Piece.B_KING] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(5, 8))  # e8
-    bitboards[Piece.W_ROOK] = ChessEngine.setbit(UInt64(0), ChessEngine.square_index(1, 1))  # a1
+    bitboards[Piece.W_KING] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(5, 1))  # e1
+    bitboards[Piece.B_KING] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(5, 8))  # e8
+    bitboards[Piece.W_ROOK] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(1, 1))  # a1
 
     # Make a board with 98 halfmoves (49 full moves) without pawn moves or captures
     b = Board(bitboards, WHITE, 0x0, -1, 98, UInt64[], UndoInfo[], 0, 0)
@@ -87,8 +87,8 @@ using Test
 
     # Now make the 99th and 100th halfmove
     moves = [
-        Move(ChessEngine.square_index(5, 1), ChessEngine.square_index(5, 2)),  # e1 to e2
-        Move(ChessEngine.square_index(5, 8), ChessEngine.square_index(5, 7))  # e8 to e7
+        Move(OrbisChessEngine.square_index(5, 1), OrbisChessEngine.square_index(5, 2)),  # e1 to e2
+        Move(OrbisChessEngine.square_index(5, 8), OrbisChessEngine.square_index(5, 7))  # e8 to e7
     ]
     for m in moves
         make_move!(b, m)
@@ -111,7 +111,7 @@ end
 
 @testset "Not insufficent material" begin
     b = Board()
-    @test ChessEngine.is_insufficient_material(b) == false
+    @test OrbisChessEngine.is_insufficient_material(b) == false
 
     g = Game()
     @test game_over(g) == :ongoing

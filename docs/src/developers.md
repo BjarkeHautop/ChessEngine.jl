@@ -5,6 +5,6 @@ CollapsedDocStrings = true
 # Internal API Reference
 
 ```@autodocs
-Modules = [ChessEngine]
+Modules = [OrbisChessEngine]
 Public = false
 ```

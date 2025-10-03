@@ -1,4 +1,4 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 function include_tests(; include_aqua::Bool = false)

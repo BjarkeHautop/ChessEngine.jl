@@ -1,8 +1,8 @@
-using ChessEngine
+using OrbisChessEngine
 using Test
 
 import Aqua
 
 @testset "Aqua" begin
-    Aqua.test_all(ChessEngine)
+    Aqua.test_all(OrbisChessEngine)
 end

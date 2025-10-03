@@ -73,6 +73,6 @@ jobs:
         shell: julia --project=docs --color=yes {0}
         run: |
           using Documenter: DocMeta, doctest
-          using ChessEngine
-          DocMeta.setdocmeta!(ChessEngine, :DocTestSetup, :(using ChessEngine); recursive=true)
-          doctest(ChessEngine)
+          using OrbisChessEngine
+          DocMeta.setdocmeta!(OrbisChessEngine, :DocTestSetup, :(using OrbisChessEngine); recursive=true)
+          doctest(OrbisChessEngine)

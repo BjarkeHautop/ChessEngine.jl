@@ -1,14 +1,14 @@
 # Getting Started
 
 ## Installation
-The ChessEngine package is available through the Julia package system by running Pkg.add("ChessEngine"). Throughout, we assume that you have installed the package.
+The OrbisChessEngine package is available through the Julia package system by running Pkg.add("OrbisChessEngine"). Throughout, we assume that you have installed the package.
 
 ## Playing Chess
 
 First we load the package:
 
 ```julia
-using ChessEngine
+using OrbisChessEngine
 ```
 
 We can create a starting position using:
