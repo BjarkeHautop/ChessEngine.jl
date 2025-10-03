@@ -13,7 +13,7 @@ using Test
     # Check d5 square is attacked by e4 pawn
     @test OrbisChessEngine.square_attacked(b, OrbisChessEngine.square_index(4, 5), WHITE)    # d5 attacked
     # Check d6 square is not attacked 
-    @test !ChessEngine.square_attacked(b, OrbisChessEngine.square_index(4, 6), WHITE)   # d6 not attacked
+    @test !OrbisChessEngine.square_attacked(b, OrbisChessEngine.square_index(4, 6), WHITE)   # d6 not attacked
 
     # --- in_check ---
     @test !in_check(b, WHITE)

@@ -349,7 +349,6 @@ function extract_pv(board::Board, max_depth::Int)
     end
     return pv
 end
-
 # Root-level iterative deepening search
 function search_root(board::Board, max_depth::Int;
         stop_time::Int = typemax(Int),

@@ -12,7 +12,7 @@ include("chess_core/board_helpers.jl")
 
 # === Game state ===
 include("opening_book.jl")  # Polyglot opening book support
-include("chess_core/game.jl")           # Game struct, time controls, game_end logic
+include("chess_core/game.jl") # Game struct, time controls, game_end logic
 
 # === Move generation ===
 include("chess_core/move_generation/magic_numbers.jl")

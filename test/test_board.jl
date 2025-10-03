@@ -51,7 +51,7 @@ end
 
     # clear bit
     bb = OrbisChessEngine.clearbit(bb, sq)
-    @test !ChessEngine.testbit(bb, sq)
+    @test !OrbisChessEngine.testbit(bb, sq)
 end
 
 @testset "Phase value calculated correctly" begin
