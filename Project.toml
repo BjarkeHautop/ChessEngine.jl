@@ -1,7 +1,7 @@
 name = "OrbisChessEngine"
 uuid = "2eacc985-a635-41e1-b67f-45fa7ceb5b4d"
 authors = ["Bjarke Hautop <bjarke.hautop@gmail.com> and contributors"]
-version = "0.1.0-DEV"
+version = "0.1.1"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
