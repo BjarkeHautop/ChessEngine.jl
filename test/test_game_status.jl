@@ -110,9 +110,19 @@ end
 end
 
 @testset "Not insufficent material" begin
-    b = Board()
+    b = Board(fen = "5k2/8/4K3/4B3/4N3/8/8/8 b - - 0 1") # King, Bishop, Knight vs King
     @test OrbisChessEngine.is_insufficient_material(b) == false
 
     g = Game()
     @test game_status(g) == :ongoing
+end
+
+@testset "Game status time out" begin
+    g = Game()
+    g.white_time = 0  # Simulate white running out of time
+    @test game_status(g) == :timeout_white
+
+    g = Game()
+    g.black_time = 0  # Simulate black running out of time
+    @test game_status(g) == :timeout_black
 end

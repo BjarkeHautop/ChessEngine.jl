@@ -203,8 +203,14 @@ end
 
 Return the current game status (checkmate, stalemate, draw, or ongoing)
 - `board`: Board struct
-Returns: Symbol (:checkmate_white, :checkmate_black, :stalemate, :draw_threefold, :draw_fiftymove, 
-:draw_insufficient_material, :ongoing)
+Returns: Symbol - one of 
+  - `:checkmate_white`  
+  - `:checkmate_black`  
+  - `:stalemate`  
+  - `:draw_threefold`  
+  - `:draw_fiftymove`  
+  - `:draw_insufficient_material`  
+  - `:ongoing`
 """
 function game_status(board::Board)
     legal = generate_legal_moves(board)
@@ -230,11 +236,31 @@ end
 """
     game_status(game::Game)
 
-Return the current game status (checkmate, stalemate, draw, or ongoing)
-- `game`: Game struct
-Returns: Symbol (:checkmate_white, :checkmate_black, :stalemate, :draw_threefold, :draw_fiftymove, 
-:draw_insufficient_material, :ongoing)
+Return the current game status (checkmate, stalemate, draw, timeout, or ongoing).
+
+- `game`: Game struct  
+Returns: Symbol — one of  
+  - `:checkmate_white`  
+  - `:checkmate_black`  
+  - `:stalemate`  
+  - `:draw_threefold`  
+  - `:draw_fiftymove`  
+  - `:draw_insufficient_material`  
+  - `:timeout_white`  
+  - `:timeout_black`  
+  - `:ongoing`
 """
 function game_status(game::Game)
-    return game_status(game.board)
+    status = game_status(game.board)
+
+    # If the position is still ongoing, check time conditions
+    if status == :ongoing
+        if game.white_time <= 0
+            return :timeout_white  # White flagged
+        elseif game.black_time <= 0
+            return :timeout_black  # Black flagged
+        end
+    end
+
+    return status
 end

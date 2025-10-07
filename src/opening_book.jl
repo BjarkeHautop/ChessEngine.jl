@@ -157,7 +157,6 @@ function decode_polyglot_move(code::UInt16, board::Board)
     if prom == 0
         promotion = 0
     else
-        print("promotion detected")
         if board.side_to_move == WHITE
             promotion = (prom == 1 ? Piece.W_KNIGHT :
                          prom == 2 ? Piece.W_BISHOP :

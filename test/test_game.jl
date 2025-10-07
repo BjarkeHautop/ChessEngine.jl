@@ -70,3 +70,19 @@ end
     @test result.move !== nothing
     @test game.board.side_to_move == WHITE  # game not mutated
 end
+
+@testset "Make timed move non mutating" begin
+    game = Game(minutes = 1, increment = 0)
+    old_board = deepcopy(game.board)
+    make_timed_move(game)
+    @test game.board.side_to_move == WHITE  # game not mutated
+    @test game.board == old_board  # board unchanged
+end
+
+@testset "Make timed move no time left" begin
+    game = Game(minutes = 0, increment = 0)
+    old_board = deepcopy(game.board)
+    make_timed_move!(game; opening_book = nothing)
+    @test game.board == old_board  # no move made
+    @test game.white_time == 0
+end
