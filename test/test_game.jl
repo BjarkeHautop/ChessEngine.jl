@@ -54,7 +54,7 @@ end
     make_timed_move!(game; opening_book = nothing)
 
     # Should have played Qh4#
-    @test game_over(game.board) == :checkmate_black
+    @test game_status(game.board) == :checkmate_black
 end
 
 @testset "Search with time verbose works" begin

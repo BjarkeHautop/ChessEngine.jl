@@ -57,10 +57,10 @@ Note, that `make_move` allows for illegal moves. You can get all legal moves usi
 legal_moves = generate_legal_moves(board)
 ```
 
-You can check if the game is over using `game_over`:
+You can check if the game is over using `game_status`:
 
 ```julia
-game_over(board)
+game_status(board)
 ```
 
 ## Using the Engine
@@ -98,13 +98,13 @@ Combining everything we can let the engine play against itself in a 1 minute gam
 ```julia
 game = Game("1+0")
 plots = []
-while game_over(game.board) == :ongoing
+while game_status(game.board) == :ongoing
     make_timed_move!(game)
     push!(plots, display(game))
 end
 ```
 
-And display the game:
+And view the game:
 
 ```julia
 for i in eachindex(plots)

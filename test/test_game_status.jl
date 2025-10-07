@@ -4,7 +4,7 @@ using Test
 @testset "Game over detection" begin
     b = Board()
 
-    @test game_over(b) == :ongoing
+    @test game_status(b) == :ongoing
 
     # Fool's mate position (black wins)
     moves = [
@@ -19,9 +19,9 @@ using Test
     end
 
     # Check game over status
-    @test game_over(b) == :checkmate_black  # white is checkmated
+    @test game_status(b) == :checkmate_black  # white is checkmated
     b.side_to_move = BLACK  # switch to black
-    @test game_over(b) == :ongoing  # black is not checkmated
+    @test game_status(b) == :ongoing  # black is not checkmated
 
     # -----------------------------
     # Stalemate example: king vs king + pawn
@@ -41,9 +41,9 @@ using Test
 
     # Black to move, no castling rights, no en passant
     b = Board(bitboards, BLACK, 0x0, -1, 0, UInt64[], UndoInfo[], 0, 0)
-    @test game_over(b) == :stalemate
+    @test game_status(b) == :stalemate
     b.side_to_move = WHITE  # switch to white
-    @test game_over(b) == :ongoing
+    @test game_status(b) == :ongoing
 
     # -----------------------------
     # Threefold repetition example
@@ -61,9 +61,9 @@ using Test
             make_move!(b, m)
         end
     end
-    @test game_over(b) == :draw_threefold
+    @test game_status(b) == :draw_threefold
     b.side_to_move = BLACK
-    @test game_over(b) == :draw_threefold
+    @test game_status(b) == :draw_threefold
 
     # -----------------------------
     # Fifty-move rule example
@@ -79,9 +79,9 @@ using Test
 
     # Make a board with 98 halfmoves (49 full moves) without pawn moves or captures
     b = Board(bitboards, WHITE, 0x0, -1, 98, UInt64[], UndoInfo[], 0, 0)
-    @test game_over(b) == :ongoing
+    @test game_status(b) == :ongoing
     b.side_to_move = BLACK
-    @test game_over(b) == :ongoing
+    @test game_status(b) == :ongoing
 
     b.side_to_move = WHITE
 
@@ -93,20 +93,20 @@ using Test
     for m in moves
         make_move!(b, m)
     end
-    @test game_over(b) == :draw_fiftymove
+    @test game_status(b) == :draw_fiftymove
     b.side_to_move = BLACK
-    @test game_over(b) == :draw_fiftymove
+    @test game_status(b) == :draw_fiftymove
 end
 
 @testset "Insufficent material" begin
     b = Board(fen = "4k3/8/8/8/8/8/8/4K3 w - - 0 1")  # King vs King
-    @test game_over(b) == :draw_insufficient_material
+    @test game_status(b) == :draw_insufficient_material
 
     b = Board(fen = "4k3/8/2b5/8/8/8/2B5/4K3 w - - 0 1") # King and Bishop vs King and Bishop (same color)
-    @test game_over(b) == :draw_insufficient_material
+    @test game_status(b) == :draw_insufficient_material
 
     b = Board(fen = "4k3/8/8/8/8/2N5/8/4K3 w - - 0 1") # King and Knight vs King
-    @test game_over(b) == :draw_insufficient_material
+    @test game_status(b) == :draw_insufficient_material
 end
 
 @testset "Not insufficent material" begin
@@ -114,5 +114,5 @@ end
     @test OrbisChessEngine.is_insufficient_material(b) == false
 
     g = Game()
-    @test game_over(g) == :ongoing
+    @test game_status(g) == :ongoing
 end

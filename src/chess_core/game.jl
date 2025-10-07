@@ -199,14 +199,14 @@ function is_insufficient_material(board::Board)
 end
 
 """
-    game_over(board::Board)
+    game_status(board::Board)
 
-Check if the game is over (checkmate, stalemate, draw)
+Return the current game status (checkmate, stalemate, draw, or ongoing)
 - `board`: Board struct
 Returns: Symbol (:checkmate_white, :checkmate_black, :stalemate, :draw_threefold, :draw_fiftymove, 
 :draw_insufficient_material, :ongoing)
 """
-function game_over(board::Board)
+function game_status(board::Board)
     legal = generate_legal_moves(board)
     if isempty(legal)
         if in_check(board, board.side_to_move)
@@ -218,7 +218,6 @@ function game_over(board::Board)
 
     if is_insufficient_material(board)
         return :draw_insufficient_material
-
     elseif is_threefold_repetition(board)
         return :draw_threefold
     elseif is_fifty_move_rule(board)
@@ -229,13 +228,13 @@ function game_over(board::Board)
 end
 
 """
-    game_over(game::Game)
+    game_status(game::Game)
 
-Check if the game is over (checkmate, stalemate, draw)
+Return the current game status (checkmate, stalemate, draw, or ongoing)
 - `game`: Game struct
 Returns: Symbol (:checkmate_white, :checkmate_black, :stalemate, :draw_threefold, :draw_fiftymove, 
 :draw_insufficient_material, :ongoing)
 """
-function game_over(game::Game)
-    return game_over(game.board)
+function game_status(game::Game)
+    return game_status(game.board)
 end
