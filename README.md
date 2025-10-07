@@ -28,6 +28,10 @@ View the documentation at [https://BjarkeHautop.github.io/OrbisChessEngine.jl/st
 
 ## TODO
 
+- Soft time management; define optimal time and maximum time per move. Stop search when optimal time is reached after completing a depth or end immediately when maximum time is reached.
+
+- Optimize search speed
+
 - Add magic bitboards for faster move generation
 
 - Implement into Lichess bot (see https://github.com/lichess-bot-devs/lichess-bot)

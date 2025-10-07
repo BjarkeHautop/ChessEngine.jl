@@ -33,21 +33,23 @@ function search_with_time(
         max_depth::Int = 64,
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose::Bool = false
-)::SearchResult
+)
     allocated = allocate_time(game)
     stop_time = Int(time_ns() ÷ 1_000_000 + allocated)
 
-    best_result = SearchResult(nothing, nothing, false)
+    best_result::Union{Nothing, SearchResult} = nothing
 
     for depth in 1:max_depth
         if (time_ns() ÷ 1_000_000) >= stop_time
             break
         end
-
-        result = _search(game.board; depth,
-            ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
-            opening_book = depth == 1 ? opening_book : nothing,  # book only at root
-            stop_time = stop_time)
+        # Book moves only at root
+        if depth == 1
+            _opening_book = opening_book
+        else
+            _opening_book = nothing
+        end
+        result = _search(game.board, depth, 0, -MATE_VALUE, MATE_VALUE, _opening_book, stop_time)
 
         # Propagate a book move immediately
         if result.from_book
@@ -83,7 +85,7 @@ function make_timed_move!(
     result = search_with_time(game; opening_book = opening_book, verbose = verbose)
     elapsed = (time_ns() ÷ 1_000_000) - start_time
 
-    if result.move === nothing
+    if result === nothing
         return nothing
     end
 

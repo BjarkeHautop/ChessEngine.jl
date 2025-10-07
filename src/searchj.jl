@@ -160,6 +160,7 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int = 0)
     end
 
     best_score = static_eval
+
     for move in generate_captures(board)
         make_move!(board, move)
         score = quiescence(board, α, β; ply = ply+1)
@@ -201,35 +202,40 @@ end
 
 Result of a search operation.
 
-- `score`: The evaluation score of the position (nothing if from book).
-- `move`: The best move found (nothing if from book).
+- `score`: The evaluation score of the position.
+- `move`: The best move found.
 - `from_book`: Boolean indicating if the move was from the opening book.
 """
 struct SearchResult
-    score::Union{Nothing, Int}  # nothing if from book
-    move::Union{Nothing, Move}
+    score::Int
+    move::Move
     from_book::Bool
 end
 
+const NO_MOVE = Move(0, 0, 0, 0, 0, false) 
+
 # Alpha-beta search with quiescence at leaves
-function _search(board::Board;
+
+function _search(
+        board::Board,
         depth::Int,
-        ply::Int = 0,
-        α::Int = -MATE_VALUE,
-        β::Int = MATE_VALUE,
-        opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
-        stop_time::Int = typemax(Int))::SearchResult
+        ply::Int,
+        α::Int,
+        β::Int,
+        opening_book::Union{Nothing, PolyglotBook},
+        stop_time::Int
+    )::SearchResult
 
     # Time check
     if (time_ns() ÷ 1_000_000) >= stop_time
-        return SearchResult(nothing, nothing, false)
+        return SearchResult(0, NO_MOVE, false)
     end
 
     # Opening book
     if opening_book !== nothing && ply == 0
         book_mv = book_move(board, opening_book)
         if book_mv !== nothing
-            return SearchResult(nothing, book_mv, true)
+            return SearchResult(0, book_mv, true)
         end
     end
 
@@ -238,54 +244,70 @@ function _search(board::Board;
     # TT lookup
     val, move, hit = tt_probe(hash_before, depth, α, β)
     if hit
-        return SearchResult(val, move, false)
+        return SearchResult(val, move === nothing ? NO_MOVE : move, false)
     end
 
-    # Leaf node: use quiescence search
+    # Leaf node: quiescence search
     if depth == 0
-        return SearchResult(quiescence(board, α, β), nothing, false)
+        return SearchResult(quiescence(board, α, β), NO_MOVE, false)
     end
 
     # Null move pruning
-    R = 2  # reduction factor for null move pruning
+    R = 2
     if depth > R + 1 && !is_endgame(board)
-        make_null_move!(board)  # side passes
-        result = _search(board; depth = depth - 1 - R, ply = ply + 1, α = -β, β = -β + 1,
-            opening_book = nothing, stop_time = stop_time)
+        make_null_move!(board)
+        result = _search(board, depth - 1 - R, ply + 1, -β, -β + 1, nothing, stop_time)
         unmake_null_move!(board)
 
         if board.side_to_move == WHITE && result.score >= β
-            return SearchResult(result.score, nothing, false)  # beta cutoff
+            return SearchResult(result.score, NO_MOVE, false)
         elseif board.side_to_move == BLACK && result.score <= α
-            return SearchResult(result.score, nothing, false)  # alpha cutoff
+            return SearchResult(result.score, NO_MOVE, false)
         end
     end
 
     moves = Vector{Move}(undef, 0)
     generate_legal_moves!(board, moves)
-    moves = sort(moves; by = m -> -move_ordering_score(board, m, ply))
 
     if isempty(moves)
-        val = if in_check(board, board.side_to_move)
-            board.side_to_move == WHITE ? -MATE_VALUE + ply : MATE_VALUE - ply
-        else
-            0
-        end
-        return SearchResult(val, nothing, false)
+        val = in_check(board, board.side_to_move) ? (board.side_to_move == WHITE ? -MATE_VALUE + ply : MATE_VALUE - ply) : 0
+        return SearchResult(val, NO_MOVE, false)
     end
 
-    best_score = board.side_to_move == WHITE ? -Inf : Inf
-    best_move = nothing
+    # Precompute move scores
+    scores = [move_ordering_score(board, m, ply) for m in moves]
 
-    for (i, m) in enumerate(moves)
+    n = length(moves)
+    best_score = board.side_to_move == WHITE ? -Inf : Inf
+    best_move = NO_MOVE
+
+    for i in 1:n
+        # Find highest scoring remaining move
+        best_idx = i
+        best_val = scores[i]
+        @inbounds for j in i+1:n
+            if scores[j] > best_val
+                best_val = scores[j]
+                best_idx = j
+            end
+        end
+
+        if best_idx != i
+            moves[i], moves[best_idx] = moves[best_idx], moves[i]
+            scores[i], scores[best_idx] = scores[best_idx], scores[i]
+        end
+
+        m = moves[i]
+
+        # Time check
         if (time_ns() ÷ 1_000_000) >= stop_time
-            val = best_score == -Inf || best_score == Inf ? 0 : best_score
+            val = (best_score == -Inf || best_score == Inf) ? 0 : best_score
             return SearchResult(val, best_move, false)
         end
 
+        # Search child node
         make_move!(board, m)
-        result = _search(board; depth = depth - 1, ply = ply + 1, α = α, β = β,
-            opening_book = opening_book, stop_time = stop_time)
+        result = _search(board, depth - 1, ply + 1, α, β, opening_book, stop_time)
         undo_move!(board, m)
 
         # Alpha-beta update
@@ -349,12 +371,15 @@ function extract_pv(board::Board, max_depth::Int)
     end
     return pv
 end
+
 # Root-level iterative deepening search
 function search_root(board::Board, max_depth::Int;
         stop_time::Int = typemax(Int),
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose::Bool = false)::SearchResult
-    best_result = SearchResult(0.0, nothing, false)
+
+    # Use NO_MOVE as placeholder internally
+    best_result_internal = SearchResult(0, NO_MOVE, false)
 
     # Opening book probe
     if opening_book !== nothing
@@ -363,21 +388,23 @@ function search_root(board::Board, max_depth::Int;
             if verbose
                 println("Book move found: $book_mv")
             end
-            return SearchResult(nothing, book_mv, true)
+            # Return book move directly
+            return SearchResult(0, book_mv, true)
         end
     end
 
     for depth in 1:max_depth
-        result = _search(board; depth = depth, ply = 0, α = -MATE_VALUE, β = MATE_VALUE,
-            stop_time = stop_time, opening_book = nothing)
-        if result.move !== nothing
-            best_result = result
+        result = _search(board, depth, 0, -MATE_VALUE, MATE_VALUE, nothing, stop_time)
+
+        # Keep the internal best result
+        if result.move !== NO_MOVE
+            best_result_internal = result
         end
 
         if verbose
             pv = extract_pv(board, depth)
             pv_str = join(string.(pv), " ")
-            println("Depth $depth | Score: $(best_result.score) | PV: $pv_str")
+            println("Depth $depth | Score: $(best_result_internal.score) | PV: $pv_str")
         end
 
         if (time_ns() ÷ 1_000_000) >= stop_time
@@ -385,7 +412,9 @@ function search_root(board::Board, max_depth::Int;
         end
     end
 
-    return best_result
+    # Convert NO_MOVE to nothing for public API
+    best_move = best_result_internal.move === NO_MOVE ? nothing : best_result_internal.move
+    return SearchResult(best_result_internal.score, best_move, best_result_internal.from_book)
 end
 
 """

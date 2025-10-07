@@ -181,3 +181,21 @@ function generate_captures(board::Board)
 
     return capture_moves
 end
+
+function generate_captures!(board::Board, moves::Vector{Move})
+    # Clear previous content
+    empty!(moves)
+
+    # Temporary vector to hold all legal moves
+    temp = Vector{Move}(undef, 0)
+    generate_legal_moves!(board, temp)
+
+    # Filter in-place
+    for m in temp
+        if m.capture != 0
+            push!(moves, m)
+        end
+    end
+
+    return moves
+end

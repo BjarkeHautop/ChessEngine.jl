@@ -93,10 +93,10 @@ The engine will then automatically allocate how much time to use for each move. 
 make_timed_move!(game)
 ```
 
-Combining everything we can let the engine play against itself in a 1 minute game:
+Combining everything we can let the engine play against itself in a 1+1 game:
 
 ```julia
-game = Game("1+0")
+game = Game("1+1")
 plots = []
 while game_status(game.board) == :ongoing
     make_timed_move!(game)
