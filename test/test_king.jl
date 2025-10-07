@@ -29,8 +29,10 @@ end
     b = Board()
 
     # Remove e2, f2 pawn, and pieces for castling
-    b.bitboards[Piece.W_PAWN] = OrbisChessEngine.clearbit(b.bitboards[Piece.W_PAWN], OrbisChessEngine.square_index(5, 2))
-    b.bitboards[Piece.W_PAWN] = OrbisChessEngine.clearbit(b.bitboards[Piece.W_PAWN], OrbisChessEngine.square_index(6, 2))
+    b.bitboards[Piece.W_PAWN] = OrbisChessEngine.clearbit(
+        b.bitboards[Piece.W_PAWN], OrbisChessEngine.square_index(5, 2))
+    b.bitboards[Piece.W_PAWN] = OrbisChessEngine.clearbit(
+        b.bitboards[Piece.W_PAWN], OrbisChessEngine.square_index(6, 2))
     b.bitboards[Piece.W_KNIGHT] = OrbisChessEngine.clearbit(
         b.bitboards[Piece.W_KNIGHT], OrbisChessEngine.square_index(2, 1))
     b.bitboards[Piece.W_BISHOP] = OrbisChessEngine.clearbit(
@@ -58,7 +60,8 @@ end
     end
 
     # Add a black rook attacking f1 to block short castling
-    b.bitboards[Piece.B_ROOK] = OrbisChessEngine.setbit(b.bitboards[Piece.B_ROOK], OrbisChessEngine.square_index(6, 4))  # f4 rook
+    b.bitboards[Piece.B_ROOK] = OrbisChessEngine.setbit(
+        b.bitboards[Piece.B_ROOK], OrbisChessEngine.square_index(6, 4))  # f4 rook
     legal_moves = generate_legal_moves(b)
     # e1 → g1 (short castle) should no longer be allowed
     short_castle = Move("e1", "g1"; castling = 1)

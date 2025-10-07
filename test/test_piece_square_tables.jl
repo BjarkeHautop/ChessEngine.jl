@@ -63,8 +63,9 @@ end
 
     # Interpolation check (mid-phase)
     phase = 0.5
-    expected_white = round(Int, 0.5 * OrbisChessEngine.KING_TABLE_W[idx] +
-                                0.5 * OrbisChessEngine.KING_TABLE_END_W[idx])
+    expected_white = round(
+        Int, 0.5 * OrbisChessEngine.KING_TABLE_W[idx] +
+             0.5 * OrbisChessEngine.KING_TABLE_END_W[idx])
     expected_black = round(
         Int, -(0.5 * OrbisChessEngine.KING_TABLE_B[idx] +
                0.5 * OrbisChessEngine.KING_TABLE_END_B[idx]))
