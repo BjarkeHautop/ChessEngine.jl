@@ -22,3 +22,13 @@ end
     @test perft_fast(b, 4) == 197281
     @test perft_fast(b, 5) == 4865609
 end
+
+@testset "super fast perft tests" begin
+    b = Board()
+    @test OrbisChessEngine.perft_superfast(b, 0) == 1
+    @test OrbisChessEngine.perft_superfast(b, 1) == 20
+    @test OrbisChessEngine.perft_superfast(b, 2) == 400
+    @test OrbisChessEngine.perft_superfast(b, 3) == 8902
+    @test OrbisChessEngine.perft_superfast(b, 4) == 197281
+    @test OrbisChessEngine.perft_superfast(b, 5) == 4865609
+end

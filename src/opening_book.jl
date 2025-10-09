@@ -63,12 +63,12 @@ function flag_index(flag::UInt8)
            error("invalid castling flag")
 end
 
-function polyglot_piece_index(piece::Int, square::Int)
+function polyglot_piece_index(piece, square)
     idx = POLYGLOT_PIECE_INDEX[piece]   # 0..11
     return idx * 64 + square            # 0..767
 end
 
-file_of(square::Int)::Int = square % 8
+file_of(square) = square % 8
 
 function has_pawn_for_en_passant(board::Board, file::Int)::Bool
     if board.side_to_move == WHITE

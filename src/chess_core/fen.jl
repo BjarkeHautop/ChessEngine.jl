@@ -6,11 +6,8 @@ function board_from_fen(fen::String)
     rows = split(parts[1], '/')
     @assert length(rows) == 8 "FEN must have 8 ranks"
 
-    # Initialize empty bitboards
-    bitboards = Dict{Int, UInt64}()
-    for piece in 1:12
-        bitboards[piece] = UInt64(0)
-    end
+    # Temporary mutable vector for bitboards
+    bb_vec = zeros(UInt64, NUM_PIECES)
 
     # Map FEN chars to piece types
     PIECE_MAP = Dict(
@@ -28,12 +25,15 @@ function board_from_fen(fen::String)
             else
                 sq = (8 - rank_idx) * 8 + file  # 0..63, A8=0
                 piece = PIECE_MAP[c]
-                bitboards[piece] |= UInt64(1) << sq
+                bb_vec[piece] |= UInt64(1) << sq
                 file += 1
             end
         end
         @assert file == 8 "Each rank must have 8 squares"
     end
+
+    # Convert to immutable SVector
+    bitboards = SVector{NUM_PIECES, UInt64}(bb_vec)
 
     # Side to move
     side_to_move = parts[2] == "w" ? WHITE : BLACK
@@ -48,13 +48,12 @@ function board_from_fen(fen::String)
     end
 
     # En passant square
-    ep = parts[4] == "-" ? -1 : square_index(parts[4])
+    ep = parts[4] == "-" ? -1 : Int8(square_index(parts[4]))
 
     # Halfmove clock
-    halfmove = length(parts) >= 5 ? parse(Int, parts[5]) : 0
+    halfmove = length(parts) >= 5 ? UInt16(parse(Int, parts[5])) : UInt16(0)
 
     # Initialize Board
-    # Construct preliminary board
     board = Board(
         bitboards,
         side_to_move,
@@ -63,8 +62,8 @@ function board_from_fen(fen::String)
         halfmove,
         UInt64[],    # position_history
         UndoInfo[],  # undo_stack
-        0,           # eval_score placeholder
-        0            # game_phase_value placeholder
+        Int32(0),    # eval_score placeholder
+        UInt8(0)     # game_phase_value placeholder
     )
 
     # Compute cached values
@@ -72,3 +71,4 @@ function board_from_fen(fen::String)
 
     return board
 end
+

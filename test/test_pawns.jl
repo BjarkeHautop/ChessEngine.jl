@@ -63,18 +63,8 @@ using Test
     # -----------------------------
     # Test promotion generation
     # -----------------------------
-    # Clear pieces to allow pawn promotion
-
-    bitboards = Dict{Int, UInt64}()
-    for p in Piece.W_PAWN:Piece.B_KING
-        bitboards[p] = UInt64(0)
-    end
-    bitboards[Piece.W_KING] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(5, 1))
-    bitboards[Piece.B_KING] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(5, 8))
-    bitboards[Piece.W_PAWN] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(7, 7))
-    bitboards[Piece.B_ROOK] = OrbisChessEngine.setbit(UInt64(0), OrbisChessEngine.square_index(8, 8))
-
-    b = Board(bitboards, WHITE, 0x0, -1, 0, UInt64[], UndoInfo[], 0, 0)
+    
+    b = Board(fen = "7r/6P1/2k5/8/8/8/8/4K3 w - - 0 1")
     promotion_moves = OrbisChessEngine.generate_pawn_moves(b)
     expected_promotions = [
         Move("g7", "g8"; promotion = Piece.W_QUEEN),
@@ -88,7 +78,7 @@ using Test
     end
 end
 
-@testset "Pawn move generation" begin
+@testset "Pawn move no illegal across board captures" begin
     b = Board()
     make_move!(b, Move("a2", "a4"))
     make_move!(b, Move("h7", "h4"))

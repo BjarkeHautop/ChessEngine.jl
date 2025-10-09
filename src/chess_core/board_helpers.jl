@@ -33,7 +33,7 @@ Return the piece type at a given square (0..63) using bitboards.
 """
 function piece_at(board::Board, sq::Int)
     mask = UInt64(1) << sq
-    for (p, bb) in board.bitboards
+    for (p, bb) in enumerate(board.bitboards)
         if bb & mask != 0
             return p
         end

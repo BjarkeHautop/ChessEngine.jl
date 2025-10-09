@@ -38,7 +38,7 @@ Evaluate a position from White’s perspective using piece-square tables.
 function evaluate(board::Board)
     score = 0
     phase = game_phase(board)
-    for (p, bb) in board.bitboards
+    for (p, bb) in enumerate(board.bitboards)
         while bb != 0
             square = trailing_zeros(bb)  # index of least significant 1-bit (0..63)
             score += piece_square_value(p, square, phase)
@@ -58,7 +58,7 @@ function compute_eval_and_phase(board::Board)
     eval_score = 0
     game_phase_value = 0
 
-    for (piece, bb) in board.bitboards
+    for (piece, bb) in enumerate(board.bitboards)
         while bb != 0
             sq = trailing_zeros(bb)
             bb &= bb - 1
@@ -71,7 +71,7 @@ function compute_eval_and_phase(board::Board)
     phase = clamp(game_phase_value / 24, 0.0, 1.0)
 
     # Now compute evaluation using that phase
-    for (piece, bb) in board.bitboards
+    for (piece, bb) in enumerate(board.bitboards)
         tmp_bb = bb
         while tmp_bb != 0
             sq = trailing_zeros(tmp_bb)

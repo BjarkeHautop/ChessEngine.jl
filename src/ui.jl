@@ -49,7 +49,7 @@ function display_board(board::Board)
     end
 
     # Pieces
-    for (ptype, bb) in board.bitboards
+    for (ptype, bb) in enumerate(board.bitboards)
         for sq in 0:63
             if testbit(bb, sq)
                 file = (sq % 8) + 1
