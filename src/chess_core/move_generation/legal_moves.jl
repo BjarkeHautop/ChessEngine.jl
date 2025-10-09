@@ -67,3 +67,14 @@ function generate_legal_moves!(board::Board, moves::Vector{Move})
     OrbisChessEngine.generate_king_moves!(board, pseudo)
     _filter_legal_moves!(board, pseudo, moves; inplace = true)
 end
+
+function generate_legal_moves_fast!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})
+    empty!(pseudo)
+    generate_pawn_moves!(board, pseudo)
+    generate_knight_moves!(board, pseudo)
+    generate_bishop_moves!(board, pseudo)
+    generate_rook_moves!(board, pseudo)
+    generate_queen_moves!(board, pseudo)
+    generate_king_moves!(board, pseudo)
+    _filter_legal_moves!(board, pseudo, moves; inplace = true)
+end
