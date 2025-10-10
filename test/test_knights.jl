@@ -33,19 +33,28 @@ end
 
 @testset "Knight move generation in place" begin
     b = Board()
-    moves = Vector{Move}(undef, 256)
-    n = OrbisChessEngine.OrbisChessEngine.generate_knight_moves!(b, moves)
+    moves = Move[]
+    OrbisChessEngine.generate_knight_moves!(b, moves)
 
     # Each knight has 2 moves at the starting position, so total 4 moves
-    @test n == 4
+    @test length(moves) == 4
 
+    expected_moves = [
+        Move("b1", "a3"), Move("b1", "c3"), Move("g1", "f3"), Move("g1", "h3")
+    ]
+
+    for em in expected_moves
+        @test em in moves
+    end
+
+    empty!(moves)
     make_move!(b, Move("b1", "c3"))
-    n = OrbisChessEngine.OrbisChessEngine.generate_knight_moves!(b, moves)
-    @test n == 4
+    OrbisChessEngine.generate_knight_moves!(b, moves)
+    @test length(moves) == 4
 
+    empty!(moves)
     make_move!(b, Move("g8", "f6"))
     make_move!(b, Move("c3", "d5"))
-
-    n = OrbisChessEngine.OrbisChessEngine.generate_knight_moves!(b, moves)
-    @test n == 7
+    OrbisChessEngine.generate_knight_moves!(b, moves)
+    @test length(moves) == 7
 end

@@ -1,7 +1,7 @@
 name = "OrbisChessEngine"
 uuid = "2eacc985-a635-41e1-b67f-45fa7ceb5b4d"
-authors = ["Bjarke Hautop <bjarke.hautop@gmail.com> and contributors"]
 version = "0.1.2-DEV"
+authors = ["Bjarke Hautop <bjarke.hautop@gmail.com> and contributors"]
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
@@ -10,6 +10,7 @@ Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
@@ -20,6 +21,7 @@ Distributions = "0.25"
 FileIO = "1.17.0"
 Images = "0.26.2"
 Random = "1.6"
+Revise = "3.10.0"
 StaticArrays = "1.9.15"
 Test = "1"
 julia = "1.6"

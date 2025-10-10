@@ -91,3 +91,25 @@ function _perft_superfast!(
 
     return nodes
 end
+
+function perft_divide(board::Board, depth::Int)
+    moves = Vector{Move}(undef, MAX_MOVES)
+    generate_legal_moves!(board, moves)
+    n = length(moves)
+    println("Depth $depth perft divide: $(n) moves")
+
+    total = 0
+    moves_child = Vector{Move}(undef, MAX_MOVES)
+
+    for i in 1:n
+        move = moves[i]
+        make_move!(board, move)
+        nodes = _perft_fast!(board, depth - 1, moves_child)
+        undo_move!(board, move)
+        total += nodes
+        println(string(move), ": ", nodes)
+    end
+
+    println("Total: ", total)
+    return total
+end

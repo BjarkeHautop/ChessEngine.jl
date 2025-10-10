@@ -199,3 +199,13 @@ function generate_captures!(board::Board, moves::Vector{Move})
 
     return moves
 end
+
+# helper to find which enemy piece occupies a square
+function find_capture_piece(board::Board, sq::Int, start_piece::Int, end_piece::Int)
+    for p in start_piece:end_piece
+        if (board.bitboards[p] & (UInt64(1) << sq)) != 0
+            return p
+        end
+    end
+    return 0
+end

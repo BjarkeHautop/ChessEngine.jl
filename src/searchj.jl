@@ -419,15 +419,15 @@ end
 
 """
     search(
-        board::Board, 
-        depth::Int;
+        board::Board; 
+        depth::Int,
         ply::Int = 0,
         α::Int = (-MATE_VALUE),
         β::Int = MATE_VALUE,
         opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose::Bool = false,
         time_budget::Int = typemax(Int)
-    )
+    )::SearchResult
 
 Search for the best move using minimax with iterative deepening, alpha-beta pruning,
 quiescence search, null move pruning, and transposition tables.
