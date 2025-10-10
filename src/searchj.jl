@@ -76,13 +76,15 @@ Transposition table entry.
 struct TTEntry
     key::UInt64
     value::Int
-    depth::Int
+    depth::Int # -1 if empty
     node_type::NodeType
-    best_move::Union{Move, Nothing}
+    best_move::Move
 end
 
+const NO_MOVE = Move(0, 0, 0, 0, 0, false) 
 const TT_SIZE = 1 << 20  # ~1M entries
-const TRANSPOSITION_TABLE = Vector{Union{TTEntry, Nothing}}(undef, TT_SIZE)
+const EMPTY_ENTRY = TTEntry(0, 0, -1, EXACT, NO_MOVE)
+const TRANSPOSITION_TABLE = fill(EMPTY_ENTRY, TT_SIZE)
 
 """
 Get index in transposition table from hash.
@@ -103,29 +105,44 @@ Returns a tuple (value, best_move, hit) where hit is true if a valid entry was f
 function tt_probe(hash::UInt64, depth::Int, α::Int, β::Int)
     idx = tt_index(hash)
     entry = TRANSPOSITION_TABLE[idx]
-    if entry !== nothing && entry.key == hash && entry.depth >= depth
-        if entry.node_type == EXACT
+
+    # Check if slot is empty
+    if entry.depth == -1
+        return 0, NO_MOVE, false
+    end
+
+    # Check key and depth
+    if entry.key != hash || entry.depth < depth
+        return 0, NO_MOVE, false
+    end
+
+    # Return based on node type
+    if entry.node_type == EXACT
+        return entry.value, entry.best_move, true
+    elseif entry.node_type == LOWERBOUND
+        if entry.value >= β
             return entry.value, entry.best_move, true
-        elseif entry.node_type == LOWERBOUND
-            if entry.value >= β
-                return entry.value, entry.best_move, true
-            end
-        elseif entry.node_type == UPPERBOUND
-            if entry.value <= α
-                return entry.value, entry.best_move, true
-            end
+        end
+    elseif entry.node_type == UPPERBOUND
+        if entry.value <= α
+            return entry.value, entry.best_move, true
         end
     end
-    return 0, nothing, false
+
+    # TT entry exists but cannot be used
+    return 0, NO_MOVE, false
 end
+
 
 """
 Store an entry in the transposition table.
 """
-function tt_store(hash::UInt64, value::Int, depth::Int, node_type::NodeType, best_move)
+function tt_store(hash::UInt64, value::Int, depth::Int, node_type::NodeType, best_move::Move)
     idx = tt_index(hash)
     entry = TRANSPOSITION_TABLE[idx]
-    if entry === nothing || depth >= entry.depth
+
+    # Store if slot is empty (depth = -1) or new depth >= existing depth
+    if entry.depth == -1 || depth >= entry.depth
         TRANSPOSITION_TABLE[idx] = TTEntry(hash, value, depth, node_type, best_move)
     end
 end
@@ -213,8 +230,6 @@ struct SearchResult
     from_book::Bool
 end
 
-const NO_MOVE = Move(0, 0, 0, 0, 0, false) 
-
 # Alpha-beta search with quiescence at leaves
 
 function _search(
@@ -245,7 +260,7 @@ function _search(
     # TT lookup
     val, move, hit = tt_probe(hash_before, depth, α, β)
     if hit
-        return SearchResult(val, move === nothing ? NO_MOVE : move, false)
+        return SearchResult(val, move, false)
     end
 
     # Leaf node: quiescence search
@@ -350,26 +365,30 @@ end
 function tt_probe_raw(hash::UInt64)
     idx = tt_index(hash)
     entry = TRANSPOSITION_TABLE[idx]
-    if entry !== nothing && entry.key == hash
+
+    if entry.depth != -1 && entry.key == hash
         return entry.value, entry.best_move, true
     else
-        return nothing, nothing, false
+        return 0, NO_MOVE, false
     end
 end
+
 
 "Reconstruct the principal variation (PV) from the transposition table"
 function extract_pv(board::Board, max_depth::Int)
     pv = Move[]
     temp_board = deepcopy(board)
-    for d in 1:max_depth
+
+    for _ in 1:max_depth
         h = zobrist_hash(temp_board)
         val, move, hit = tt_probe_raw(h)
-        if !hit || move === nothing
+        if !hit || move === NO_MOVE
             break
         end
         push!(pv, move)
         make_move!(temp_board, move)
     end
+
     return pv
 end
 
@@ -459,5 +478,5 @@ function search(
 end
 
 function tt_clear!()
-    fill!(TRANSPOSITION_TABLE, nothing)
+    fill!(TRANSPOSITION_TABLE, EMPTY_ENTRY)
 end
