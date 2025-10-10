@@ -92,6 +92,7 @@ function _perft_superfast!(
     return nodes
 end
 
+# Mainly for debugging: print per-move counts at the top level
 function perft_divide(board::Board, depth::Int)
     moves = Vector{Move}(undef, MAX_MOVES)
     generate_legal_moves!(board, moves)

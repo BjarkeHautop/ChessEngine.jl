@@ -34,3 +34,9 @@ end
     # @test OrbisChessEngine.perft_superfast(b, 6) == 119_060_324
     # @test OrbisChessEngine.perft_superfast(b, 7) == 3_195_901_860
 end
+
+@testset "perft divide tests" begin
+    b = Board()
+    result = OrbisChessEngine.perft_divide(b, 1)
+    @test result == 20
+end
