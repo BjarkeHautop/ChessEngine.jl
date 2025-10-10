@@ -81,7 +81,7 @@ struct TTEntry
     best_move::Union{Move, Nothing}
 end
 
-const TT_SIZE = 1 << 20  # ~1M entries, adjust to your memory budget
+const TT_SIZE = 1 << 20  # ~1M entries
 const TRANSPOSITION_TABLE = Vector{Union{TTEntry, Nothing}}(undef, TT_SIZE)
 
 """
@@ -106,13 +106,14 @@ function tt_probe(hash::UInt64, depth::Int, α::Int, β::Int)
     if entry !== nothing && entry.key == hash && entry.depth >= depth
         if entry.node_type == EXACT
             return entry.value, entry.best_move, true
-        elseif entry.node_type == LOWERBOUND && entry.value > α
-            α = entry.value
-        elseif entry.node_type == UPPERBOUND && entry.value < β
-            β = entry.value
-        end
-        if α >= β
-            return entry.value, entry.best_move, true
+        elseif entry.node_type == LOWERBOUND
+            if entry.value >= β
+                return entry.value, entry.best_move, true
+            end
+        elseif entry.node_type == UPPERBOUND
+            if entry.value <= α
+                return entry.value, entry.best_move, true
+            end
         end
     end
     return 0, nothing, false
@@ -450,8 +451,13 @@ function search(
         verbose::Bool = false,
         time_budget::Int = typemax(Int)
 )::SearchResult
+    tt_clear!()  # reset TT for this search
     tb = min(time_budget, 1_000_000_000)  # cap to 1e9 ms ~ 11 days
     stop_time = Int((time_ns() ÷ 1_000_000) + tb)
     return search_root(board, depth; stop_time = stop_time, opening_book = opening_book,
         verbose = verbose)
+end
+
+function tt_clear!()
+    fill!(TRANSPOSITION_TABLE, nothing)
 end
