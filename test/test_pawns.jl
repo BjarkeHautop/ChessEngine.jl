@@ -63,7 +63,7 @@ using Test
     # -----------------------------
     # Test promotion generation
     # -----------------------------
-    
+
     b = Board(fen = "7r/6P1/2k5/8/8/8/8/4K3 w - - 0 1")
     promotion_moves = OrbisChessEngine.generate_pawn_moves(b)
     expected_promotions = [

@@ -28,7 +28,7 @@ using Test
     # -----------------------------
     b = Board(fen = "1k6/1P6/1K6/8/8/8/8/8 b - - 0 1")
     @test game_status(b) == :stalemate
-    b.side_to_move = WHITE  
+    b.side_to_move = WHITE
     @test game_status(b) == :ongoing
 
     # -----------------------------

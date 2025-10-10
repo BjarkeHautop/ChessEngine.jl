@@ -15,7 +15,7 @@ function init_knight_masks!()
                 end
             end
         end
-        knight_attack_masks[sq + 1] = mask  
+        knight_attack_masks[sq + 1] = mask
     end
 end
 
@@ -64,7 +64,7 @@ function generate_knight_moves!(board::Board, moves::Vector{Move})
                 end
             end
 
-            push!(moves, Move(sq, to_sq; capture=capture))
+            push!(moves, Move(sq, to_sq; capture = capture))
         end
     end
 end

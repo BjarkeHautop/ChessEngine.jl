@@ -88,5 +88,5 @@ end
     OrbisChessEngine.tt_store(h3, 10, 2, OrbisChessEngine.EXACT, OrbisChessEngine.NO_MOVE)
     val, move, hit = OrbisChessEngine.tt_probe_raw(h3)
     @test hit == true
-    @test move === OrbisChessEngine.NO_MOVE    
+    @test move === OrbisChessEngine.NO_MOVE
 end

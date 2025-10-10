@@ -80,7 +80,7 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move})
         if 0 <= to_sq < 64 && ((all_occupied & (UInt64(1) << to_sq)) == 0)
             if (UInt64(1) << to_sq) & promo_rank_mask != 0
                 for promo in promo_pieces
-                    push!(moves, Move(Int(sq), Int(to_sq); promotion=promo))
+                    push!(moves, Move(Int(sq), Int(to_sq); promotion = promo))
                 end
             else
                 push!(moves, Move(Int(sq), Int(to_sq)))
@@ -110,10 +110,11 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move})
                     )
                     if (UInt64(1) << to_sq) & promo_rank_mask != 0
                         for promo in promo_pieces
-                            push!(moves, Move(Int(sq), Int(to_sq); capture=capture_piece, promotion=promo))
+                            push!(moves,
+                                Move(Int(sq), Int(to_sq); capture = capture_piece, promotion = promo))
                         end
                     else
-                        push!(moves, Move(Int(sq), Int(to_sq); capture=capture_piece))
+                        push!(moves, Move(Int(sq), Int(to_sq); capture = capture_piece))
                     end
                 end
             end
@@ -124,7 +125,7 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move})
             ep_sq = board.en_passant
             if (sq % 8 != 0 && sq + left_capture_offset == ep_sq) ||
                (sq % 8 != 7 && sq + right_capture_offset == ep_sq)
-                push!(moves, Move(Int(sq), Int(ep_sq); capture=ep_capture_piece, en_passant=true))
+                push!(moves, Move(Int(sq), Int(ep_sq); capture = ep_capture_piece, en_passant = true))
             end
         end
     end
@@ -140,6 +141,3 @@ function generate_pawn_moves(board::Board)
     generate_pawn_moves!(board, moves)
     return moves
 end
-
-
-

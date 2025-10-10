@@ -86,8 +86,8 @@ end
 
     # Test 2: Check that each rank is flipped vertically
     for rank in 0:7
-        orig_row = tbl[rank * 8 + 1 : rank * 8 + 8]
-        flipped_row = flipped[(7 - rank) * 8 + 1 : (7 - rank) * 8 + 8]
+        orig_row = tbl[(rank * 8 + 1):(rank * 8 + 8)]
+        flipped_row = flipped[((7 - rank) * 8 + 1):((7 - rank) * 8 + 8)]
         @test flipped_row == orig_row
     end
 

@@ -81,7 +81,7 @@ struct TTEntry
     best_move::Move
 end
 
-const NO_MOVE = Move(0, 0, 0, 0, 0, false) 
+const NO_MOVE = Move(0, 0, 0, 0, 0, false)
 const TT_SIZE = 1 << 20  # ~1M entries
 const EMPTY_ENTRY = TTEntry(0, 0, -1, EXACT, NO_MOVE)
 const TRANSPOSITION_TABLE = fill(EMPTY_ENTRY, TT_SIZE)
@@ -133,11 +133,11 @@ function tt_probe(hash::UInt64, depth::Int, α::Int, β::Int)
     return 0, NO_MOVE, false
 end
 
-
 """
 Store an entry in the transposition table.
 """
-function tt_store(hash::UInt64, value::Int, depth::Int, node_type::NodeType, best_move::Move)
+function tt_store(
+        hash::UInt64, value::Int, depth::Int, node_type::NodeType, best_move::Move)
     idx = tt_index(hash)
     entry = TRANSPOSITION_TABLE[idx]
 
@@ -240,7 +240,7 @@ function _search(
         β::Int,
         opening_book::Union{Nothing, PolyglotBook},
         stop_time::Int
-    )::SearchResult
+)::SearchResult
 
     # Time check
     if (time_ns() ÷ 1_000_000) >= stop_time
@@ -286,7 +286,8 @@ function _search(
     generate_legal_moves!(board, moves)
 
     if isempty(moves)
-        val = in_check(board, board.side_to_move) ? (board.side_to_move == WHITE ? -MATE_VALUE + ply : MATE_VALUE - ply) : 0
+        val = in_check(board, board.side_to_move) ?
+              (board.side_to_move == WHITE ? -MATE_VALUE + ply : MATE_VALUE - ply) : 0
         return SearchResult(val, NO_MOVE, false)
     end
 
@@ -301,7 +302,7 @@ function _search(
         # Find highest scoring remaining move
         best_idx = i
         best_val = scores[i]
-        @inbounds for j in i+1:n
+        @inbounds for j in (i + 1):n
             if scores[j] > best_val
                 best_val = scores[j]
                 best_idx = j
@@ -372,7 +373,6 @@ function tt_probe_raw(hash::UInt64)
         return 0, NO_MOVE, false
     end
 end
-
 
 "Reconstruct the principal variation (PV) from the transposition table"
 function extract_pv(board::Board, max_depth::Int)

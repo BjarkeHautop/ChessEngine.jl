@@ -73,4 +73,3 @@ function board_from_fen(fen::String)
 
     return board
 end
-

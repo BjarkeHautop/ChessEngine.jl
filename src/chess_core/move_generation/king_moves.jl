@@ -66,28 +66,29 @@ function generate_king_moves!(board::Board, moves::Vector{Move})
             end
         end
 
-        push!(moves, Move(king_sq, to_sq; capture=capture))
+        push!(moves, Move(king_sq, to_sq; capture = capture))
     end
 
     # =============== Castling (pseudo-legal) ===============
     occupied_mask = friendly_mask | enemy_mask
     if board.side_to_move == WHITE
         if (rights & 0b0001) != 0 &&
-           ( (occupied_mask & ((UInt64(1) << 5) | (UInt64(1) << 6))) == 0 )
-            push!(moves, Move(4, 6; castling=1))
+           ((occupied_mask & ((UInt64(1) << 5) | (UInt64(1) << 6))) == 0)
+            push!(moves, Move(4, 6; castling = 1))
         end
         if (rights & 0b0010) != 0 &&
-           ( (occupied_mask & ((UInt64(1) << 1) | (UInt64(1) << 2) | (UInt64(1) << 3))) == 0 )
-            push!(moves, Move(4, 2; castling=2))
+           ((occupied_mask & ((UInt64(1) << 1) | (UInt64(1) << 2) | (UInt64(1) << 3))) == 0)
+            push!(moves, Move(4, 2; castling = 2))
         end
     else
         if (rights & 0b0100) != 0 &&
-           ( (occupied_mask & ((UInt64(1) << 61) | (UInt64(1) << 62))) == 0 )
-            push!(moves, Move(60, 62; castling=1))
+           ((occupied_mask & ((UInt64(1) << 61) | (UInt64(1) << 62))) == 0)
+            push!(moves, Move(60, 62; castling = 1))
         end
         if (rights & 0b1000) != 0 &&
-           ( (occupied_mask & ((UInt64(1) << 57) | (UInt64(1) << 58) | (UInt64(1) << 59))) == 0 )
-            push!(moves, Move(60, 58; castling=2))
+           ((occupied_mask & ((UInt64(1) << 57) | (UInt64(1) << 58) | (UInt64(1) << 59))) ==
+            0)
+            push!(moves, Move(60, 58; castling = 2))
         end
     end
 end

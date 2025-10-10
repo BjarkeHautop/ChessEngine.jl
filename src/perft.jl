@@ -32,7 +32,6 @@ function perft_fast(board::Board, depth::Int)
     return _perft_fast!(board, depth, moves)
 end
 
-
 # internal recursive function
 function _perft_fast!(board::Board, depth::Int, moves::Vector{Move})
     if depth == 0
@@ -58,8 +57,8 @@ end
 
 function perft_superfast(board::Board, depth::Int)
     levels = depth + 1  # allocate one buffer for each level (safe)
-    moves_stack  = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
-    pseudo_stack  = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
+    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
+    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
 
     return _perft_superfast!(board, depth, moves_stack, pseudo_stack, 1)
 end
@@ -69,8 +68,8 @@ function _perft_superfast!(
         depth::Int,
         moves_stack::Vector{Vector{Move}},
         pseudo_stack::Vector{Vector{Move}},
-        level::Int,
-    )
+        level::Int
+)
     if depth == 0
         return 1
     end
@@ -78,7 +77,7 @@ function _perft_superfast!(
     nodes = 0
     moves = moves_stack[level]
     pseudo = pseudo_stack[level]
-    empty!(pseudo)                
+    empty!(pseudo)
 
     OrbisChessEngine.generate_legal_moves_fast!(board, moves, pseudo)
 

@@ -49,7 +49,8 @@ function search_with_time(
         else
             _opening_book = nothing
         end
-        result = _search(game.board, depth, 0, -MATE_VALUE, MATE_VALUE, _opening_book, stop_time)
+        result = _search(
+            game.board, depth, 0, -MATE_VALUE, MATE_VALUE, _opening_book, stop_time)
 
         # Propagate a book move immediately
         if result.from_book
