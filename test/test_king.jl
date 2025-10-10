@@ -192,3 +192,20 @@ end
     @test OrbisChessEngine.testbit(b.bitboards[Piece.B_KING], OrbisChessEngine.square_index(5, 8))  # King back on e8
     @test OrbisChessEngine.testbit(b.bitboards[Piece.B_ROOK], OrbisChessEngine.square_index(8, 8))  # Rook back on h8
 end
+
+@testset "King attack masks" begin
+    # a1; Neighbors: b1 (bit 1), a2 (bit 8), b2 (bit 9)
+    @test OrbisChessEngine.king_attack_masks[1] == 0x302
+
+    # h1; Neighbors: g1 (bit 6), g2 (bit 14), h2 (bit 15)
+    @test OrbisChessEngine.king_attack_masks[8] == 0xC040
+
+    # a8; Neighbors: a7 (bit 48), b7 (bit 49), b8 (bit 57)
+    @test OrbisChessEngine.king_attack_masks[57] == 0x0203000000000000
+
+    # h8; Neighbors: g7 (bit 54), g8 (bit 62), h7 (bit 55)
+    @test OrbisChessEngine.king_attack_masks[64] == 0x40c0000000000000
+
+    # d4; Neighbors: c3, c4, c5, d3, d5, e3, e4, e5
+    @test OrbisChessEngine.king_attack_masks[28] == 0x0000001c141c0000
+end

@@ -58,3 +58,20 @@ end
     OrbisChessEngine.generate_knight_moves!(b, moves)
     @test length(moves) == 7
 end
+
+@testset "Knight attack masks" begin
+    # a1; Neighbors: c2 and b3
+    @test OrbisChessEngine.knight_attack_masks[1] == 0x20400
+
+    # h1; Neighbors: f2 and g3
+    @test OrbisChessEngine.knight_attack_masks[8] == 0x402000
+
+    # a8; Neighbors: b6 and c7
+    @test OrbisChessEngine.knight_attack_masks[57] == 0x0004020000000000
+
+    # h8; Neighbors: f7 and g6
+    @test OrbisChessEngine.knight_attack_masks[64] == 0x0020400000000000
+
+    # d4; Neighbors: c2, b3, b5, c6, e2, f3, f5, e6
+    @test OrbisChessEngine.knight_attack_masks[28] == 0x0000142200221400
+end

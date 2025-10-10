@@ -97,3 +97,23 @@ end
     en_passant_move = Move("e5", "d6"; capture = Piece.B_PAWN, en_passant = true)
     @test en_passant_move in legal_moves
 end
+
+@testset "promotion captures black" begin
+    b = Board(fen = "4k3/8/8/8/8/8/p7/1N2K3 b - - 0 1")
+    pawn_moves = OrbisChessEngine.generate_pawn_moves(b)
+
+    expected_pawn_moves = [
+        Move(b, "a2a1=Q"),
+        Move(b, "a2a1=R"),
+        Move(b, "a2a1=B"),
+        Move(b, "a2a1=N"),
+        Move(b, "a2b1=Q"),
+        Move(b, "a2b1=R"),
+        Move(b, "a2b1=B"),
+        Move(b, "a2b1=N")
+    ]
+    @test length(pawn_moves) == length(expected_pawn_moves)
+    for em in expected_pawn_moves
+        @test em in pawn_moves
+    end
+end
