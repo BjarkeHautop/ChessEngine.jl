@@ -1,3 +1,5 @@
+# Add further checks for valid FEN strings such as castling rights
+
 function board_from_fen(fen::String)
     parts = split(fen)
     @assert length(parts) >= 4 "FEN must have at least 4 fields"

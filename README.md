@@ -24,7 +24,7 @@ Particularly, *OrbisChessEngine* implements:
 
 ## Resources
 
-View the documentation at [https://BjarkeHautop.github.io/OrbisChessEngine.jl/stable/](https://BjarkeHautop.github.io/OrbisChessEngine.jl/stable/).
+View the documentation at [https://BjarkeHautop.github.io/OrbisChessEngine.jl/dev/](https://BjarkeHautop.github.io/OrbisChessEngine.jl/dev/).
 
 ## TODO
 
