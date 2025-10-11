@@ -94,7 +94,7 @@ const KING_TABLE_END_W = [
 ]
 
 # Flip index vertically (mirror ranks only)
-flip_index(idx::Int) = begin
+flip_index(idx) = begin
     i0 = idx - 1
     file = mod(i0, 8)
     rank_top = div(i0, 8)
@@ -103,14 +103,14 @@ flip_index(idx::Int) = begin
 end
 
 # Convert 0-based square (a1=0..h8=63) to PSQT index (1-based, A8=1..H1=64)
-psqt_index(square::Int) = 8*(7 - div(square, 8)) + mod(square, 8) + 1
+psqt_index(square) = 8*(7 - div(square, 8)) + mod(square, 8) + 1
 
 """
 Flip a piece-square table vertically (white → black perspective).
 Input is a 64-element vector (row-major, starting at A8).
 Returns a new 64-element vector with ranks mirrored.
 """
-function flip_table(tbl::Vector{Int})
+function flip_table(tbl)
     flipped = similar(tbl)
     for rank in 0:7
         for file in 0:7
@@ -136,7 +136,7 @@ Return the PSQT value of a piece on a given square.
 - square: 0..63 (a1=0, h8=63)
 - phase: Float64 in [0.0, 1.0], where 1.0 = opening, 0.0 = endgame
 """
-function piece_square_value(piece::Int, square::Int, phase::Float64)
+function piece_square_value(piece, square, phase)
     idx = psqt_index(square)
 
     if piece == Piece.W_PAWN

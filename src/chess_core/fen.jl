@@ -1,5 +1,7 @@
 # Add further checks for valid FEN strings such as castling rights
 
+const MAX_MOVES_PER_GAME = 1024
+
 function board_from_fen(fen::String)
     parts = split(fen)
     @assert length(parts) >= 4 "FEN must have at least 4 fields"
@@ -55,6 +57,10 @@ function board_from_fen(fen::String)
     # Halfmove clock
     halfmove = length(parts) >= 5 ? UInt16(parse(Int, parts[5])) : UInt16(0)
 
+    # Preallocate position_history and undo_stack to fixed size
+    pos_hist = Vector{UInt64}(undef, MAX_MOVES_PER_GAME)
+    undo_stk = Vector{UndoInfo}(undef, MAX_MOVES_PER_GAME)
+
     # Initialize Board
     board = Board(
         bitboards,
@@ -62,10 +68,10 @@ function board_from_fen(fen::String)
         cr,
         ep,
         halfmove,
-        UInt64[],    # position_history
-        UndoInfo[],  # undo_stack
-        Int32(0),    # eval_score placeholder
-        UInt8(0)     # game_phase_value placeholder
+        pos_hist,
+        undo_stk,
+        Int32(0), # eval_score placeholder
+        UInt8(0) # game_phase_value placeholder
     )
 
     # Compute cached values

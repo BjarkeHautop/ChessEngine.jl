@@ -32,7 +32,7 @@ function Base.show(io::IO, m::Move)
     print(io, s)
 end
 
-function piece_symbol(piece::Int)
+function piece_symbol(piece)
     if piece == Piece.W_QUEEN || piece == Piece.B_QUEEN
         return "Q"
     elseif piece == Piece.W_ROOK || piece == Piece.B_ROOK
@@ -80,33 +80,28 @@ Also accepts "o-o", "0-0", "o-o-o", "0-0-0".
 function Move(board::Board, str::AbstractString)
     # Castling shortcuts
     if str in ["O-O", "o-o", "0-0"]
-        return Move(4, 6; castling = 1)
+        return Move(Int8(4), Int8(6); castling = Int8(1))
     elseif str in ["O-O-O", "o-o-o", "0-0-0"]
-        return Move(4, 2; castling = 2)
+        return Move(Int8(4), Int8(2); castling = Int8(2))
     end
 
     # Parse squares
     from = square_from_name(str[1:2])
-    to = square_from_name(str[3:4])
+    to   = square_from_name(str[3:4])
 
-    # Parse promotion from string if present
+    # Parse promotion if present
     promotion = 0
     if length(str) > 4 && str[5] == '='
-        piece_char = uppercase(str[6])
-        promotion = piece_from_symbol(piece_char, board.side_to_move)
+        promotion = piece_from_symbol(uppercase(str[6]), board.side_to_move)
     end
 
-    # Infer capture from board
+    # Infer captured piece
     captured_piece = 0
     for p in 1:12
-        if testbit(board.bitboards[p], to)
-            captured_piece = p
-            break
-        end
+        captured_piece = testbit(board.bitboards[p], to) ? p : captured_piece
     end
 
     # Infer en passant
-    is_ep = false
     moving_piece = 0
     for p in (board.side_to_move == WHITE ? (Piece.W_PAWN:Piece.W_KING) :
          (Piece.B_PAWN:Piece.B_KING))
@@ -115,11 +110,19 @@ function Move(board::Board, str::AbstractString)
             break
         end
     end
-    if moving_piece in (Piece.W_PAWN, Piece.B_PAWN) && to == board.en_passant
-        is_ep = true
+
+    is_ep = moving_piece in (Piece.W_PAWN, Piece.B_PAWN) && to == board.en_passant
+    if is_ep
         captured_piece = board.side_to_move == WHITE ? Piece.B_PAWN : Piece.W_PAWN
     end
 
-    return Move(from, to; promotion = promotion, capture = captured_piece,
-        castling = 0, en_passant = is_ep)
+    return Move(
+        Int8(from),
+        Int8(to);
+        promotion  = Int8(promotion),
+        capture    = Int8(captured_piece),
+        castling   = Int8(0),
+        en_passant = is_ep
+    )
 end
+

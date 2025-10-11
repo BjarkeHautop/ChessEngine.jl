@@ -7,31 +7,32 @@
 
 A chess move.
 
-- `from` and `to` are square indices 0..63
+- `from` is a square index (0-63)
+- `to` is a square index (0-63)
 - `promotion` is the piece type promoted to (0 if none)
 - `capture` is captured piece type (0 if none)
 - `castling`: 0 = normal, 1 = kingside, 2 = queenside
 - `en_passant`: true if en passant capture
 """
 struct Move
-    from::Int
-    to::Int
-    promotion::Int
-    capture::Int
-    castling::Int
+    from::Int8
+    to::Int8
+    promotion::Int8
+    capture::Int8
+    castling::Int8
     en_passant::Bool
 end
 
 # default constructor function
 function Move(
-        from::Int, to::Int; promotion = 0, capture = 0, castling = 0, en_passant = false)
+        from, to; promotion = 0, capture = 0, castling = 0, en_passant = false)
     Move(from, to, promotion, capture, castling, en_passant)
 end
 
-file_char(file::Int) = Char('a' + file - 1)
-rank_char(rank::Int) = string(rank)
+file_char(file) = Char('a' + file - 1)
+rank_char(rank) = string(rank)
 
-square_name(sq::Int) = string(file_char(sq % 8 + 1), rank_char(div(sq, 8)+1))
+square_name(sq) = string(file_char(sq % 8 + 1), rank_char(div(sq, 8)+1))
 # square_name(0) => "a1", square_name(63) => "h8"
 
 function square_from_name(s::AbstractString)

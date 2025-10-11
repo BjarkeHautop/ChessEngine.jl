@@ -17,7 +17,7 @@ mutable struct Game
     increment::Int    # per-move increment in ms
 end
 
-function time_mangement(move_time::Int, increment::Int)
+function time_mangement(move_time, increment)
     # Use current_time / 20 + increment / 2 as a heuristic for time management
     return move_time ÷ 20 + increment ÷ 2
 end

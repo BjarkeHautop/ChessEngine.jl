@@ -5,12 +5,12 @@
 """
 Check if a square index is on the board
 """
-on_board(sq::Int) = 0 <= sq <= 63
+on_board(sq) = 0 <= sq <= 63
 
 """
 Return file (1..8) and rank (1..8) for a square index
 """
-file_rank(sq::Int) = (sq % 8 + 1, sq ÷ 8 + 1)
+file_rank(sq) = (sq % 8 + 1, sq ÷ 8 + 1)
 
 """
 Get the square index of the king for the given side
@@ -31,7 +31,7 @@ end
 """
 Return the piece type at a given square (0..63) using bitboards.
 """
-function piece_at(board::Board, sq::Int)
+function piece_at(board::Board, sq)
     mask = UInt64(1) << sq
     for (p, bb) in enumerate(board.bitboards)
         if bb & mask != 0
@@ -48,7 +48,7 @@ Check if a square is attacked by the given side.
 - `attacker`: Side (WHITE or BLACK)
 Returns: Bool
 """
-function square_attacked(board::Board, sq::Int, attacker::Side)::Bool
+function square_attacked(board::Board, sq, attacker::Side)::Bool
     ########################
     # 1) Pawn attacks
     ########################
@@ -201,7 +201,7 @@ function generate_captures!(board::Board, moves::Vector{Move})
 end
 
 # helper to find which enemy piece occupies a square
-function find_capture_piece(board::Board, sq::Int, start_piece::Int, end_piece::Int)
+function find_capture_piece(board::Board, sq, start_piece, end_piece)
     for p in start_piece:end_piece
         if (board.bitboards[p] & (UInt64(1) << sq)) != 0
             return p

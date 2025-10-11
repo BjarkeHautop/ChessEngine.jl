@@ -47,6 +47,8 @@ Information needed to undo a move
 - `moved_piece`: The piece type that was moved.
 - `promotion`: The piece type if the move was a promotion, or 0 otherwise.
 - `is_en_passant`: A boolean indicating if the move was an en passant capture.
+- `prev_eval_score`: The evaluation score before the move.
+- `prev_game_phase_value`: The game phase value before the move.
 """
 struct UndoInfo
     captured_piece::Int
@@ -67,7 +69,7 @@ using StaticArrays
 
 A chess board representation using bitboards.
 
-- `bitboards`: A dictionary mapping piece types to their corresponding bitboards.
+- `bitboards`: A fixed-size vector where each element corresponds to a piece type's bitboard.
 - `side_to_move`: The side to move.
 - `castling_rights`: A 4-bit integer representing castling rights (KQkq).
 - `en_passant`: The square index (0-63) for en passant target, or -1 if none.
