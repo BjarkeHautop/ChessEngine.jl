@@ -194,6 +194,8 @@ end
 end
 
 @testset "King attack masks" begin
+    OrbisChessEngine.init_king_masks!()
+
     # a1; Neighbors: b1 (bit 1), a2 (bit 8), b2 (bit 9)
     @test OrbisChessEngine.king_attack_masks[1] == 0x302
 

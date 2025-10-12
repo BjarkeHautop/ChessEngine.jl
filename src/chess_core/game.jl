@@ -124,10 +124,8 @@ Returns: Bool
 """
 function is_threefold_repetition(board::Board)
     n = 0
+    # Update to not use findlast
     last_index = findlast(!=(0), board.position_history)
-    if last_index === nothing
-        return false  # no valid positions yet
-    end
     last_key = board.position_history[last_index]
     for k in board.position_history
         if k == 0

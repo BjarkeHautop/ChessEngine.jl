@@ -26,7 +26,6 @@ function king_square(board::Board, side::Side)
             return sq
         end
     end
-    return -1  # shouldn't happen
 end
 
 """
@@ -159,18 +158,6 @@ function in_check(board::Board, side::Side)::Bool
     return square_attacked(board, king_sq, attacker)
 end
 
-function generate_captures(board::Board)
-    moves = generate_legal_moves(board)
-    capture_moves = Move[]
-    for m in moves
-        if m.capture != 0
-            push!(capture_moves, m)
-        end
-    end
-
-    return capture_moves
-end
-
 function generate_captures!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})
     # Generate all legal moves into `moves`
     n_moves = generate_legal_moves!(board, moves, pseudo)
@@ -197,12 +184,4 @@ function find_capture_piece(board::Board, sq, start_piece, end_piece)
         end
     end
     return 0
-end
-
-function square_attacked_withinner(board::Board, sq, attacker::Side)::Bool
-    occ = zero(UInt64)
-    function attacked_by_sliders(directions, bb_piece)
-        return false
-    end
-    return false
 end

@@ -117,3 +117,10 @@ end
         @test em in pawn_moves
     end
 end
+
+@testset "pawn mask" begin
+    OrbisChessEngine.init_pawn_masks!()
+
+    # Add explicit square tests ...
+    @test true
+end

@@ -95,3 +95,16 @@ end
     @test length(OrbisChessEngine.ZOBRIST_EP) == 8
     @test all(isa.(OrbisChessEngine.ZOBRIST_EP, UInt64))
 end
+
+@testset "board structs not equal" begin
+    b1 = Board()
+    b2 = Board()
+    make_move!(b1, Move("e2", "e4"))
+
+    @test b1 != b2
+
+    make_move!(b2, Move("e2", "e4"))
+    b1.undo_stack = Vector{UndoInfo}(undef, OrbisChessEngine.MAX_MOVES_PER_GAME)
+
+    @test b1 != b2
+end

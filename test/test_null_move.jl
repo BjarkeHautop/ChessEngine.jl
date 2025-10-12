@@ -16,3 +16,8 @@ using Test
     @test OrbisChessEngine.position_equal(b, b_copy)
     @test b == b_copy
 end
+
+@testset "undo_null_move! errors" begin
+    b = Board()
+    @test_throws ErrorException OrbisChessEngine.undo_null_move!(b)
+end

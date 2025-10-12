@@ -61,6 +61,8 @@ end
 end
 
 @testset "Knight attack masks" begin
+    OrbisChessEngine.init_knight_masks!()
+
     # a1; Neighbors: c2 and b3
     @test OrbisChessEngine.knight_attack_masks[1] == 0x20400
 

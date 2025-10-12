@@ -30,3 +30,9 @@ end
     make_move!(b, Move("c2", "c4"))
     @test OrbisChessEngine.has_pawn_for_en_passant(b, 2) == true
 end
+
+@testset "load polyglot book works" begin
+    book = load_polyglot_book(joinpath(@__DIR__, "..", "assets", "komodo.bin"))
+    @test typeof(book) == PolyglotBook
+end
+
