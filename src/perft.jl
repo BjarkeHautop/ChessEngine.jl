@@ -1,7 +1,7 @@
 const MAX_MOVES = 256  # 256 is safely larger than max legal moves
 
 function perft(board::Board, depth::Int)
-    levels = depth + 1  # allocate one buffer for each level (safe)
+    levels = depth + 1  # allocate one buffer for each level
     moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
     pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
 

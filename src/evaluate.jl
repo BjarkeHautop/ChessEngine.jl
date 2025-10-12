@@ -24,8 +24,11 @@ end
 
 # convert Board's phase counter into float
 """
-Compute game phase (0 = endgame, 1 = opening). 
-A simple heuristic: count non-pawn, non-king material. 
+    game_phase(board::Board) -> Float64
+
+Compute game phase (0 = endgame, 1 = opening).
+A simple heuristic: count non-pawn, non-king material.
+- board: Board struct
 """
 function game_phase(board::Board)
     maxphase = 24
@@ -33,7 +36,10 @@ function game_phase(board::Board)
 end
 
 """
+    evaluate(board::Board) -> Int
+
 Evaluate a position from White’s perspective using piece-square tables.
+- board: Board struct
 """
 function evaluate(board::Board)
     score = 0

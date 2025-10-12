@@ -1,7 +1,7 @@
 using OrbisChessEngine
 using Test
 
-@testset "Unmake normal moves" begin
+@testset "Undo normal moves" begin
     # Normal move
     b = Board()
     original_board = deepcopy(b)
@@ -13,7 +13,7 @@ using Test
     @test OrbisChessEngine.zobrist_hash(b) == original_hash
 end
 
-@testset "Unmake capture moves" begin
+@testset "Undo capture moves" begin
     # Capture
     b = Board()
     # Set up a simple capture
@@ -29,7 +29,7 @@ end
     @test OrbisChessEngine.zobrist_hash(b) == original_hash
 end
 
-@testset "Unmake promotion moves" begin
+@testset "Undo promotion moves" begin
     b = Board()
     moves = [
         Move("a2", "a4"),
@@ -54,7 +54,7 @@ end
     @test OrbisChessEngine.zobrist_hash(b) == original_hash
 end
 
-@testset "Unmake promotion and capture moves" begin
+@testset "Undo promotion and capture moves" begin
     b = Board()
     moves = [
         Move("a2", "a4"),
@@ -79,7 +79,7 @@ end
     @test OrbisChessEngine.zobrist_hash(b) == original_hash
 end
 
-@testset "Unmake castling" begin
+@testset "Undo castling" begin
     b = Board()
     # Clear squares between king and rook for kingside castling
     b.bitboards[Piece.W_KNIGHT] = OrbisChessEngine.clearbit(
@@ -95,7 +95,7 @@ end
     @test OrbisChessEngine.zobrist_hash(b) == original_hash
 end
 
-@testset "Unmake en passant" begin
+@testset "Undo en passant" begin
     b = Board()
     # White pawn to e5
     make_move!(b, Move("e2", "e5"))

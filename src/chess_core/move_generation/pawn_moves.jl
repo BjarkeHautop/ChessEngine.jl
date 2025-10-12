@@ -1,3 +1,36 @@
+const pawn_attack_masks_white = Vector{UInt64}(undef, 64)
+const pawn_attack_masks_black = Vector{UInt64}(undef, 64)
+
+function init_pawn_masks!()
+    for sq in 0:63
+        mask_white = zero(UInt64)
+        mask_black = zero(UInt64)
+        f, r = sq % 8, sq ÷ 8
+
+        # White pawns attack "up-left" and "up-right"
+        for df in (-1, 1)
+            tf, tr = f + df, r - 1   # moving up for white
+            if 0 <= tf < 8 && 0 <= tr < 8
+                mask_white |= UInt64(1) << (tr * 8 + tf)
+            end
+        end
+
+        # Black pawns attack "down-left" and "down-right"
+        for df in (-1, 1)
+            tf, tr = f + df, r + 1   # moving down for black
+            if 0 <= tf < 8 && 0 <= tr < 8
+                mask_black |= UInt64(1) << (tr * 8 + tf)
+            end
+        end
+
+        pawn_attack_masks_white[sq + 1] = mask_white
+        pawn_attack_masks_black[sq + 1] = mask_black
+    end
+end
+
+init_pawn_masks!()
+
+
 """
 Generate pseudo-legal pawn moves in-place
 - `board`: Board struct

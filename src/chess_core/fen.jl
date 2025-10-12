@@ -58,9 +58,8 @@ function board_from_fen(fen::String)
     halfmove = length(parts) >= 5 ? UInt16(parse(Int, parts[5])) : UInt16(0)
 
     # Preallocate position_history and undo_stack to fixed size
-    pos_hist = Vector{UInt64}(undef, MAX_MOVES_PER_GAME)
+    pos_hist = zeros(UInt64, MAX_MOVES_PER_GAME) # Intialize with zeros so we can check for threefold repetition
     undo_stk = Vector{UndoInfo}(undef, MAX_MOVES_PER_GAME)
-
     # Initialize Board
     board = Board(
         bitboards,
@@ -70,10 +69,13 @@ function board_from_fen(fen::String)
         halfmove,
         pos_hist,
         undo_stk,
+        Int16(0), # undo_stack pointer
         Int32(0), # eval_score placeholder
         UInt8(0) # game_phase_value placeholder
     )
-
+    # Initial position hash
+    board.position_history[1] = zobrist_hash(board)
+    
     # Compute cached values
     board.eval_score, board.game_phase_value = compute_eval_and_phase(board)
 

@@ -48,8 +48,11 @@ using Test
         end
     end
     @test game_status(b) == :draw_threefold
-    b.side_to_move = BLACK
-    @test game_status(b) == :draw_threefold
+    # Lose a move intentionally so it's the other side to move
+    make_move!(b, Move(b, "g1f3"))
+    b.side_to_move = WHITE
+    make_move!(b, Move(b, "f3g1"))
+    @test game_status(b) == :ongoing
 
     # -----------------------------
     # Fifty-move rule example

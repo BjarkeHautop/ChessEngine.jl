@@ -37,51 +37,38 @@ function search_with_time(
     allocated = allocate_time(game)
     stop_time = Int(time_ns() ÷ 1_000_000 + allocated)
 
-    best_result::Union{Nothing, SearchResult} = nothing
-
-    for depth in 1:max_depth
-        if (time_ns() ÷ 1_000_000) >= stop_time
-            break
-        end
-        # Book moves only at root
-        if depth == 1
-            _opening_book = opening_book
-        else
-            _opening_book = nothing
-        end
-        result = _search(
-            game.board, depth, 0, -MATE_VALUE, MATE_VALUE, _opening_book, stop_time)
-
-        # Propagate a book move immediately
-        if result.from_book
-            return result
-        end
-
-        if result.move !== nothing
-            best_result = result
-        end
-
-        if abs(best_result.score) >= MATE_THRESHOLD
-            return best_result
-        end
+    # Use search_root to perform iterative deepening at the root
+    result = search_root(
+        game.board,
+        max_depth;
+        stop_time = stop_time,
+        opening_book = opening_book,
+        verbose = verbose
+    )
+    if result.move === NO_MOVE
+        return nothing
     end
-
-    return best_result
+    return result
 end
 
 """
     make_timed_move!(game::Game; opening_book::Union{Nothing, PolyglotBook}=KOMODO_OPENING_BOOK, verbose=false)
 
-Make a move for the current player, updating the game state and time control.
+Searches for and makes a move for the current player, updating the Game struct with the updated board and time remaining.
 - `game`: Game struct
 - `opening_book`: Optional PolyglotBook for opening moves
 - `verbose`: If true, print move details and time used
+
+The time allocated for the search is done automatically based on remaining time and increment.
+See [`search`](@ref) for details on how the search is performed.
 """
 function make_timed_move!(
         game::Game;
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose = false
 )
+    OrbisChessEngine.tt_clear!()  # reset TT for this search
+
     start_time = time_ns() ÷ 1_000_000
     result = search_with_time(game; opening_book = opening_book, verbose = verbose)
     elapsed = (time_ns() ÷ 1_000_000) - start_time
@@ -110,12 +97,15 @@ end
 
 # Non-mutating version
 """
-    make_timed_move(game::Game; opening_book::Union{Nothing, PolyglotBook}=KOMODO_OPENING_BOOK, verbose=false)
+    make_timed_move(game::Game; opening_book::Union{Nothing, PolyglotBook}=KOMODO_OPENING_BOOK, verbose=false) -> Game
 
-Make a move for the current player, returning a new Game state.
+Searches for and makes a move for the current player, returning a new Game struct with the updated board and time remaining.
 - `game`: Game struct
 - `opening_book`: Optional PolyglotBook for opening moves
 - `verbose`: If true, print move details and time used
+
+The time allocated for the search is done automatically based on remaining time and increment.
+See [`search`](@ref) for details on how the search is performed.
 """
 function make_timed_move(
         game::Game;
@@ -133,13 +123,21 @@ Check for threefold repetition
 Returns: Bool
 """
 function is_threefold_repetition(board::Board)
-    if isempty(board.position_history)
-        return false
+    n = 0
+    last_index = findlast(!=(0), board.position_history)
+    if last_index === nothing
+        return false  # no valid positions yet
     end
-    last_key = board.position_history[end]
-    n = count(k -> k == last_key, board.position_history)
+    last_key = board.position_history[last_index]
+    for k in board.position_history
+        if k == 0
+            break  # stop at unused entries
+        end
+        n += k == last_key ? 1 : 0
+    end
     return n >= 3
 end
+
 
 """
 Check for fifty-move rule
@@ -151,9 +149,10 @@ function is_fifty_move_rule(board::Board)
 end
 
 """
+    is_insufficient_material(board::Board) -> Bool
+
 Check for insufficient material to mate
 - `board`: Board struct
-Returns: Bool
 """
 function is_insufficient_material(board::Board)
     # Count pieces using bitboards
@@ -202,7 +201,7 @@ function is_insufficient_material(board::Board)
 end
 
 """
-    game_status(board::Board)
+    game_status(board::Board) -> Symbol
 
 Return the current game status (checkmate, stalemate, draw, or ongoing)
 - `board`: Board struct

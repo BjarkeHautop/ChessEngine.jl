@@ -150,7 +150,7 @@ end
 # Quiescence search: only searches captures 
 const MAX_QUIESCENCE_PLY = 4
 
-function quiescence(board::Board, α::Int, β::Int; ply::Int = 0)
+function quiescence(board::Board, α::Int, β::Int; ply::Int = 0, moves_buf::Vector{Move} = Vector{Move}(undef, 0))
     side_to_move = board.side_to_move
     static_eval = evaluate(board)  # evaluation if we stop here
 
@@ -178,8 +178,8 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int = 0)
     end
 
     best_score = static_eval
-
-    for move in generate_captures(board)
+    generate_captures!(board, moves_buf)
+    for move in moves_buf
         make_move!(board, move)
         score = quiescence(board, α, β; ply = ply+1)
         undo_move!(board, move)
@@ -268,9 +268,9 @@ function _search(
         return SearchResult(quiescence(board, α, β), NO_MOVE, false)
     end
 
-    # Null move pruning
+    # Null move pruning (only if not in check and not endgame)
     R = 2
-    if depth > R + 1 && !is_endgame(board)
+    if depth > R + 1 && !is_endgame(board) && !in_check(board, board.side_to_move)
         make_null_move!(board)
         result = _search(board, depth - 1 - R, ply + 1, -β, -β + 1, nothing, stop_time)
         unmake_null_move!(board)
@@ -430,21 +430,26 @@ function search_root(board::Board, max_depth::Int;
         if (time_ns() ÷ 1_000_000) >= stop_time
             break
         end
+
+        # Stop if a mate is found
+        if abs(best_result_internal.score) >= MATE_THRESHOLD
+            if verbose
+                mate_in = OrbisChessEngine.MATE_VALUE - abs(best_result_internal.score)
+                println("Depth $depth | Score: Mate in $mate_in ply | PV: $pv_str")
+            end
+
+            break
+        end
     end
 
-    # Convert NO_MOVE to nothing for public API
-    best_move = best_result_internal.move === NO_MOVE ? nothing : best_result_internal.move
-    return SearchResult(best_result_internal.score, best_move, best_result_internal.from_book)
+    return SearchResult(best_result_internal.score, best_result_internal.move, best_result_internal.from_book)
 end
 
 """
     search(
-        board::Board; 
+        board::Board;
         depth::Int,
-        ply::Int = 0,
-        α::Int = (-MATE_VALUE),
-        β::Int = MATE_VALUE,
-        opening_book::Union{Nothing,PolyglotBook} = KOMODO_OPENING_BOOK,
+        opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose::Bool = false,
         time_budget::Int = typemax(Int)
     )::SearchResult
@@ -461,7 +466,7 @@ Set to `nothing` to disable.
 - `verbose`: if true, prints search information and principal variation (PV) at each depth
 - `time_budget`: time in milliseconds to stop the search (if depth not reached)
 Returns:
-- `SearchResult` containing the best move and its evaluation score.
+- `SearchResult` containing the best move and its evaluation score (or `nothing` if no move found)
 """
 function search(
         board::Board;
@@ -469,12 +474,22 @@ function search(
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose::Bool = false,
         time_budget::Int = typemax(Int)
-)::SearchResult
+)
     tt_clear!()  # reset TT for this search
     tb = min(time_budget, 1_000_000_000)  # cap to 1e9 ms ~ 11 days
     stop_time = Int((time_ns() ÷ 1_000_000) + tb)
-    return search_root(board, depth; stop_time = stop_time, opening_book = opening_book,
+    result = search_root(board, depth; stop_time = stop_time, opening_book = opening_book,
         verbose = verbose)
+    
+    # Convert NO_MOVE to nothing for public API
+    if result.move === NO_MOVE
+        if verbose
+            println("No move found.")
+        end
+        return nothing
+    else
+        return result
+    end
 end
 
 function tt_clear!()

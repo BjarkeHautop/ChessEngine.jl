@@ -74,6 +74,7 @@ using the board to infer capture, en passant, and castling.
 - `board`: current Board state
 - `str`: move string in long algebraic notation
 
+Captures are inferred based on the board state (so "e4d5" captures if d5 is occupied by opponent).
 Castling can be specified with "O-O" (kingside) or "O-O-O" (queenside). 
 Also accepts "o-o", "0-0", "o-o-o", "0-0-0".
 """

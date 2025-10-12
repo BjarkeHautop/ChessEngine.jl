@@ -1,14 +1,21 @@
 """
     undo_move!(board::Board, m::Move)
+
 Undo move `m` on `board` in place, restoring previous state.
+- `board`: Board struct
+- `m`: Move struct
 """
 function undo_move!(board::Board, m::Move)
     # --- 1. Flip side back ---
     board.side_to_move = board.side_to_move == WHITE ? BLACK : WHITE
 
     # --- 2. Restore position history and undo stack ---
-    pop!(board.position_history)
-    u = pop!(board.undo_stack)
+    if board.undo_index == 0
+        error("Undo stack empty!")
+    end
+    pos_index = board.undo_index + 1
+    u = board.undo_stack[board.undo_index]
+    board.undo_index -= 1  # pop
 
     moved_piece = u.moved_piece
 
@@ -54,11 +61,17 @@ function undo_move!(board::Board, m::Move)
     board.halfmove_clock = u.halfmove_clock
     board.eval_score = u.prev_eval_score
     board.game_phase_value = u.prev_game_phase_value
+
+    # --- 7. Restore position history ---
+    board.position_history[pos_index] = 0
 end
 
 """
-    undo_move(board::Board, m::Move)
+    undo_move(board::Board, m::Move) -> Board
+
 Return a new board with move `m` undone, leaving the original board unchanged.
+- `board`: Board struct
+- `m`: Move struct
 """
 function undo_move(board::Board, m::Move)
     board_copy = deepcopy(board)

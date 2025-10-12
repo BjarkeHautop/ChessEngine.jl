@@ -87,20 +87,31 @@ mutable struct Board
     halfmove_clock::UInt16          # for 50-move rule
     position_history::Vector{UInt64}  # for threefold repetition
     undo_stack::Vector{UndoInfo} # stack of UndoInfo for unmaking moves
+    undo_index::Int16         # current index in undo_stack
     eval_score::Int32           # cached evaluation from White’s POV
     game_phase_value::UInt8     # cached phase numerator (sum of weights)
 end
 
 function Base.:(==)(a::Board, b::Board)
-    a.bitboards == b.bitboards &&
-        a.side_to_move == b.side_to_move &&
-        a.castling_rights == b.castling_rights &&
-        a.en_passant == b.en_passant &&
-        a.halfmove_clock == b.halfmove_clock &&
-        a.position_history == b.position_history &&
-        a.undo_stack == b.undo_stack &&
-        a.eval_score == b.eval_score &&
-        a.game_phase_value == b.game_phase_value
+    if a.bitboards != b.bitboards ||
+       a.side_to_move != b.side_to_move ||
+       a.castling_rights != b.castling_rights ||
+       a.en_passant != b.en_passant ||
+       a.halfmove_clock != b.halfmove_clock ||
+       a.position_history != b.position_history ||
+       a.eval_score != b.eval_score ||
+       a.game_phase_value != b.game_phase_value ||
+       a.undo_index != b.undo_index
+        return false
+    end
+
+    for i in 1:a.undo_index
+        if a.undo_stack[i] != b.undo_stack[i]
+            return false
+        end
+    end
+
+    return true
 end
 
 function position_equal(a::Board, b::Board)

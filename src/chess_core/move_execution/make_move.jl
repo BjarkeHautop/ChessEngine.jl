@@ -25,25 +25,23 @@ function make_move!(board::Board, m::Move)
     piece_type == 0 && error("No piece found on from-square $(m.from)")
 
     # --- Detect en passant capture ---
-    is_ep = false
-    if piece_type in (Piece.W_PAWN, Piece.B_PAWN) && m.to == board.en_passant
-        is_ep = true
-    end
+    is_ep = piece_type in (Piece.W_PAWN, Piece.B_PAWN) && m.to == board.en_passant
 
-    # --- Save UndoInfo before modifying ---
-    push!(
-        board.undo_stack,
-        UndoInfo(
-            m.capture,
-            board.en_passant,
-            board.castling_rights,
-            board.halfmove_clock,
-            piece_type,
-            m.promotion,
-            is_ep,
-            board.eval_score,
-            board.game_phase_value
-        )
+    # --- Save UndoInfo at current undo_index ---
+    board.undo_index += 1
+    if board.undo_index > length(board.undo_stack)
+        error("Undo stack full!")
+    end
+    board.undo_stack[board.undo_index] = UndoInfo(
+        m.capture,
+        board.en_passant,
+        board.castling_rights,
+        board.halfmove_clock,
+        piece_type,
+        m.promotion,
+        is_ep,
+        board.eval_score,
+        board.game_phase_value
     )
 
     # --- Remove piece from origin square ---
@@ -166,7 +164,8 @@ function make_move!(board::Board, m::Move)
     end
 
     # --- Save history & flip side ---
-    push!(board.position_history, zobrist_hash(board))
+    pos_index = board.undo_index + 1
+    board.position_history[pos_index] = zobrist_hash(board)
     board.side_to_move = (board.side_to_move == WHITE ? BLACK : WHITE)
 end
 

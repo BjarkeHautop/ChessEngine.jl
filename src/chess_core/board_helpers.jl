@@ -2,17 +2,18 @@
 # Move helpers          #
 #########################
 
-"""
-Check if a square index is on the board
-"""
 on_board(sq) = 0 <= sq <= 63
 
 """
+    file_rank(sq) -> (Int, Int)
+
 Return file (1..8) and rank (1..8) for a square index
 """
 file_rank(sq) = (sq % 8 + 1, sq ÷ 8 + 1)
 
 """
+    king_square(board::Board, side::Side) -> Int
+
 Get the square index of the king for the given side
 - `board`: Board struct
 - `side`: Side (WHITE or BLACK)
@@ -29,6 +30,8 @@ function king_square(board::Board, side::Side)
 end
 
 """
+    piece_at(board::Board, sq) -> Int
+
 Return the piece type at a given square (0..63) using bitboards.
 """
 function piece_at(board::Board, sq)
@@ -42,6 +45,8 @@ function piece_at(board::Board, sq)
 end
 
 """
+    square_attacked(board, sq, attacker) -> Bool
+
 Check if a square is attacked by the given side.
 - `board`: Board struct
 - `sq`: Int (square index 0..63)
@@ -52,35 +57,22 @@ function square_attacked(board::Board, sq, attacker::Side)::Bool
     ########################
     # 1) Pawn attacks
     ########################
-    if attacker == WHITE
-        pawn_attacks = [-9, -7]   # white pawns attack up-left / up-right
-        pawns = board.bitboards[Piece.W_PAWN]
-    else
-        pawn_attacks = [7, 9]     # black pawns attack down-left / down-right
-        pawns = board.bitboards[Piece.B_PAWN]
-    end
-    for d in pawn_attacks
-        from = sq + d
-        if on_board(from) && testbit(pawns, from)
-            return true
-        end
+    pawns = attacker == WHITE ? board.bitboards[Piece.W_PAWN] : board.bitboards[Piece.B_PAWN]
+    mask = attacker == WHITE ? pawn_attack_masks_white[sq + 1] : pawn_attack_masks_black[sq + 1]
+    if (pawns & mask) != 0
+        return true
     end
 
-    ########################
-    # 2) Knight attacks
-    ########################
-    knight_deltas = [-17, -15, -10, -6, 6, 10, 15, 17]
-    knights = (attacker == WHITE) ? board.bitboards[Piece.W_KNIGHT] :
-              board.bitboards[Piece.B_KNIGHT]
-    for d in knight_deltas
-        from = sq + d
-        if on_board(from)
-            f1, r1 = file_rank(sq)
-            f2, r2 = file_rank(from)
-            if abs(f1 - f2) <= 2 && abs(r1 - r2) <= 2 && testbit(knights, from)
-                return true
-            end
-        end
+    # --- 2) Knight attacks ---
+    knights = attacker == WHITE ? board.bitboards[Piece.W_KNIGHT] : board.bitboards[Piece.B_KNIGHT]
+    if (knights & OrbisChessEngine.knight_attack_masks[sq + 1]) != 0
+        return true
+    end
+
+    # --- 3) King attacks ---
+    kings = attacker == WHITE ? board.bitboards[Piece.W_KING] : board.bitboards[Piece.B_KING]
+    if (kings & OrbisChessEngine.king_attack_masks[sq + 1]) != 0
+        return true
     end
 
     ########################
@@ -142,23 +134,12 @@ function square_attacked(board::Board, sq, attacker::Side)::Bool
         return true
     end
 
-    ########################
-    # 4) King attacks
-    ########################
-    king_deltas = [-9, -8, -7, -1, 1, 7, 8, 9]
-    kings = (attacker == WHITE) ? board.bitboards[Piece.W_KING] :
-            board.bitboards[Piece.B_KING]
-    for d in king_deltas
-        from = sq + d
-        if on_board(from) && testbit(kings, from)
-            return true
-        end
-    end
-
     return false
 end
 
 """
+    in_check(board::Board, side::Side) -> Bool
+
 Check if the king of the given side is in check
 - `board`: Board struct
 - `side`: Side (WHITE or BLACK)

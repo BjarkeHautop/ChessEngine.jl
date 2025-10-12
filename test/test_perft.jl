@@ -1,7 +1,7 @@
 using OrbisChessEngine
 using Test
 
-# Takes 5 sec for depth 5 on my machine
+# Takes 4 sec for depth 5 on my machine
 @testset "perft tests" begin
     b = Board()
     @test perft(b, 0) == 1
