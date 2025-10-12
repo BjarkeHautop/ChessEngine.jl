@@ -88,7 +88,7 @@ function Move(board::Board, str::AbstractString)
 
     # Parse squares
     from = square_from_name(str[1:2])
-    to   = square_from_name(str[3:4])
+    to = square_from_name(str[3:4])
 
     # Parse promotion if present
     promotion = 0
@@ -120,10 +120,9 @@ function Move(board::Board, str::AbstractString)
     return Move(
         Int8(from),
         Int8(to);
-        promotion  = Int8(promotion),
-        capture    = Int8(captured_piece),
-        castling   = Int8(0),
+        promotion = Int8(promotion),
+        capture = Int8(captured_piece),
+        castling = Int8(0),
         en_passant = is_ep
     )
 end
-

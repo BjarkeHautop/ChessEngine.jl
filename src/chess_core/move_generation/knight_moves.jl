@@ -78,5 +78,5 @@ function generate_knight_moves(board::Board)
     moves = Vector{Move}(undef, 64)  # Preallocate maximum possible moves
     start_idx = 1
     end_idx = generate_knight_moves!(board, moves, start_idx)
-    return moves[1:end_idx - 1]  # Return only the filled portion
+    return moves[1:(end_idx - 1)]  # Return only the filled portion
 end

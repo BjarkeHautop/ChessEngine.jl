@@ -1,5 +1,6 @@
 # Internal shared logic for filtering pseudo-legal moves
-function _filter_legal_moves!(board::Board, pseudo::Vector{Move}, start::Int, stop::Int, moves::Vector{Move}, n_moves::Int)
+function _filter_legal_moves!(board::Board, pseudo::Vector{Move}, start::Int,
+        stop::Int, moves::Vector{Move}, n_moves::Int)
     side = board.side_to_move
     opp = opposite(side)
     @inbounds for i in start:stop

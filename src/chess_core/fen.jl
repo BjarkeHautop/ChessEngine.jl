@@ -75,7 +75,7 @@ function board_from_fen(fen::String)
     )
     # Initial position hash
     board.position_history[1] = zobrist_hash(board)
-    
+
     # Compute cached values
     board.eval_score, board.game_phase_value = compute_eval_and_phase(board)
 

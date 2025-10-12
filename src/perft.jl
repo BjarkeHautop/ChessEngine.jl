@@ -72,8 +72,8 @@ function perft_fast(board::Board, depth::Int)
     end
 
     # Preallocate moves/pseudo stacks for the root
-    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
-    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
+    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
+    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
 
     # Generate legal moves at root
     root_moves = moves_stack[1]
@@ -90,14 +90,15 @@ function perft_fast(board::Board, depth::Int)
         range = chunks[t]
         futures[t] = Threads.@spawn begin
             local_board = deepcopy(board)  # thread-local board
-            local_moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
-            local_pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
+            local_moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
+            local_pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
 
             nodes = 0
             for i in range
                 move = root_moves[i]
                 make_move!(local_board, move)
-                nodes += _perft!(local_board, depth-1, local_moves_stack, local_pseudo_stack, 2)
+                nodes += _perft!(
+                    local_board, depth-1, local_moves_stack, local_pseudo_stack, 2)
                 undo_move!(local_board, move)
             end
             return nodes

@@ -30,7 +30,6 @@ end
 
 init_pawn_masks!()
 
-
 """
 Generate pseudo-legal pawn moves in-place
 - `board`: Board struct
@@ -118,7 +117,7 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
                     )
                     if (UInt64(1) << to_sq) & promo_rank_mask != 0
                         for promo in promo_pieces
-                            moves[idx] = Move(Int(sq), Int(to_sq); 
+                            moves[idx] = Move(Int(sq), Int(to_sq);
                                 capture = capture_piece, promotion = promo)
                             idx += 1
                         end
@@ -152,5 +151,5 @@ function generate_pawn_moves(board::Board)
     moves = Vector{Move}(undef, 64)  # Preallocate maximum possible moves
     start_idx = 1
     end_idx = generate_pawn_moves!(board, moves, start_idx)
-    return moves[1:end_idx - 1]  # Return only the filled portion
+    return moves[1:(end_idx - 1)]  # Return only the filled portion
 end

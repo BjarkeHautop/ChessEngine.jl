@@ -84,20 +84,24 @@ function square_attacked(board::Board, sq, attacker::Side)::Bool
     ########################
     # 1) Pawn attacks
     ########################
-    pawns = attacker == WHITE ? board.bitboards[Piece.W_PAWN] : board.bitboards[Piece.B_PAWN]
-    mask = attacker == WHITE ? pawn_attack_masks_white[sq + 1] : pawn_attack_masks_black[sq + 1]
+    pawns = attacker == WHITE ? board.bitboards[Piece.W_PAWN] :
+            board.bitboards[Piece.B_PAWN]
+    mask = attacker == WHITE ? pawn_attack_masks_white[sq + 1] :
+           pawn_attack_masks_black[sq + 1]
     if (pawns & mask) != 0
         return true
     end
 
     # --- 2) Knight attacks ---
-    knights = attacker == WHITE ? board.bitboards[Piece.W_KNIGHT] : board.bitboards[Piece.B_KNIGHT]
+    knights = attacker == WHITE ? board.bitboards[Piece.W_KNIGHT] :
+              board.bitboards[Piece.B_KNIGHT]
     if (knights & knight_attack_masks[sq + 1]) != 0
         return true
     end
 
     # --- 3) King attacks ---
-    kings = attacker == WHITE ? board.bitboards[Piece.W_KING] : board.bitboards[Piece.B_KING]
+    kings = attacker == WHITE ? board.bitboards[Piece.W_KING] :
+            board.bitboards[Piece.B_KING]
     if (kings & king_attack_masks[sq + 1]) != 0
         return true
     end

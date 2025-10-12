@@ -153,7 +153,7 @@ const moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:MAX_QUIESCENCE_PL
 const pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:MAX_QUIESCENCE_PLY]
 
 function quiescence(board::Board, α::Int, β::Int;
-    ply::Int = 0
+        ply::Int = 0
 )
     side_to_move = board.side_to_move
     static_eval = evaluate(board)  # evaluation if we stop here
@@ -494,7 +494,7 @@ function search(
     stop_time = Int((time_ns() ÷ 1_000_000) + tb)
     result = search_root(board, depth; stop_time = stop_time, opening_book = opening_book,
         verbose = verbose)
-    
+
     # Convert NO_MOVE to nothing for public API
     if result.move === NO_MOVE
         if verbose

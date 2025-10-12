@@ -138,7 +138,6 @@ function is_threefold_repetition(board::Board)
     return n >= 3
 end
 
-
 """
 Check for fifty-move rule
 - `board`: Board struct
