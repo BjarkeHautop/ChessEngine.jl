@@ -35,4 +35,3 @@ end
     book = load_polyglot_book(joinpath(@__DIR__, "..", "assets", "komodo.bin"))
     @test typeof(book) == PolyglotBook
 end
-
