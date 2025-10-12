@@ -1,9 +1,27 @@
 # Internal helper for sliding moves
-function _generate_sliding_moves_internal(board::Board, bb_piece::UInt64, directions::Vector{Int}, push_fn)
-    friendly_pieces,
-    enemy_pieces = board.side_to_move == WHITE ?
-                   (Piece.W_PAWN:Piece.W_KING, Piece.B_PAWN:Piece.B_KING) :
-                   (Piece.B_PAWN:Piece.B_KING, Piece.W_PAWN:Piece.W_KING)
+const WHITE_PIECES = Piece.W_PAWN:Piece.W_KING
+const BLACK_PIECES = Piece.B_PAWN:Piece.B_KING
+const DIAGONAL_DIRS = [-9, -7, 7, 9]
+const ORTHOGONAL_DIRS = [-8, -1, 1, 8]
+const ALL_DIRS = [-9, -8, -7, -1, 1, 7, 8, 9]
+
+function generate_sliding_moves!(
+    board::Board,
+    bb_piece::UInt64,
+    directions::Vector{Int},
+    moves::Vector{Move},
+    start_idx::Int
+)
+
+    idx = start_idx
+
+    if board.side_to_move == WHITE
+        friendly_pieces = WHITE_PIECES
+        enemy_pieces    = BLACK_PIECES
+    else
+        friendly_pieces = BLACK_PIECES
+        enemy_pieces    = WHITE_PIECES
+    end
 
     # Bitboard of all friendly pieces
     occupied_friendly = zero(UInt64)
@@ -11,7 +29,7 @@ function _generate_sliding_moves_internal(board::Board, bb_piece::UInt64, direct
         occupied_friendly |= board.bitboards[p]
     end
 
-    for sq in 0:63
+    @inbounds for sq in 0:63
         if !testbit(bb_piece, sq)
             continue
         end
@@ -47,7 +65,8 @@ function _generate_sliding_moves_internal(board::Board, bb_piece::UInt64, direct
                     end
                 end
 
-                push_fn(sq, to_sq; capture = capture)
+                moves[idx] = Move(sq, to_sq; capture = capture)
+                idx += 1
 
                 # Stop sliding if captured
                 if capture != 0
@@ -56,89 +75,50 @@ function _generate_sliding_moves_internal(board::Board, bb_piece::UInt64, direct
             end
         end
     end
-end
 
-# Returns new vector
-function generate_sliding_moves(board::Board, bb_piece::UInt64, directions::Vector{Int})
-    moves = Move[]
-    _generate_sliding_moves_internal(board, bb_piece, directions,
-        (sq, to_sq; kwargs...) -> push!(moves, Move(sq, to_sq; kwargs...)))
-    return moves
-end
-
-"""
-Generate pseudo-legal bishop moves for the given side
-- `board`: Board struct
-Returns: Vector of Move
-"""
-function generate_bishop_moves(board::Board)
-    if board.side_to_move == WHITE
-        bb = board.bitboards[Piece.W_BISHOP]
-    else
-        bb = board.bitboards[Piece.B_BISHOP]
-    end
-    directions = [-9, -7, 7, 9]  # diagonals
-    return generate_sliding_moves(board, bb, directions)
-end
-
-"""
-Generate pseudo-legal rook moves for the given side
-- `board`: Board struct
-Returns: Vector of Move
-"""
-function generate_rook_moves(board::Board)
-    if board.side_to_move == WHITE
-        bb = board.bitboards[Piece.W_ROOK]
-    else
-        bb = board.bitboards[Piece.B_ROOK]
-    end
-    directions = [-8, -1, 1, 8]  # orthogonal
-    return generate_sliding_moves(board, bb, directions)
-end
-
-"""
-Generate pseudo-legal queen moves for the given side
-- `board`: Board struct
-Returns: Vector of Move
-"""
-function generate_queen_moves(board::Board)
-    if board.side_to_move == WHITE
-        bb = board.bitboards[Piece.W_QUEEN]
-    else
-        bb = board.bitboards[Piece.B_QUEEN]
-    end
-    directions = [-9, -8, -7, -1, 1, 7, 8, 9]  # all directions
-    return generate_sliding_moves(board, bb, directions)
-end
-
-# In-place version
-function generate_sliding_moves!(board::Board, bb_piece::UInt64, directions::Vector{Int}, moves::Vector{Move})
-    len_before = length(moves)
-    _generate_sliding_moves_internal(board, bb_piece, directions,
-        (sq, to_sq; kwargs...) -> push!(moves, Move(sq, to_sq; kwargs...)))
-    return length(moves) - len_before
+    return idx  # new length after adding all sliding moves
 end
 
 # In-place bishop moves
-function generate_bishop_moves!(board::Board, moves::Vector{Move})
+function generate_bishop_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_BISHOP] :
          board.bitboards[Piece.B_BISHOP]
-    directions = [-9, -7, 7, 9]  # diagonals
-    return generate_sliding_moves!(board, bb, directions, moves)
+    return generate_sliding_moves!(board, bb, DIAGONAL_DIRS, moves, start_idx)
 end
 
 # In-place rook moves
-function generate_rook_moves!(board::Board, moves::Vector{Move})
+function generate_rook_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_ROOK] :
          board.bitboards[Piece.B_ROOK]
     directions = [-8, -1, 1, 8]  # orthogonal
-    return generate_sliding_moves!(board, bb, directions, moves)
+    return generate_sliding_moves!(board, bb, ORTHOGONAL_DIRS, moves, start_idx)
 end
 
 # In-place queen moves
-function generate_queen_moves!(board::Board, moves::Vector{Move})
+function generate_queen_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_QUEEN] :
          board.bitboards[Piece.B_QUEEN]
     directions = [-9, -8, -7, -1, 1, 7, 8, 9]  # all directions
-    return generate_sliding_moves!(board, bb, directions, moves)
+    return generate_sliding_moves!(board, bb, ALL_DIRS, moves, start_idx)
+end
+
+function generate_bishop_moves(board::Board)
+    moves = Vector{Move}(undef, 256)  # preallocate a large enough buffer
+    start_idx = 1
+    end_idx = generate_bishop_moves!(board, moves, start_idx)
+    return moves[1:end_idx - 1]
+end
+
+function generate_rook_moves(board::Board)
+    moves = Vector{Move}(undef, 256)  # preallocate a large enough buffer
+    start_idx = 1
+    end_idx = generate_rook_moves!(board, moves, start_idx)
+    return moves[1:end_idx - 1]
+end
+
+function generate_queen_moves(board::Board)
+    moves = Vector{Move}(undef, 256)  # preallocate a large enough buffer
+    start_idx = 1
+    end_idx = generate_queen_moves!(board, moves, start_idx)
+    return moves[1:end_idx - 1]
 end

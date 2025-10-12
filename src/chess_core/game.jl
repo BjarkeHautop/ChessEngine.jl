@@ -67,7 +67,7 @@ function make_timed_move!(
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose = false
 )
-    OrbisChessEngine.tt_clear!()  # reset TT for this search
+    tt_clear!()  # reset TT for this search
 
     start_time = time_ns() ÷ 1_000_000
     result = search_with_time(game; opening_book = opening_book, verbose = verbose)

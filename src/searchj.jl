@@ -149,8 +149,12 @@ end
 
 # Quiescence search: only searches captures 
 const MAX_QUIESCENCE_PLY = 4
+const moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:MAX_QUIESCENCE_PLY]
+const pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:MAX_QUIESCENCE_PLY]
 
-function quiescence(board::Board, α::Int, β::Int; ply::Int = 0, moves_buf::Vector{Move} = Vector{Move}(undef, 0))
+function quiescence(board::Board, α::Int, β::Int;
+    ply::Int = 0
+)
     side_to_move = board.side_to_move
     static_eval = evaluate(board)  # evaluation if we stop here
 
@@ -178,10 +182,16 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int = 0, moves_buf::Vec
     end
 
     best_score = static_eval
-    generate_captures!(board, moves_buf)
-    for move in moves_buf
+
+    local_moves = moves_stack[ply + 1]      # safe per-ply buffer
+    local_pseudo = pseudo_stack[ply + 1]
+
+    n_moves = generate_captures!(board, local_moves, local_pseudo)
+
+    @inbounds for i in 1:n_moves
+        move = local_moves[i]
         make_move!(board, move)
-        score = quiescence(board, α, β; ply = ply+1)
+        score = quiescence(board, α, β; ply = ply + 1)
         undo_move!(board, move)
 
         if side_to_move == WHITE
@@ -192,7 +202,7 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int = 0, moves_buf::Vec
                 α = best_score
             end
             if α >= β
-                break  # beta cutoff
+                break
             end
         else
             if score < best_score
@@ -202,7 +212,7 @@ function quiescence(board::Board, α::Int, β::Int; ply::Int = 0, moves_buf::Vec
                 β = best_score
             end
             if β <= α
-                break  # alpha cutoff
+                break
             end
         end
     end
@@ -273,7 +283,7 @@ function _search(
     if depth > R + 1 && !is_endgame(board) && !in_check(board, board.side_to_move)
         make_null_move!(board)
         result = _search(board, depth - 1 - R, ply + 1, -β, -β + 1, nothing, stop_time)
-        unmake_null_move!(board)
+        undo_null_move!(board)
 
         if board.side_to_move == WHITE && result.score >= β
             return SearchResult(result.score, NO_MOVE, false)
@@ -282,27 +292,31 @@ function _search(
         end
     end
 
-    moves = Vector{Move}(undef, 0)
-    generate_legal_moves!(board, moves)
+    moves = Vector{Move}(undef, MAX_MOVES)
+    pseudo = Vector{Move}(undef, MAX_MOVES)
 
-    if isempty(moves)
+    n_moves = generate_legal_moves!(board, moves, pseudo)
+
+    if n_moves == 0
         val = in_check(board, board.side_to_move) ?
               (board.side_to_move == WHITE ? -MATE_VALUE + ply : MATE_VALUE - ply) : 0
         return SearchResult(val, NO_MOVE, false)
     end
 
     # Precompute move scores
-    scores = [move_ordering_score(board, m, ply) for m in moves]
+    scores = Vector{Int}(undef, n_moves)
+    @inbounds for i in 1:n_moves
+        scores[i] = move_ordering_score(board, moves[i], ply)
+    end
 
-    n = length(moves)
     best_score = board.side_to_move == WHITE ? -Inf : Inf
     best_move = NO_MOVE
 
-    for i in 1:n
+    @inbounds for i in 1:n_moves
         # Find highest scoring remaining move
         best_idx = i
         best_val = scores[i]
-        @inbounds for j in (i + 1):n
+        @inbounds for j in (i + 1):n_moves
             if scores[j] > best_val
                 best_val = scores[j]
                 best_idx = j
@@ -434,7 +448,7 @@ function search_root(board::Board, max_depth::Int;
         # Stop if a mate is found
         if abs(best_result_internal.score) >= MATE_THRESHOLD
             if verbose
-                mate_in = OrbisChessEngine.MATE_VALUE - abs(best_result_internal.score)
+                mate_in = MATE_VALUE - abs(best_result_internal.score)
                 println("Depth $depth | Score: Mate in $mate_in ply | PV: $pv_str")
             end
 

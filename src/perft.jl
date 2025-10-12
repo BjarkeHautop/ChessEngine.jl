@@ -27,11 +27,11 @@ function _perft!(
     nodes = 0
     moves = moves_stack[level]
     pseudo = pseudo_stack[level]
-    empty!(pseudo)
 
-    OrbisChessEngine.generate_legal_moves_fast!(board, moves, pseudo)
+    # Generate legal moves and get the number of moves
+    n_moves = generate_legal_moves!(board, moves, pseudo)
 
-    @inbounds for i in eachindex(moves)
+    @inbounds for i in 1:n_moves
         move = moves[i]
         make_move!(board, move)
         nodes += _perft!(board, depth - 1, moves_stack, pseudo_stack, level + 1)
@@ -39,41 +39,6 @@ function _perft!(
     end
 
     return nodes
-end
-
-# Mainly for debugging: print per-move counts at the top level
-function perft_divide(board::Board, depth::Int)
-    levels = depth + 1  # one buffer per level
-    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
-    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
-
-    # Generate all root moves
-    moves = moves_stack[1]
-    pseudo = pseudo_stack[1]
-    empty!(pseudo)
-
-    OrbisChessEngine.generate_legal_moves_fast!(board, moves, pseudo)
-    n = length(moves)
-
-    println("Depth $depth perft divide: $(n) moves")
-
-    total = 0
-
-    for i in 1:n
-        move = moves[i]
-        make_move!(board, move)
-
-        # recursive call using preallocated stacks
-        nodes = _perft!(board, depth - 1, moves_stack, pseudo_stack, 2)
-
-        undo_move!(board, move)
-        total += nodes
-
-        println(string(move), ": ", nodes)
-    end
-
-    println("Total: ", total)
-    return total
 end
 
 using Base.Threads
@@ -99,40 +64,40 @@ end
     perft_fast(board::Board, depth::Int) -> Int
 
 Compute the number of leaf nodes reachable from the given board position at the given depth
-using multiple threads.
+using multiple threads at the root.
 """
 function perft_fast(board::Board, depth::Int)
     if depth == 0
         return 1
     end
-    moves = Vector{Move}(undef, MAX_MOVES)
-    pseudo = Vector{Move}(undef, MAX_MOVES)
-    empty!(pseudo)
 
-    OrbisChessEngine.generate_legal_moves_fast!(board, moves, pseudo)
-    nmoves = length(moves)
+    # Preallocate moves/pseudo stacks for the root
+    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
+    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
 
-    nthreads_ = Threads.nthreads()
-    chunks = split_indices(nmoves, nthreads_)
+    # Generate legal moves at root
+    root_moves = moves_stack[1]
+    root_pseudo = pseudo_stack[1]
+    n_moves = generate_legal_moves!(board, root_moves, root_pseudo)
 
+    # Split moves among threads
+    nthreads_ = min(n_moves, Threads.nthreads())  # don't spawn more threads than moves
+    chunks = split_indices(n_moves, nthreads_)
+
+    # Spawn tasks for each thread
     futures = Vector{Task}(undef, nthreads_)
-
     for t in 1:nthreads_
         range = chunks[t]
-
         futures[t] = Threads.@spawn begin
-            # make a thread-local board copy
-            local_board = deepcopy(board)
-
-            # thread-local recursion stacks
-            moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
-            pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
+            local_board = deepcopy(board)  # thread-local board
+            local_moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
+            local_pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth+1)]
 
             nodes = 0
             for i in range
-                move = moves[i]
+                move = root_moves[i]
                 make_move!(local_board, move)
-                nodes += _perft!(local_board, depth-1, moves_stack, pseudo_stack, 2)
+                nodes += _perft!(local_board, depth-1, local_moves_stack, local_pseudo_stack, 2)
                 undo_move!(local_board, move)
             end
             return nodes

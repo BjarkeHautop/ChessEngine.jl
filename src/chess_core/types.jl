@@ -76,6 +76,7 @@ A chess board representation using bitboards.
 - `halfmove_clock`: The number of halfmoves since the last capture or pawn move (for the 50-move rule).
 - `position_history`: A vector of position Zobrist hashes for detecting threefold repetition.
 - `undo_stack`: A stack of `UndoInfo` structs for unmaking moves.
+- `undo_index`: The current index in the undo stack.
 - `eval_score`: Cached evaluation score from White's point of view.
 - `game_phase_value`: Cached phase numerator (sum of weights) for evaluation scaling.
 """

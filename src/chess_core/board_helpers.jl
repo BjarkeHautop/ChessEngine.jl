@@ -44,6 +44,33 @@ function piece_at(board::Board, sq)
     return 0
 end
 
+function attacked_by_sliders(occ, sq, directions, bb_piece)
+    for d in directions
+        pos = sq
+        prev_f, prev_r = file_rank(pos)
+        while true
+            pos += d
+            if !on_board(pos)
+                break
+            end
+            f, r = file_rank(pos)
+            if abs(f - prev_f) > 1 || abs(r - prev_r) > 1
+                break
+            end
+            prev_f, prev_r = f, r
+
+            if testbit(occ, pos)
+                if testbit(bb_piece, pos)
+                    return true   # correct slider found
+                else
+                    break        # blocked by wrong piece
+                end
+            end
+        end
+    end
+    return false
+end
+
 """
     square_attacked(board, sq, attacker) -> Bool
 
@@ -65,13 +92,13 @@ function square_attacked(board::Board, sq, attacker::Side)::Bool
 
     # --- 2) Knight attacks ---
     knights = attacker == WHITE ? board.bitboards[Piece.W_KNIGHT] : board.bitboards[Piece.B_KNIGHT]
-    if (knights & OrbisChessEngine.knight_attack_masks[sq + 1]) != 0
+    if (knights & knight_attack_masks[sq + 1]) != 0
         return true
     end
 
     # --- 3) King attacks ---
     kings = attacker == WHITE ? board.bitboards[Piece.W_KING] : board.bitboards[Piece.B_KING]
-    if (kings & OrbisChessEngine.king_attack_masks[sq + 1]) != 0
+    if (kings & king_attack_masks[sq + 1]) != 0
         return true
     end
 
@@ -83,36 +110,11 @@ function square_attacked(board::Board, sq, attacker::Side)::Bool
         occ |= board.bitboards[p]
     end
 
-    function attacked_by_sliders(directions, bb_piece)
-        for d in directions
-            pos = sq
-            prev_f, prev_r = file_rank(pos)
-            while true
-                pos += d
-                if !on_board(pos)
-                    break
-                end
-                f, r = file_rank(pos)
-                if abs(f - prev_f) > 1 || abs(r - prev_r) > 1
-                    break
-                end
-                prev_f, prev_r = f, r
-
-                if testbit(occ, pos)
-                    if testbit(bb_piece, pos)
-                        return true   # correct slider found
-                    else
-                        break        # blocked by wrong piece
-                    end
-                end
-            end
-        end
-        return false
-    end
-
     # Bishops + queens (diagonals)
     if attacked_by_sliders(
-        [-9, -7, 7, 9],
+        occ,
+        sq,
+        DIAGONAL_DIRS,
         if (attacker == WHITE)
             (board.bitboards[Piece.W_BISHOP] | board.bitboards[Piece.W_QUEEN])
         else
@@ -124,7 +126,9 @@ function square_attacked(board::Board, sq, attacker::Side)::Bool
 
     # Rooks + queens (orthogonals)
     if attacked_by_sliders(
-        [-8, -1, 1, 8],
+        occ,
+        sq,
+        ORTHOGONAL_DIRS,
         if (attacker == WHITE)
             (board.bitboards[Piece.W_ROOK] | board.bitboards[Piece.W_QUEEN])
         else
@@ -163,22 +167,22 @@ function generate_captures(board::Board)
     return capture_moves
 end
 
-function generate_captures!(board::Board, moves::Vector{Move})
-    # Clear previous content
-    empty!(moves)
+function generate_captures!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})
+    # Generate all legal moves into `moves`
+    n_moves = generate_legal_moves!(board, moves, pseudo)
 
-    # Temporary vector to hold all legal moves
-    temp = Vector{Move}(undef, 0)
-    generate_legal_moves!(board, temp)
-
-    # Filter in-place
-    for m in temp
+    # Filter in-place: keep only capture moves
+    write_idx = 1
+    @inbounds for i in 1:n_moves
+        m = moves[i]
         if m.capture != 0
-            push!(moves, m)
+            moves[write_idx] = m
+            write_idx += 1
         end
     end
 
-    return moves
+    # Return number of capture moves
+    return write_idx - 1
 end
 
 # helper to find which enemy piece occupies a square
@@ -189,4 +193,12 @@ function find_capture_piece(board::Board, sq, start_piece, end_piece)
         end
     end
     return 0
+end
+
+function square_attacked_withinner(board::Board, sq, attacker::Side)::Bool
+    occ = zero(UInt64)
+    function attacked_by_sliders(directions, bb_piece)
+        return false
+    end
+    return false
 end

@@ -12,7 +12,7 @@ using Test
     @test result.score < -10_000  # Checkmate 
     @test result.move == Move("d8", "h4")
 end
-1+1
+
 @testset "Search with time constraint" begin
     b = Board()
 

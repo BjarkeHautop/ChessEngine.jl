@@ -33,11 +33,12 @@ end
 
 @testset "Knight move generation in place" begin
     b = Board()
-    moves = Move[]
-    OrbisChessEngine.generate_knight_moves!(b, moves)
-
+    moves = Vector{Move}(undef, 256)  # preallocate a large enough buffer
+    start_idx = 1
+    idx = OrbisChessEngine.generate_knight_moves!(b, moves, start_idx)
+    idx -= 1  # Adjust for 1-based indexing
     # Each knight has 2 moves at the starting position, so total 4 moves
-    @test length(moves) == 4
+    @test idx == 4
 
     expected_moves = [
         Move("b1", "a3"), Move("b1", "c3"), Move("g1", "f3"), Move("g1", "h3")
@@ -47,16 +48,16 @@ end
         @test em in moves
     end
 
-    empty!(moves)
     make_move!(b, Move("b1", "c3"))
-    OrbisChessEngine.generate_knight_moves!(b, moves)
-    @test length(moves) == 4
+    idx = OrbisChessEngine.generate_knight_moves!(b, moves, start_idx)
+    idx -= 1  # Adjust for 1-based indexing
+    @test idx == 4
 
-    empty!(moves)
     make_move!(b, Move("g8", "f6"))
     make_move!(b, Move("c3", "d5"))
-    OrbisChessEngine.generate_knight_moves!(b, moves)
-    @test length(moves) == 7
+    idx = OrbisChessEngine.generate_knight_moves!(b, moves, start_idx)
+    idx -= 1  # Adjust for 1-based indexing
+    @test idx == 7
 end
 
 @testset "Knight attack masks" begin

@@ -22,7 +22,9 @@ end
 # Initialize once at startup
 init_knight_masks!()
 
-function generate_knight_moves!(board::Board, moves::Vector{Move})
+function generate_knight_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
+    idx = start_idx
+
     if board.side_to_move == WHITE
         knights = board.bitboards[Piece.W_KNIGHT]
         friendly_mask = board.bitboards[Piece.W_PAWN] | board.bitboards[Piece.W_KNIGHT] |
@@ -64,13 +66,17 @@ function generate_knight_moves!(board::Board, moves::Vector{Move})
                 end
             end
 
-            push!(moves, Move(sq, to_sq; capture = capture))
+            moves[idx] = Move(sq, to_sq; capture = capture)
+            idx += 1
         end
     end
+
+    return idx  # new length of moves array after adding knight moves
 end
 
 function generate_knight_moves(board::Board)
-    moves = Move[]
-    generate_knight_moves!(board, moves)
-    return moves
+    moves = Vector{Move}(undef, 64)  # Preallocate maximum possible moves
+    start_idx = 1
+    end_idx = generate_knight_moves!(board, moves, start_idx)
+    return moves[1:end_idx - 1]  # Return only the filled portion
 end

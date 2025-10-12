@@ -23,7 +23,9 @@ end
 # Initialize once
 init_king_masks!()
 
-function generate_king_moves!(board::Board, moves::Vector{Move})
+function generate_king_moves!(board::Board, moves::Vector{Move}, start_idx::Int = 1)
+    idx = start_idx
+
     # Choose correct side bitboards
     if board.side_to_move == WHITE
         kings = board.bitboards[Piece.W_KING]
@@ -66,7 +68,8 @@ function generate_king_moves!(board::Board, moves::Vector{Move})
             end
         end
 
-        push!(moves, Move(king_sq, to_sq; capture = capture))
+        moves[idx] = Move(king_sq, to_sq; capture = capture)
+        idx += 1
     end
 
     # =============== Castling (pseudo-legal) ===============
@@ -74,27 +77,33 @@ function generate_king_moves!(board::Board, moves::Vector{Move})
     if board.side_to_move == WHITE
         if (rights & 0b0001) != 0 &&
            ((occupied_mask & ((UInt64(1) << 5) | (UInt64(1) << 6))) == 0)
-            push!(moves, Move(4, 6; castling = 1))
+            moves[idx] = Move(4, 6; castling = 1)
+            idx += 1
         end
         if (rights & 0b0010) != 0 &&
            ((occupied_mask & ((UInt64(1) << 1) | (UInt64(1) << 2) | (UInt64(1) << 3))) == 0)
-            push!(moves, Move(4, 2; castling = 2))
+            moves[idx] = Move(4, 2; castling = 2)
+            idx += 1
         end
     else
         if (rights & 0b0100) != 0 &&
            ((occupied_mask & ((UInt64(1) << 61) | (UInt64(1) << 62))) == 0)
-            push!(moves, Move(60, 62; castling = 1))
+            moves[idx] = Move(60, 62; castling = 1)
+            idx += 1
         end
         if (rights & 0b1000) != 0 &&
            ((occupied_mask & ((UInt64(1) << 57) | (UInt64(1) << 58) | (UInt64(1) << 59))) ==
             0)
-            push!(moves, Move(60, 58; castling = 2))
+            moves[idx] = Move(60, 58; castling = 2)
+            idx += 1
         end
     end
+    return idx # new length of moves array after adding king moves
 end
 
 function generate_king_moves(board::Board)
-    moves = Move[]
-    generate_king_moves!(board, moves)
-    return moves
+    moves = Vector{Move}(undef, 64)  # Preallocate maximum possible moves
+    start_idx = 1
+    end_idx = generate_king_moves!(board, moves, start_idx)
+    return moves[1:end_idx - 1]  # Return only the filled portion
 end

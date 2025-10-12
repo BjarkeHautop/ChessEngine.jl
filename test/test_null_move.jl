@@ -9,9 +9,10 @@ using Test
     @test b.side_to_move == BLACK
     @test b.halfmove_clock == 1
 
-    OrbisChessEngine.unmake_null_move!(b)
+    OrbisChessEngine.undo_null_move!(b)
     @test b.side_to_move == WHITE
     @test b.halfmove_clock == 0
 
     @test OrbisChessEngine.position_equal(b, b_copy)
+    @test b == b_copy
 end

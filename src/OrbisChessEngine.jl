@@ -31,8 +31,8 @@ include("chess_core/move_execution/undo_move.jl")
 
 include("piece_square_tables.jl")
 include("evaluate.jl")
-include("searchj.jl")
 include("perft.jl")  # Perft testing
+include("searchj.jl")
 include("api.jl")    # User-facing API functions
 include("ui.jl")    # Board display
 

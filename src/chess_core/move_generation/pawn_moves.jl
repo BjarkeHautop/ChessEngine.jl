@@ -37,7 +37,9 @@ Generate pseudo-legal pawn moves in-place
 - `moves`: preallocated buffer to append moves
 Returns: number of moves added
 """
-function generate_pawn_moves!(board::Board, moves::Vector{Move})
+function generate_pawn_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
+    idx = start_idx
+
     # Setup depending on side
     if board.side_to_move == WHITE
         pawns = board.bitboards[Piece.W_PAWN]
@@ -83,17 +85,20 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move})
         if 0 <= to_sq < 64 && ((all_occupied & (UInt64(1) << to_sq)) == 0)
             if (UInt64(1) << to_sq) & promo_rank_mask != 0
                 for promo in promo_pieces
-                    push!(moves, Move(Int(sq), Int(to_sq); promotion = promo))
+                    moves[idx] = Move(Int(sq), Int(to_sq); promotion = promo)
+                    idx += 1
                 end
             else
-                push!(moves, Move(Int(sq), Int(to_sq)))
+                moves[idx] = Move(Int(sq), Int(to_sq))
+                idx += 1
             end
 
             # double push
             if (UInt64(1) << sq) & start_rank_mask != 0
                 to_sq2 = sq + 2*direction
                 if 0 <= to_sq2 < 64 && (all_occupied & (UInt64(1) << to_sq2)) == 0
-                    push!(moves, Move(Int(sq), Int(to_sq2)))
+                    moves[idx] = Move(Int(sq), Int(to_sq2))
+                    idx += 1
                 end
             end
         end
@@ -113,11 +118,13 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move})
                     )
                     if (UInt64(1) << to_sq) & promo_rank_mask != 0
                         for promo in promo_pieces
-                            push!(moves,
-                                Move(Int(sq), Int(to_sq); capture = capture_piece, promotion = promo))
+                            moves[idx] = Move(Int(sq), Int(to_sq); 
+                                capture = capture_piece, promotion = promo)
+                            idx += 1
                         end
                     else
-                        push!(moves, Move(Int(sq), Int(to_sq); capture = capture_piece))
+                        moves[idx] = Move(Int(sq), Int(to_sq); capture = capture_piece)
+                        idx += 1
                     end
                 end
             end
@@ -128,10 +135,12 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move})
             ep_sq = board.en_passant
             if (sq % 8 != 0 && sq + left_capture_offset == ep_sq) ||
                (sq % 8 != 7 && sq + right_capture_offset == ep_sq)
-                push!(moves, Move(Int(sq), Int(ep_sq); capture = ep_capture_piece, en_passant = true))
+                moves[idx] = Move(Int(sq), Int(ep_sq); capture = ep_capture_piece, en_passant = true)
+                idx += 1
             end
         end
     end
+    return idx # new length of moves after adding pawn moves
 end
 
 """
@@ -140,7 +149,8 @@ Generate pseudo-legal pawn moves for the side to move
 Returns: Vector of Move
 """
 function generate_pawn_moves(board::Board)
-    moves = Move[]
-    generate_pawn_moves!(board, moves)
-    return moves
+    moves = Vector{Move}(undef, 64)  # Preallocate maximum possible moves
+    start_idx = 1
+    end_idx = generate_pawn_moves!(board, moves, start_idx)
+    return moves[1:end_idx - 1]  # Return only the filled portion
 end
