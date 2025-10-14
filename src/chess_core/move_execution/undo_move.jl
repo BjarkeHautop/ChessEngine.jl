@@ -6,13 +6,14 @@ Undo move `m` on `board` in place, restoring previous state.
 - `m`: Move struct
 """
 function undo_move!(board::Board, m::Move)
+    if board.undo_index == 0
+        error("Undo stack empty!")
+    end
+
     # --- 1. Flip side back ---
     board.side_to_move = board.side_to_move == WHITE ? BLACK : WHITE
 
     # --- 2. Restore position history and undo stack ---
-    if board.undo_index == 0
-        error("Undo stack empty!")
-    end
     pos_index = board.undo_index + 1
     u = board.undo_stack[board.undo_index]
     board.undo_index -= 1  # pop
