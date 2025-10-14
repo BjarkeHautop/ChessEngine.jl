@@ -24,3 +24,8 @@ end
     # @test perft_fast(b, 6) == 119_060_324
     # @test perft_fast(b, 7) == 3_195_901_860
 end
+
+@testset "Split indicies tests" begin
+    @test OrbisChessEngine.split_indices(10, 2) == [1:5, 6:10]
+    @test OrbisChessEngine.split_indices(10, 3) == [1:4, 5:7, 8:10]
+end

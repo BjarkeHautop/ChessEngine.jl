@@ -21,6 +21,8 @@ function store_killer!(m::Move, ply::Int)
 end
 
 """
+    move_ordering_score(board::Board, m::Move, ply::Int)
+
 Heuristic to score moves for ordering:
 - Promotions are prioritized highest.
 - Captures are prioritized higher.
@@ -242,6 +244,8 @@ end
 
 # Alpha-beta search with quiescence at leaves
 
+const NULL_MOVE_REDUCTION = 2
+
 function _search(
         board::Board,
         depth::Int,
@@ -249,7 +253,10 @@ function _search(
         α::Int,
         β::Int,
         opening_book::Union{Nothing, PolyglotBook},
-        stop_time::Int
+        stop_time::Int,
+        moves_stack::Vector{Vector{Move}},
+        pseudo_stack::Vector{Vector{Move}},
+        score_stack::Vector{Vector{Int}}
 )::SearchResult
 
     # Time check
@@ -279,10 +286,11 @@ function _search(
     end
 
     # Null move pruning (only if not in check and not endgame)
-    R = 2
-    if depth > R + 1 && !is_endgame(board) && !in_check(board, board.side_to_move)
+    if depth > NULL_MOVE_REDUCTION + 1 && !is_endgame(board) && !in_check(board, board.side_to_move)
         make_null_move!(board)
-        result = _search(board, depth - 1 - R, ply + 1, -β, -β + 1, nothing, stop_time)
+        result = _search(board, depth - 1 - NULL_MOVE_REDUCTION, ply + 1, -β, -β + 1,
+                        nothing, stop_time,
+                        moves_stack, pseudo_stack, score_stack)
         undo_null_move!(board)
 
         if board.side_to_move == WHITE && result.score >= β
@@ -292,8 +300,9 @@ function _search(
         end
     end
 
-    moves = Vector{Move}(undef, MAX_MOVES)
-    pseudo = Vector{Move}(undef, MAX_MOVES)
+    moves = moves_stack[ply + 1]
+    pseudo = pseudo_stack[ply + 1]
+    scores = score_stack[ply + 1]
 
     n_moves = generate_legal_moves!(board, moves, pseudo)
 
@@ -304,12 +313,11 @@ function _search(
     end
 
     # Precompute move scores
-    scores = Vector{Int}(undef, n_moves)
     @inbounds for i in 1:n_moves
         scores[i] = move_ordering_score(board, moves[i], ply)
     end
 
-    best_score = board.side_to_move == WHITE ? -Inf : Inf
+    best_score = board.side_to_move == WHITE ? -MATE_VALUE : MATE_VALUE
     best_move = NO_MOVE
 
     @inbounds for i in 1:n_moves
@@ -332,13 +340,14 @@ function _search(
 
         # Time check
         if (time_ns() ÷ 1_000_000) >= stop_time
-            val = (best_score == -Inf || best_score == Inf) ? 0 : best_score
-            return SearchResult(val, best_move, false)
+            return SearchResult(best_score, best_move, false)
         end
 
         # Search child node
         make_move!(board, m)
-        result = _search(board, depth - 1, ply + 1, α, β, opening_book, stop_time)
+        result = _search(board, depth - 1, ply + 1, α, β,
+                        opening_book, stop_time,
+                        moves_stack, pseudo_stack, score_stack)
         undo_move!(board, m)
 
         # Alpha-beta update
@@ -411,9 +420,12 @@ function search_root(board::Board, max_depth::Int;
         stop_time::Int = typemax(Int),
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose::Bool = false)::SearchResult
-
     # Use NO_MOVE as placeholder internally
     best_result_internal = SearchResult(0, NO_MOVE, false)
+
+    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:max_depth+1]
+    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:max_depth+1]
+    score_stack = [Vector{Int}(undef, MAX_MOVES) for _ in 1:max_depth+1]
 
     # Opening book probe
     if opening_book !== nothing
@@ -426,21 +438,22 @@ function search_root(board::Board, max_depth::Int;
             return SearchResult(0, book_mv, true)
         end
     end
-
     for depth in 1:max_depth
-        result = _search(board, depth, 0, -MATE_VALUE, MATE_VALUE, nothing, stop_time)
+        result = _search(board, depth, 0, -MATE_VALUE, MATE_VALUE,
+                         opening_book, stop_time,
+                         moves_stack, pseudo_stack, score_stack)
 
         # Keep the internal best result
         if result.move !== NO_MOVE
             best_result_internal = result
         end
+        
 
         if verbose
             pv = extract_pv(board, depth)
             pv_str = join(string.(pv), " ")
             println("Depth $depth | Score: $(best_result_internal.score) | PV: $pv_str")
         end
-
         if (time_ns() ÷ 1_000_000) >= stop_time
             break
         end
@@ -455,7 +468,6 @@ function search_root(board::Board, max_depth::Int;
             break
         end
     end
-
     return SearchResult(best_result_internal.score, best_result_internal.move, best_result_internal.from_book)
 end
 

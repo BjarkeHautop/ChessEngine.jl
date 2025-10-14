@@ -108,3 +108,21 @@ end
     @test b == original_board
     @test OrbisChessEngine.zobrist_hash(b) == original_hash
 end
+
+@testset "Undo move" begin
+    b = Board()
+    b_copy = deepcopy(b)
+    m1 = Move("e2", "e4")
+    make_move!(b, m1)
+    b = undo_move(b, m1)
+    @test b == b_copy
+end
+
+@testset "Undo stack overflow / underflow" begin
+    b = Board()
+    m1 = Move("e2", "e4")
+    @test_throws ErrorException undo_move!(b, m1)
+
+    b.undo_index = OrbisChessEngine.MAX_MOVES_PER_GAME
+    @test_throws ErrorException make_move!(b, m1)
+end

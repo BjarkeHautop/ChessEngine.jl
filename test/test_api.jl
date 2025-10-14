@@ -77,3 +77,9 @@ end
           Piece.W_PAWN
     @test OrbisChessEngine.piece_at(b, 12) == OrbisChessEngine.piece_at(new_b, 12) == 0
 end
+
+@testset "Piece symbol tests" begin
+    @test OrbisChessEngine.piece_symbol(Piece.W_QUEEN) == "Q"
+    @test OrbisChessEngine.piece_symbol(Piece.B_KNIGHT) == "N"
+    @test OrbisChessEngine.piece_symbol(0) == ""
+end

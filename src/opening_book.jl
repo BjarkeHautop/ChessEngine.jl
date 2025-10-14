@@ -134,18 +134,33 @@ end
 using Distributions
 
 function book_move(board::Board, book::PolyglotBook)
+    # Add seed? 
+    
     key = polyglot_hash(board)
-    candidates = filter(e -> e.key == key, book.entries)
-    if isempty(candidates)
+    total_weight = 0
+    count = 0
+    # First pass: sum weights of matching entries
+    for e in book.entries
+        if e.key == key
+            total_weight += e.weight
+            count += 1
+        end
+    end
+    if count == 0
         return nothing
     end
 
-    weights = [Float64(c.weight) for c in candidates]
-    probs = weights ./ sum(weights)
-    dist = Distributions.Categorical(probs)
-    idx = rand(dist)
-    entry = candidates[idx]
-    return decode_polyglot_move(entry.move, board)
+    # Sample without allocating arrays
+    target = rand() * total_weight
+    acc = 0
+    for e in book.entries
+        if e.key == key
+            acc += e.weight
+            if acc >= target
+                return decode_polyglot_move(e.move, board)
+            end
+        end
+    end
 end
 
 function decode_polyglot_move(code::UInt16, board::Board)

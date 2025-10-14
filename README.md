@@ -30,7 +30,11 @@ View the documentation at [https://BjarkeHautop.github.io/OrbisChessEngine.jl/de
 
 - Soft time management; define optimal time and maximum time per move. Stop search when optimal time is reached after completing a depth or end immediately when maximum time is reached.
 
-- Optimize search speed
+- Add support for multiple threads in search (e.g. lazy SMP)
+
+- Implement (some of) [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) protocol
+
+- Make executable with [PackageCompiler.jl](https://julialang.github.io/PackageCompiler.jl/dev/)
 
 - Add magic bitboards for faster move generation
 
