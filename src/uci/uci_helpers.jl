@@ -1,5 +1,8 @@
 # See https://www.wbec-ridderkerk.nl/html/UCIProtocol.html 
 # for the UCI protocol specification
+# Need to modify search to support node limits, ponder mode, etc.
+# Need to modify game struct to support different time increments for
+# white and black, moves to next time control, etc.
 
 function get_engine_version()
     proj_path = normpath(joinpath(@__DIR__, "..", "..", "Project.toml"))
