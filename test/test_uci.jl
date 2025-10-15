@@ -43,12 +43,15 @@ end
     fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
     board = OrbisChessEngine.handle_position("position fen $fen")
     @test OrbisChessEngine.position_equal(Board(fen = fen), board)
+
+    @test_throws ErrorException OrbisChessEngine.handle_position("position invalidcommand")
 end
 
 @testset "handle_go" begin
     b = Board()
-    command = "searchmoves e2e4 ponder e2e4 white " *
+    command = "searchmoves e2e4 d7d5 e4d5 ponder e2e4 wtime " *
               "30000 btime 30000 winc 100 binc 100 movestogo 5 " *
-              "depth 5 nodes 10000 mate 3 movetime 2000 infinite"
+              "depth 5 nodes 10000 mate 3 movetime 2000 infinite " *
+              "unknowncommand"
     OrbisChessEngine.handle_go(command, b)
 end

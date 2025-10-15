@@ -93,7 +93,6 @@ function find_magic(sq, masks, attack_fn; tries::Int = 100_000_000)
     occs = occupancy_variations(mask)
     attacks = [attack_fn(sq, occ) for occ in occs]
 
-    print("  mask has $n bits … ")
     for _ in 1:tries
         # Generate a random sparse number
         magic = rand(UInt64) & rand(UInt64) & rand(UInt64)
@@ -135,9 +134,7 @@ function generate_magics(masks, attack_fn)
     Random.seed!(1405)
     magics = Vector{UInt64}(undef, 64)
     for sq in 0:63
-        println("Finding magic for square $sq …")
         magics[sq + 1] = find_magic(sq, masks, attack_fn)
-        println("  found: ", string(magics[sq + 1], base = 16))
     end
     return magics
 end
