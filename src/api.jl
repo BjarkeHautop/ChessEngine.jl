@@ -92,8 +92,15 @@ function Move(board::Board, str::AbstractString)
 
     # Parse promotion if present
     promotion = 0
-    if length(str) > 4 && str[5] == '='
-        promotion = piece_from_symbol(uppercase(str[6]), board.side_to_move)
+    if length(str) > 4
+        if str[5] == '='
+            # old format e7e8=Q
+            promotion_char = uppercase(str[6])
+        else
+            # UCI-style format e7e8q
+            promotion_char = uppercase(str[5])
+        end
+        promotion = piece_from_symbol(promotion_char, board.side_to_move)
     end
 
     # Infer captured piece

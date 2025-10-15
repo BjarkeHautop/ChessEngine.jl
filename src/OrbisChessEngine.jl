@@ -35,6 +35,8 @@ include("perft.jl")  # Perft testing
 include("searchj.jl")
 include("api.jl")    # User-facing API functions
 include("ui.jl")    # Board display
+include("uci/uci_helpers.jl")  # UCI protocol handling helpers
+include("uci/uci.jl")  # UCI protocol handling
 
 # Core types
 export Board, UndoInfo, Move, Game, SearchResult
