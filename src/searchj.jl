@@ -286,11 +286,12 @@ function _search(
     end
 
     # Null move pruning (only if not in check and not endgame)
-    if depth > NULL_MOVE_REDUCTION + 1 && !is_endgame(board) && !in_check(board, board.side_to_move)
+    if depth > NULL_MOVE_REDUCTION + 1 && !is_endgame(board) &&
+       !in_check(board, board.side_to_move)
         make_null_move!(board)
         result = _search(board, depth - 1 - NULL_MOVE_REDUCTION, ply + 1, -β, -β + 1,
-                        nothing, stop_time,
-                        moves_stack, pseudo_stack, score_stack)
+            nothing, stop_time,
+            moves_stack, pseudo_stack, score_stack)
         undo_null_move!(board)
 
         if board.side_to_move == WHITE && result.score >= β
@@ -346,8 +347,8 @@ function _search(
         # Search child node
         make_move!(board, m)
         result = _search(board, depth - 1, ply + 1, α, β,
-                        opening_book, stop_time,
-                        moves_stack, pseudo_stack, score_stack)
+            opening_book, stop_time,
+            moves_stack, pseudo_stack, score_stack)
         undo_move!(board, m)
 
         # Alpha-beta update
@@ -423,9 +424,9 @@ function search_root(board::Board, max_depth::Int;
     # Use NO_MOVE as placeholder internally
     best_result_internal = SearchResult(0, NO_MOVE, false)
 
-    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:max_depth+1]
-    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:max_depth+1]
-    score_stack = [Vector{Int}(undef, MAX_MOVES) for _ in 1:max_depth+1]
+    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(max_depth + 1)]
+    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(max_depth + 1)]
+    score_stack = [Vector{Int}(undef, MAX_MOVES) for _ in 1:(max_depth + 1)]
 
     # Opening book probe
     if opening_book !== nothing
@@ -440,14 +441,13 @@ function search_root(board::Board, max_depth::Int;
     end
     for depth in 1:max_depth
         result = _search(board, depth, 0, -MATE_VALUE, MATE_VALUE,
-                         opening_book, stop_time,
-                         moves_stack, pseudo_stack, score_stack)
+            opening_book, stop_time,
+            moves_stack, pseudo_stack, score_stack)
 
         # Keep the internal best result
         if result.move !== NO_MOVE
             best_result_internal = result
         end
-        
 
         if verbose
             pv = extract_pv(board, depth)

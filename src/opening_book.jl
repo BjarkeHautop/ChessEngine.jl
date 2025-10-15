@@ -135,7 +135,7 @@ using Distributions
 
 function book_move(board::Board, book::PolyglotBook)
     # Add seed? 
-    
+
     key = polyglot_hash(board)
     total_weight = 0
     count = 0

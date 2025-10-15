@@ -33,7 +33,7 @@ end
     OrbisChessEngine.handle_register()
     OrbisChessEngine.handle_stop()
     OrbisChessEngine.handle_ponderhit()
-    @test true 
+    @test true
 end
 
 @testset "handle_position" begin
@@ -48,7 +48,7 @@ end
 @testset "handle_go" begin
     b = Board()
     command = "searchmoves e2e4 ponder e2e4 white " *
-            "30000 btime 30000 winc 100 binc 100 movestogo 5 " *
-            "depth 5 nodes 10000 mate 3 movetime 2000 infinite"
+              "30000 btime 30000 winc 100 binc 100 movestogo 5 " *
+              "depth 5 nodes 10000 mate 3 movetime 2000 infinite"
     OrbisChessEngine.handle_go(command, b)
 end

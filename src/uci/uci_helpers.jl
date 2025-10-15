@@ -27,10 +27,10 @@ end
 function handle_uci_command()
     # 1. Print engine identification
     id()  # prints name, version, author
-    
+
     # 2. Print engine options 
     # (none for now)
-    
+
     # 3. Signal that UCI mode is ready
     println("uciok")
 end
@@ -63,7 +63,7 @@ function handle_position(command::String)
     elseif tokens[2] == "fen"
         # collect FEN tokens (until "moves" or end of line)
         moves_index = findfirst(isequal("moves"), tokens)
-        fen_tokens = moves_index === nothing ? tokens[3:end] : tokens[3:moves_index-1]
+        fen_tokens = moves_index === nothing ? tokens[3:end] : tokens[3:(moves_index - 1)]
         fen_string = join(fen_tokens, " ")
         board = Board(fen = fen_string)
     else
@@ -78,7 +78,7 @@ end
 
 function handle_go(command::String, board)
     tokens = split(command)  # split by space
-    search_params = Dict{String,Any}()
+    search_params = Dict{String, Any}()
 
     i = 2  # skip "go"
     while i <= length(tokens)
@@ -86,9 +86,9 @@ function handle_go(command::String, board)
 
         if token == "searchmoves"
             # restrict search to this moves only
-		    # Example: After "position startpos" and "go infinite searchmoves e2e4 d2d4"
-		    # the engine should only search the two moves e2e4 and d2d4 in the initial position.
-            
+            # Example: After "position startpos" and "go infinite searchmoves e2e4 d2d4"
+            # the engine should only search the two moves e2e4 and d2d4 in the initial position.
+
             # Not implemented yet
             i += 1
             while i <= length(tokens) && !occursin(r"^[a-z]", tokens[i])
@@ -104,40 +104,40 @@ function handle_go(command::String, board)
         elseif token == "btime"
             i += 1
             search_params["btime"] = parse(Int, tokens[i])
-        # Currently only have shared increment in Game struct
+            # Currently only have shared increment in Game struct
         elseif token == "winc"
             i += 1
             search_params["winc"] = parse(Int, tokens[i])
         elseif token == "binc"
             i += 1
             search_params["binc"] = parse(Int, tokens[i])
-        # Number of moves until next time control
+            # Number of moves until next time control
         elseif token == "movestogo"
             i += 1
             search_params["movestogo"] = parse(Int, tokens[i])
-        # Depth to search
+            # Depth to search
         elseif token == "depth"
             i += 1
             search_params["depth"] = parse(Int, tokens[i])
-        # Number of nodes (positions) to search
+            # Number of nodes (positions) to search
         elseif token == "nodes"
             i += 1
             search_params["nodes"] = parse(Int, tokens[i])
-        # Search for mate in x moves
-        # Not implemented yet
+            # Search for mate in x moves
+            # Not implemented yet
         elseif token == "mate"
             i += 1
             search_params["mate"] = parse(Int, tokens[i])
-        # Search for exactly this much time
-        # Not implemented yet
+            # Search for exactly this much time
+            # Not implemented yet
         elseif token == "movetime"
             i += 1
             search_params["movetime"] = parse(Int, tokens[i])
-        # Search until stopped
+            # Search until stopped
         elseif token == "infinite"
             search_params["infinite"] = true
-        # Pondering mode
-        # Not implemented yet
+            # Pondering mode
+            # Not implemented yet
         elseif token == "ponder"
             search_params["ponder"] = true
         else
@@ -157,7 +157,7 @@ end
 
 function handle_ponderhit()
     # The user has played the expected move. This will be sent if the engine was told to ponder on the same move
-	# the user has played. The engine should continue searching but switch from pondering to normal search.
+    # the user has played. The engine should continue searching but switch from pondering to normal search.
     # Not implemented yet
     # search ...
     println("bestmove e2e4")  # placeholder
