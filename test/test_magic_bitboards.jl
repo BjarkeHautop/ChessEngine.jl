@@ -57,9 +57,11 @@ end
 
 @testset "Find magics" begin
     bishop_mask_0 = OrbisChessEngine.sliding_mask(0, OrbisChessEngine.BISHOP_DIRECTIONS)
-    magic_number = OrbisChessEngine.find_magic(0, bishop_mask_0, OrbisChessEngine.bishop_attack_from_occupancy; tries = 1000)
+    magic_number = OrbisChessEngine.find_magic(
+        0, bishop_mask_0, OrbisChessEngine.bishop_attack_from_occupancy; tries = 1000)
     @test magic_number != 0
-    @test_throws ErrorException OrbisChessEngine.find_magic(0, bishop_mask_0, OrbisChessEngine.bishop_attack_from_occupancy; tries = 0)
+    @test_throws ErrorException OrbisChessEngine.find_magic(
+        0, bishop_mask_0, OrbisChessEngine.bishop_attack_from_occupancy; tries = 0)
 end
 
 @testset "ROOK_ATTACKS basic sanity" begin
