@@ -86,3 +86,47 @@ end
 
     @test attacks == expected
 end
+
+@testset "Magic attack correctness" begin
+    for piece in [:bishop, :rook]
+        if piece == :bishop
+            masks = OrbisChessEngine.BISHOP_MASKS
+            magics = OrbisChessEngine.BISHOP_MAGICS_new
+            attack_fn = OrbisChessEngine.bishop_attack_from_occupancy
+            directions = OrbisChessEngine.BISHOP_DIRECTIONS
+        else
+            masks = OrbisChessEngine.ROOK_MASKS
+            magics = OrbisChessEngine.ROOK_MAGICS_new
+            attack_fn = OrbisChessEngine.rook_attack_from_occupancy
+            directions = OrbisChessEngine.ROOK_DIRECTIONS
+        end
+
+        for sq in 0:63
+            mask = masks[sq + 1]
+            n = count_ones(mask)
+            shift = 64 - n
+
+            occs = OrbisChessEngine.occupancy_variations(mask)
+            for occ in occs
+                # Compute brute-force attack
+                expected = attack_fn(sq, occ)
+
+                # Compute magic index
+                magic = magics[sq + 1]
+                idx = Int(((occ * magic) & 0xFFFFFFFFFFFFFFFF) >> shift)
+                idx &= (1 << (64 - shift)) - 1
+
+                # Simulate a magic table lookup
+                # For correctness test, recompute reference table
+                reference_table = Dict{Int, UInt64}()
+                for occ′ in occs
+                    idx′ = Int(((occ′ * magic) & 0xFFFFFFFFFFFFFFFF) >> shift)
+                    idx′ &= (1 << (64 - shift)) - 1
+                    reference_table[idx′] = attack_fn(sq, occ′)
+                end
+
+                @test expected == reference_table[idx]
+            end
+        end
+    end
+end

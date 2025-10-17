@@ -1,4 +1,4 @@
-# Generate magic numbers once and save them to a file.
+# Generate magic numbers once and save them.
 
 # BISHOP_MAGICS = generate_magics(BISHOP_MASKS, bishop_attack_from_occupancy)
 # ROOK_MAGICS = generate_magics(ROOK_MASKS, rook_attack_from_occupancy)

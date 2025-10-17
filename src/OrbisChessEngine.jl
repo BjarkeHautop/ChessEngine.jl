@@ -59,4 +59,8 @@ export perft, perft_fast
 export PolyglotBook, load_polyglot_book
 export book_move, polyglot_hash, KOMODO_OPENING_BOOK
 
+
+
+# Test
+include("chess_core/move_generation/magic_bishop.jl")
 end

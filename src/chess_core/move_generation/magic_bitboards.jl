@@ -6,23 +6,14 @@ Generic sliding mask generator.
 function sliding_mask(sq, directions)
     mask = UInt64(0)
     f, r = file_rank(sq)
-
     for (df, dr) in directions
         nf, nr = f + df, r + dr
-        while 1 <= nf <= 8 && 1 <= nr <= 8
-            # direction-aware edge check:
-            if df != 0 && (nf == 1 || nf == 8)
-                break
-            end
-            if dr != 0 && (nr == 1 || nr == 8)
-                break
-            end
+        while 1 < nf < 8 && 1 < nr < 8
             mask |= UInt64(1) << square_index(nf, nr)
             nf += df
             nr += dr
         end
     end
-
     return mask
 end
 
@@ -98,7 +89,7 @@ function find_magic(sq, masks, attack_fn; tries::Int = 100_000_000)
         magic = rand(UInt64) & rand(UInt64) & rand(UInt64)
 
         # Skip bad magics (too few bits set in high region)
-        if count_ones((mask * magic) & 0xFF00000000000000) < 6
+        if count_ones(magic & 0xFF00000000000000) < 6
             continue
         end
 
@@ -106,7 +97,7 @@ function find_magic(sq, masks, attack_fn; tries::Int = 100_000_000)
         success = true
 
         for (occ, attack) in zip(occs, attacks)
-            idx = Int((occ * magic) >> shift)
+            idx = Int(((occ * magic) & 0xFFFFFFFFFFFFFFFF) >> shift)
             if haskey(used, idx)
                 if used[idx] != attack
                     success = false
@@ -201,3 +192,7 @@ for sq in 0:63
     occs = occupancy_variations(QUEEN_MASKS[sq + 1])
     QUEEN_ATTACKS[sq + 1] = [queen_attack_from_occupancy(sq, occ) for occ in occs]
 end
+
+const BISHOP_MAGICS_new = generate_magics(BISHOP_MASKS, bishop_attack_from_occupancy)
+const ROOK_MAGICS_new = generate_magics(ROOK_MASKS, rook_attack_from_occupancy)
+const QUEEN_MAGICS_new = generate_magics(QUEEN_MASKS, queen_attack_from_occupancy)

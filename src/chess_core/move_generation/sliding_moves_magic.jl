@@ -45,35 +45,22 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
             continue
         end
 
-        println("\n=== square $sq ===")
-        println("full_occ (hex)   = ", string(full_occ, base = 16))
-
         mask = mask_table[sq + 1]
         relevant_bits = count_bits(mask)
         shift = 64 - relevant_bits
-        println("mask (hex)       = ", string(mask, base = 16))
-        println("relevant_bits    = $relevant_bits  shift = $shift")
 
         table = attack_table[sq + 1]
         expected_len = UInt(1) << relevant_bits
-        println("attack table len = ", length(table), " expected = $expected_len")
 
         raw_index = ((full_occ & mask) * magic_table[sq + 1]) >> shift
         index_mask = (UInt64(1) << relevant_bits) - UInt64(1)
         idx = Int((raw_index & index_mask) + 1)
 
-        println("magic (hex)      = ", string(magic_table[sq + 1], base = 16))
-        println("masked occ (hex) = ", string(full_occ & mask, base = 16))
-        println("raw_index (hex)  = ", string(raw_index, base = 16))
-        println("idx (1-based)    = $idx")
-
         @assert 1 <= idx <= length(table)
 
         attacks = table[idx]
-        println("attacks (hex)    = ", string(attacks, base = 16))
 
         attacks &= ~friendly_bb
-        println("after removing friendly (hex) = ", string(attacks, base = 16))
 
         while attacks != 0
             to_sq = trailing_zeros(attacks)
@@ -86,10 +73,7 @@ function generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
                 end
             end
 
-            println("  -> move $sq → $to_sq capture=$capture")
-
             push!(moves, Move(sq, to_sq; capture = capture))
-
             attacks &= attacks - 1
         end
     end
@@ -177,14 +161,14 @@ function generate_bishop_moves_magic(board::Board)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_BISHOP] :
          board.bitboards[Piece.B_BISHOP]
     return generate_sliding_moves_magic(
-        board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS)
+        board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS_new)
 end
 
 function generate_bishop_moves_magic!(board::Board, moves::Vector{Move})
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_BISHOP] :
          board.bitboards[Piece.B_BISHOP]
     return generate_sliding_moves_magic!(
-        board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS, moves)
+        board, bb, BISHOP_MASKS, BISHOP_ATTACKS, BISHOP_MAGICS_new, moves)
 end
 
 # ========================

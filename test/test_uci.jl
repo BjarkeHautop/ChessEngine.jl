@@ -49,7 +49,7 @@ end
 
 @testset "handle_go" begin
     b = Board()
-    command = "searchmoves e2e4 d7d5 e4d5 ponder e2e4 wtime " *
+    command = "go searchmoves e2e4 d7d5 e4d5 ponder e2e4 wtime " *
               "30000 btime 30000 winc 100 binc 100 movestogo 5 " *
               "depth 5 nodes 10000 mate 3 movetime 2000 infinite " *
               "unknowncommand"

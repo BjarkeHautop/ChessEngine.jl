@@ -26,6 +26,8 @@ Particularly, *OrbisChessEngine* implements:
 
 View the documentation at [https://BjarkeHautop.github.io/OrbisChessEngine.jl/dev/](https://BjarkeHautop.github.io/OrbisChessEngine.jl/dev/).
 
+Visit chess programming wiki for useful articles on chess engine programming: [https://www.chessprogramming.org/Main_Page](https://www.chessprogramming.org/Main_Page).
+
 ## TODO
 
 - Soft time management; define optimal time and maximum time per move. Stop search when optimal time is reached after completing a depth or end immediately when maximum time is reached.
