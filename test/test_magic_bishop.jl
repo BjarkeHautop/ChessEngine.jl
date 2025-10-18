@@ -35,3 +35,9 @@ end
     move_set_standard = Set(moves_standard)
     @test move_set_magic == move_set_standard
 end
+
+@testset "bishop_mask" begin
+    BISHOP_MASKS = [OrbisChessEngine.bishop_mask(sq) for sq in 0:63]
+    @test BISHOP_MASKS[1] == 0x0040201008040200
+    @test BISHOP_MASKS[36] == 0x0022140014224000
+end
