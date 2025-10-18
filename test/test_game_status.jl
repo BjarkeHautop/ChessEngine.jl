@@ -50,8 +50,10 @@ using Test
     @test game_status(b) == :draw_threefold
     # Lose a move intentionally so it's the other side to move
     make_move!(b, Move(b, "g1f3"))
-    b.side_to_move = WHITE
-    make_move!(b, Move(b, "f3g1"))
+    make_move!(b, Move(b, "g8f6"))
+    make_move!(b, Move(b, "f3h4"))
+    make_move!(b, Move(b, "f6g8"))
+    make_move!(b, Move(b, "h4g1"))
     @test game_status(b) == :ongoing
 
     # -----------------------------

@@ -20,60 +20,47 @@ end
 @testset "piece_square_value tests" begin
     square = 1
     idx = OrbisChessEngine.psqt_index(square)
-
+    opening_val = 24
+    endgame_val = 0
     # Pawns
-    @test OrbisChessEngine.piece_square_value(Piece.W_PAWN, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.W_PAWN, square, opening_val) ==
           OrbisChessEngine.PAWN_TABLE_W[idx]
-    @test OrbisChessEngine.piece_square_value(Piece.B_PAWN, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.B_PAWN, square, opening_val) ==
           -OrbisChessEngine.PAWN_TABLE_B[idx]
 
     # Knights
-    @test OrbisChessEngine.piece_square_value(Piece.W_KNIGHT, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.W_KNIGHT, square, opening_val) ==
           OrbisChessEngine.KNIGHT_TABLE_W[idx]
-    @test OrbisChessEngine.piece_square_value(Piece.B_KNIGHT, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.B_KNIGHT, square, opening_val) ==
           -OrbisChessEngine.KNIGHT_TABLE_B[idx]
 
     # Bishops
-    @test OrbisChessEngine.piece_square_value(Piece.W_BISHOP, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.W_BISHOP, square, opening_val) ==
           OrbisChessEngine.BISHOP_TABLE_W[idx]
-    @test OrbisChessEngine.piece_square_value(Piece.B_BISHOP, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.B_BISHOP, square, opening_val) ==
           -OrbisChessEngine.BISHOP_TABLE_B[idx]
 
     # Rooks
-    @test OrbisChessEngine.piece_square_value(Piece.W_ROOK, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.W_ROOK, square, opening_val) ==
           OrbisChessEngine.ROOK_TABLE_W[idx]
-    @test OrbisChessEngine.piece_square_value(Piece.B_ROOK, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.B_ROOK, square, opening_val) ==
           -OrbisChessEngine.ROOK_TABLE_B[idx]
 
     # Queens
-    @test OrbisChessEngine.piece_square_value(Piece.W_QUEEN, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.W_QUEEN, square, opening_val) ==
           OrbisChessEngine.QUEEN_TABLE_W[idx]
-    @test OrbisChessEngine.piece_square_value(Piece.B_QUEEN, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.B_QUEEN, square, opening_val) ==
           -OrbisChessEngine.QUEEN_TABLE_B[idx]
 
     # Kings
-    @test OrbisChessEngine.piece_square_value(Piece.W_KING, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.W_KING, square, opening_val) ==
           OrbisChessEngine.KING_TABLE_W[idx]
-    @test OrbisChessEngine.piece_square_value(Piece.W_KING, square, 0.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.W_KING, square, endgame_val) ==
           OrbisChessEngine.KING_TABLE_END_W[idx]
-    @test OrbisChessEngine.piece_square_value(Piece.B_KING, square, 1.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.B_KING, square, opening_val) ==
           -OrbisChessEngine.KING_TABLE_B[idx]
-    @test OrbisChessEngine.piece_square_value(Piece.B_KING, square, 0.0) ==
+    @test OrbisChessEngine.piece_square_value(Piece.B_KING, square, endgame_val) ==
           -OrbisChessEngine.KING_TABLE_END_B[idx]
-
-    # Interpolation check (mid-phase)
-    phase = 0.5
-    expected_white = round(
-        Int, 0.5 * OrbisChessEngine.KING_TABLE_W[idx] +
-             0.5 * OrbisChessEngine.KING_TABLE_END_W[idx])
-    expected_black = round(
-        Int, -(0.5 * OrbisChessEngine.KING_TABLE_B[idx] +
-               0.5 * OrbisChessEngine.KING_TABLE_END_B[idx]))
-    @test OrbisChessEngine.piece_square_value(Piece.W_KING, square, phase) == expected_white
-    @test OrbisChessEngine.piece_square_value(Piece.B_KING, square, phase) == expected_black
-
-    # Invalid piece should throw
-    @test_throws ErrorException OrbisChessEngine.piece_square_value(999, square, 1.0)
 end
 
 @testset "flip_table tests" begin

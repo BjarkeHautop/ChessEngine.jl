@@ -44,27 +44,37 @@ function make_move!(board::Board, m::Move)
         board.game_phase_value
     )
 
-    # --- Remove piece from origin square ---
-    board.bitboards[piece_type] = clearbit(board.bitboards[piece_type], m.from)
+    # --- Initialize incremental Zobrist hash ---
+    h = board.position_history[board.undo_index]  # current hash before move
 
-    # --- Update eval: piece moved off origin ---
-    board.eval_score -= piece_square_value(piece_type, m.from, game_phase(board))
+    # --- Remove moving piece from origin ---
+    board.bitboards[piece_type] = clearbit(board.bitboards[piece_type], m.from)
+    h ⊻= ZOBRIST_PIECES[piece_type, m.from + 1]  # remove piece from origin
+
+    board.eval_score -= piece_square_value(piece_type, m.from, board.game_phase_value)
 
     # --- Captures ---
     if m.capture != 0 && !is_ep
         board.bitboards[m.capture] = clearbit(board.bitboards[m.capture], m.to)
-        board.eval_score -= piece_square_value(m.capture, m.to, game_phase(board))
+        h ⊻= ZOBRIST_PIECES[m.capture, m.to + 1]  # remove captured piece
+
+        board.eval_score -= piece_square_value(m.capture, m.to, board.game_phase_value)
         board.game_phase_value -= phase_weight(m.capture)
+
     elseif is_ep
         if board.side_to_move == WHITE
             captured_sq = m.to - 8
             board.bitboards[Piece.B_PAWN] = clearbit(board.bitboards[Piece.B_PAWN], captured_sq)
-            board.eval_score -= piece_square_value(Piece.B_PAWN, captured_sq, game_phase(board))
+            h ⊻= ZOBRIST_PIECES[Piece.B_PAWN, captured_sq + 1]
+
+            board.eval_score -= piece_square_value(Piece.B_PAWN, captured_sq, board.game_phase_value)
             board.game_phase_value -= phase_weight(Piece.B_PAWN)
         else
             captured_sq = m.to + 8
             board.bitboards[Piece.W_PAWN] = clearbit(board.bitboards[Piece.W_PAWN], captured_sq)
-            board.eval_score -= piece_square_value(Piece.W_PAWN, captured_sq, game_phase(board))
+            h ⊻= ZOBRIST_PIECES[Piece.W_PAWN, captured_sq + 1]
+
+            board.eval_score -= piece_square_value(Piece.W_PAWN, captured_sq, board.game_phase_value)
             board.game_phase_value -= phase_weight(Piece.W_PAWN)
         end
     end
@@ -72,42 +82,67 @@ function make_move!(board::Board, m::Move)
     # --- Promotions / normal move ---
     if m.promotion != 0
         board.bitboards[m.promotion] = setbit(board.bitboards[m.promotion], m.to)
-        board.eval_score += piece_square_value(m.promotion, m.to, game_phase(board))
+        h ⊻= ZOBRIST_PIECES[m.promotion, m.to + 1]
+
+        board.eval_score += piece_square_value(m.promotion, m.to, board.game_phase_value)
         board.game_phase_value += phase_weight(m.promotion)
-        board.game_phase_value -= phase_weight(piece_type)  # pawn removed
+        board.game_phase_value -= phase_weight(piece_type)
     else
         board.bitboards[piece_type] = setbit(board.bitboards[piece_type], m.to)
-        board.eval_score += piece_square_value(piece_type, m.to, game_phase(board))
+        h ⊻= ZOBRIST_PIECES[piece_type, m.to + 1]
+
+        board.eval_score += piece_square_value(piece_type, m.to, board.game_phase_value)
     end
 
     # --- Castling rook moves ---
     if piece_type == Piece.W_KING && m.from == 4 && abs(m.to - m.from) == 2
-        if m.to == 6      # short castle (e1 → g1)
+        if m.to == 6
+            # e1 → g1, rook h1→f1
             board.bitboards[Piece.W_ROOK] = clearbit(board.bitboards[Piece.W_ROOK], 7)
             board.bitboards[Piece.W_ROOK] = setbit(board.bitboards[Piece.W_ROOK], 5)
-            board.eval_score -= piece_square_value(Piece.W_ROOK, 7, game_phase(board))
-            board.eval_score += piece_square_value(Piece.W_ROOK, 5, game_phase(board))
-        elseif m.to == 2  # long castle (e1 → c1)
+            h ⊻= ZOBRIST_PIECES[Piece.W_ROOK, 7 + 1]
+            h ⊻= ZOBRIST_PIECES[Piece.W_ROOK, 5 + 1]
+
+            board.eval_score -= piece_square_value(Piece.W_ROOK, 7, board.game_phase_value)
+            board.eval_score += piece_square_value(Piece.W_ROOK, 5, board.game_phase_value)
+        elseif m.to == 2
+            # e1 → c1, rook a1→d1
             board.bitboards[Piece.W_ROOK] = clearbit(board.bitboards[Piece.W_ROOK], 0)
             board.bitboards[Piece.W_ROOK] = setbit(board.bitboards[Piece.W_ROOK], 3)
-            board.eval_score -= piece_square_value(Piece.W_ROOK, 0, game_phase(board))
-            board.eval_score += piece_square_value(Piece.W_ROOK, 3, game_phase(board))
+            h ⊻= ZOBRIST_PIECES[Piece.W_ROOK, 0 + 1]
+            h ⊻= ZOBRIST_PIECES[Piece.W_ROOK, 3 + 1]
+
+            board.eval_score -= piece_square_value(Piece.W_ROOK, 0, board.game_phase_value)
+            board.eval_score += piece_square_value(Piece.W_ROOK, 3, board.game_phase_value)
         end
     elseif piece_type == Piece.B_KING && m.from == 60 && abs(m.to - m.from) == 2
-        if m.to == 62     # short castle (e8 → g8)
+        if m.to == 62
+            # e8 → g8, rook h8→f8
             board.bitboards[Piece.B_ROOK] = clearbit(board.bitboards[Piece.B_ROOK], 63)
             board.bitboards[Piece.B_ROOK] = setbit(board.bitboards[Piece.B_ROOK], 61)
-            board.eval_score -= piece_square_value(Piece.B_ROOK, 63, game_phase(board))
-            board.eval_score += piece_square_value(Piece.B_ROOK, 61, game_phase(board))
-        elseif m.to == 58 # long castle (e8 → c8)
+            h ⊻= ZOBRIST_PIECES[Piece.B_ROOK, 63 + 1]
+            h ⊻= ZOBRIST_PIECES[Piece.B_ROOK, 61 + 1]
+
+            board.eval_score -= piece_square_value(Piece.B_ROOK, 63, board.game_phase_value)
+            board.eval_score += piece_square_value(Piece.B_ROOK, 61, board.game_phase_value)
+        elseif m.to == 58
+            # e8 → c8, rook a8→d8
             board.bitboards[Piece.B_ROOK] = clearbit(board.bitboards[Piece.B_ROOK], 56)
             board.bitboards[Piece.B_ROOK] = setbit(board.bitboards[Piece.B_ROOK], 59)
-            board.eval_score -= piece_square_value(Piece.B_ROOK, 56, game_phase(board))
-            board.eval_score += piece_square_value(Piece.B_ROOK, 59, game_phase(board))
+            h ⊻= ZOBRIST_PIECES[Piece.B_ROOK, 56 + 1]
+            h ⊻= ZOBRIST_PIECES[Piece.B_ROOK, 59 + 1]
+
+            board.eval_score -= piece_square_value(Piece.B_ROOK, 56, board.game_phase_value)
+            board.eval_score += piece_square_value(Piece.B_ROOK, 59, board.game_phase_value)
         end
     end
 
-    # --- Update en passant target square ---
+    # --- En passant target square ---
+    old_ep = board.en_passant
+    if old_ep != -1
+        h ⊻= ZOBRIST_EP[(old_ep % 8) + 1]
+    end
+
     board.en_passant = -1
     if piece_type == Piece.W_PAWN && (m.to - m.from) == 16
         board.en_passant = m.from + 8
@@ -115,59 +150,69 @@ function make_move!(board::Board, m::Move)
         board.en_passant = m.from - 8
     end
 
-    # --- Update castling rights ---
+    if board.en_passant != -1
+        h ⊻= ZOBRIST_EP[(board.en_passant % 8) + 1]
+    end
 
-    # If a king moved, clear both its castling bits
+    # --- Castling rights ---
+    old_castling = board.castling_rights
+    new_castling = old_castling
+
     if piece_type == Piece.W_KING
-        board.castling_rights &= 0x0c   # clear 0x01 and 0x02 -> keep only 0x0c (1100)
+        new_castling &= 0x0c
     elseif piece_type == Piece.B_KING
-        board.castling_rights &= 0x03   # clear 0x04 and 0x08 -> keep only 0x03 (0011)
+        new_castling &= 0x03
     end
 
-    # If a rook moved FROM its original square, clear that side's right.
     if piece_type == Piece.W_ROOK
-        if m.from == 0                   # a1
-            board.castling_rights &= 0x0d   # clear White Q (0x02) -> 0x0f & ~0x02 = 0x0d
-        elseif m.from == 7               # h1
-            board.castling_rights &= 0x0e   # clear White K (0x01) -> 0x0f & ~0x01 = 0x0e
+        if m.from == 0
+            new_castling &= 0x0d
+        elseif m.from == 7
+            new_castling &= 0x0e
+        end
+    elseif piece_type == Piece.B_ROOK
+        if m.from == 56
+            new_castling &= 0x07
+        elseif m.from == 63
+            new_castling &= 0x0b
         end
     end
 
-    if piece_type == Piece.B_ROOK
-        if m.from == 56                  # a8
-            board.castling_rights &= 0x07   # clear Black q (0x08) -> 0x0f & ~0x08 = 0x07
-        elseif m.from == 63              # h8
-            board.castling_rights &= 0x0b   # clear Black k (0x04) -> 0x0f & ~0x04 = 0x0b
-        end
-    end
-
-    # If a rook was captured ON its original square, clear that side's right.
     if m.capture == Piece.W_ROOK
         if m.to == 0
-            board.castling_rights &= 0x0d   # clear White Q
+            new_castling &= 0x0d
         elseif m.to == 7
-            board.castling_rights &= 0x0e   # clear White K
+            new_castling &= 0x0e
         end
     elseif m.capture == Piece.B_ROOK
         if m.to == 56
-            board.castling_rights &= 0x07   # clear Black q
+            new_castling &= 0x07
         elseif m.to == 63
-            board.castling_rights &= 0x0b   # clear Black k
+            new_castling &= 0x0b
         end
     end
 
-    # --- Halfmove clock (50-move rule) ---
+    if new_castling != old_castling
+        h ⊻= ZOBRIST_CASTLING[Int(old_castling) + 1]
+        h ⊻= ZOBRIST_CASTLING[Int(new_castling) + 1]
+    end
+    board.castling_rights = new_castling
+
+    # --- Halfmove clock ---
     if piece_type in (Piece.W_PAWN, Piece.B_PAWN) || m.capture != 0 || m.promotion != 0
         board.halfmove_clock = 0
     else
         board.halfmove_clock += 1
     end
 
-    # --- Save history & flip side ---
-    pos_index = board.undo_index + 1
-    board.position_history[pos_index] = zobrist_hash(board)
+    # --- Side to move ---
     board.side_to_move = (board.side_to_move == WHITE ? BLACK : WHITE)
+    h ⊻= ZOBRIST_SIDE[]  # flip side
+
+    # --- Save updated hash ---
+    board.position_history[board.undo_index + 1] = h
 end
+
 
 """
     make_move(board, m) -> Board

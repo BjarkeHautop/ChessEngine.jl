@@ -22,19 +22,6 @@ function phase_weight(p)
      p == Piece.W_KNIGHT||p == Piece.B_KNIGHT) ? 1 : 0
 end
 
-# convert Board's phase counter into float
-"""
-    game_phase(board::Board) -> Float64
-
-Compute game phase (0 = endgame, 1 = opening).
-A simple heuristic: count non-pawn, non-king material.
-- board: Board struct
-"""
-function game_phase(board::Board)
-    maxphase = 24
-    return clamp(board.game_phase_value / maxphase, 0.0, 1.0)
-end
-
 """
     evaluate(board::Board) -> Int
 
@@ -43,11 +30,10 @@ Evaluate a position from White’s perspective using piece-square tables.
 """
 function evaluate(board::Board)
     score = 0
-    phase = game_phase(board)
     for (p, bb) in enumerate(board.bitboards)
         while bb != 0
             square = trailing_zeros(bb)  # index of least significant 1-bit (0..63)
-            score += piece_square_value(p, square, phase)
+            score += piece_square_value(p, square, board.game_phase_value)
             bb &= bb - 1  # clear that bit
         end
     end
@@ -73,17 +59,13 @@ function compute_eval_and_phase(board::Board)
         end
     end
 
-    # Convert to float 0..1 for piece-square interpolation
-    phase = clamp(game_phase_value / 24, 0.0, 1.0)
-
     # Now compute evaluation using that phase
     for (piece, bb) in enumerate(board.bitboards)
         tmp_bb = bb
         while tmp_bb != 0
             sq = trailing_zeros(tmp_bb)
             tmp_bb &= tmp_bb - 1
-
-            eval_score += piece_square_value(piece, sq, phase)
+            eval_score += piece_square_value(piece, sq, game_phase_value)
         end
     end
 

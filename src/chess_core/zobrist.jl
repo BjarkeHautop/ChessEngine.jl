@@ -1,5 +1,7 @@
 ######################### Zobrist hashing #########################
 
+# Use OffsetArrays and use 0 based indexing for easier mapping maybe?
+
 using Random
 
 # Tables

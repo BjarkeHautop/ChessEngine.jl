@@ -16,9 +16,8 @@ include("chess_core/game.jl") # Game struct, time controls, game_end logic
 
 # === Move generation ===
 include("chess_core/move_generation/magic_numbers.jl")
-include("chess_core/move_generation/magic_bitboards.jl")
+include("chess_core/move_generation/magic_bishop.jl")
 include("chess_core/move_generation/sliding_moves.jl")
-include("chess_core/move_generation/sliding_moves_magic.jl")
 include("chess_core/move_generation/pawn_moves.jl")
 include("chess_core/move_generation/knight_moves.jl")
 include("chess_core/move_generation/king_moves.jl")
@@ -59,8 +58,4 @@ export perft, perft_fast
 export PolyglotBook, load_polyglot_book
 export book_move, polyglot_hash, KOMODO_OPENING_BOOK
 
-
-
-# Test
-include("chess_core/move_generation/magic_bishop.jl")
 end

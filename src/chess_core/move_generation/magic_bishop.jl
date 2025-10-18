@@ -1,25 +1,15 @@
 """
-    new_file_rank(sq) -> (Int, Int)
-
-Return file (1..8) and rank (1..8) for a square index
-"""
-new_file_rank(sq) = (sq % 8 + 1, sq ÷ 8 + 1)
-
-"Map (file, rank) → square index (0..63). file=1→a, rank=1→1."
-new_square_index(file, rank) = (rank - 1) * 8 + (file - 1)
-
-"""
 Generic sliding mask generator.
 - sq: square index (0..63)
 - directions: list of (df, dr) directions
 """
-function new_sliding_mask(sq, directions)
+function sliding_mask(sq, directions)
     mask = UInt64(0)
-    f, r = new_file_rank(sq)
+    f, r = file_rank(sq)
     for (df, dr) in directions
         nf, nr = f + df, r + dr
         while 1 < nf < 8 && 1 < nr < 8
-            mask |= UInt64(1) << new_square_index(nf, nr)
+            mask |= UInt64(1) << square_index(nf, nr)
             nf += df
             nr += dr
         end
@@ -33,14 +23,14 @@ Generic sliding attack generator.
 - occ: occupancy bitboard
 - directions: list of (df, dr) directions
 """
-function new_sliding_attack_from_occupancy(sq, occ, directions)
+function sliding_attack_from_occupancy(sq, occ, directions)
     attacks = UInt64(0)
-    f, r = new_file_rank(sq)
+    f, r = file_rank(sq)
 
     for (df, dr) in directions
         nf, nr = f + df, r + dr
         while 1 <= nf <= 8 && 1 <= nr <= 8
-            idx = new_square_index(nf, nr)
+            idx = square_index(nf, nr)
             attacks |= UInt64(1) << idx
             if testbit(occ, idx)
                 break
@@ -55,7 +45,7 @@ end
 """
 Generate all possible occupancy bitboards for the given mask
 """
-function new_occupancy_variations(mask)
+function occupancy_variations(mask)
     bits = [i for i in 0:63 if testbit(mask, i)]   # actual square indices 0..63
     n = length(bits)
     variations = UInt64[]
@@ -74,7 +64,7 @@ end
 """
 Count the number of bits set in a UInt64.
 """
-new_count_bits(bb::UInt64) = count_ones(bb)
+count_bits(bb::UInt64) = count_ones(bb)
 
 using Random
 
@@ -85,13 +75,13 @@ Try to find a magic number for a given square.
 - attack_fn: function (sq, occ) → attacks
 - tries: number of random candidates to attempt
 """
-function new_find_magic(sq, masks, attack_fn; tries::Int = 10_000_000_000)
+function find_magic(sq, masks, attack_fn; tries::Int = 10_000_000_000)
     mask = masks[sq + 1]
     n = count_ones(mask)
     shift = 64 - n
 
     # Generate all occupancies and their attacks
-    occs = new_occupancy_variations(mask)
+    occs = occupancy_variations(mask)
     attacks = [attack_fn(sq, occ) for occ in occs]
 
     for _ in 1:tries
@@ -132,71 +122,56 @@ Compute magic numbers for all squares.
 - masks: precomputed mask table (bishop or rook)
 - attack_fn: function (sq, occ) → attacks
 """
-function new_generate_magics(masks, attack_fn)
+function generate_magics(masks, attack_fn; tries::Int = 10_000_000_000)
     Random.seed!(1405)
     magics = Vector{UInt64}(undef, 64)
     for sq in 0:63
-        magics[sq + 1] = new_find_magic(sq, masks, attack_fn)
+        magics[sq + 1] = find_magic(sq, masks, attack_fn; tries = tries)
     end
     return magics
 end
 
 # Bishop-specific
-const new_BISHOP_DIRECTIONS = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
-new_bishop_mask(sq) = new_sliding_mask(sq, new_BISHOP_DIRECTIONS)
-function new_bishop_attack_from_occupancy(sq, occ)
-    new_sliding_attack_from_occupancy(sq, occ, new_BISHOP_DIRECTIONS)
+const BISHOP_DIRECTIONS = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+bishop_mask(sq) = sliding_mask(sq, BISHOP_DIRECTIONS)
+
+function bishop_attack_from_occupancy(sq, occ)
+    sliding_attack_from_occupancy(sq, occ, BISHOP_DIRECTIONS)
 end
 
-function new_bishop_mask_bitcounts()
-    masks = [new_bishop_mask(sq) for sq in 0:63]
-    return [new_count_bits(mask) for mask in masks]
-end
-
-new_BISHOP_MASKS = [new_bishop_mask(sq) for sq in 0:63]
-new_BISHOP_ATTACKS = Vector{Vector{UInt64}}(undef, 64)
+BISHOP_MASKS = [bishop_mask(sq) for sq in 0:63]
+BISHOP_ATTACKS = Vector{Vector{UInt64}}(undef, 64)
 
 for sq in 0:63
-    occs = new_occupancy_variations(new_BISHOP_MASKS[sq + 1])
-    new_BISHOP_ATTACKS[sq + 1] = [new_bishop_attack_from_occupancy(sq, occ) for occ in occs]
+    occs = occupancy_variations(BISHOP_MASKS[sq + 1])
+    BISHOP_ATTACKS[sq + 1] = [bishop_attack_from_occupancy(sq, occ) for occ in occs]
 end
 
-const new_BISHOP_MAGICS = new_generate_magics(new_BISHOP_MASKS, new_bishop_attack_from_occupancy)
+# const BISHOP_MAGICS = generate_magics(BISHOP_MASKS, bishop_attack_from_occupancy)
 
 # Build magic attack tables properly
-new_BISHOP_ATTACK_TABLES = Vector{Vector{UInt64}}(undef, 64)
+BISHOP_ATTACK_TABLES = Vector{Vector{UInt64}}(undef, 64)
 
 for sq in 0:63
-    mask = new_BISHOP_MASKS[sq + 1]
+    mask = BISHOP_MASKS[sq + 1]
     n = count_ones(mask)
     shift = 64 - n
     table_size = 1 << n
     
     table = zeros(UInt64, table_size)
-    occs = new_occupancy_variations(mask)
+    occs = occupancy_variations(mask)
     
     for occ in occs
-        magic = new_BISHOP_MAGICS[sq + 1]
+        magic = BISHOP_MAGICS[sq + 1]
         idx = Int(((occ * magic) >> shift)) + 1
-        attack = new_bishop_attack_from_occupancy(sq, occ)
+        attack = bishop_attack_from_occupancy(sq, occ)
         table[idx] = attack
     end
     
-    new_BISHOP_ATTACK_TABLES[sq + 1] = table
+    BISHOP_ATTACK_TABLES[sq + 1] = table
 end
 
-# Utility to iterate over set bits in a UInt64
-function new__iter_bits(bb::UInt64)
-    idxs = Int[]
-    while bb != 0
-        tz = trailing_zeros(bb)
-        push!(idxs, tz)
-        bb &= bb - 1
-    end
-    return idxs
-end
-
-function new_occupied_bb(board::Board)
+function occupied_bb(board::Board)
     occ = UInt64(0)
     for bb in values(board.bitboards)
         occ |= bb
@@ -204,53 +179,47 @@ function new_occupied_bb(board::Board)
     return occ
 end
 
-"""
-Generate pseudo-legal moves for a sliding piece using magic bitboards.
-- bb_piece: bitboard of the moving piece
-- mask_table, attack_table, magic_table: precomputed tables
-- friendly_pieces, enemy_pieces: arrays of piece indices
-"""
-function new_generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
-        mask_table, attack_table, magic_table)
-    moves = Move[]
+function generate_sliding_moves_magic!(
+    board::Board,
+    bb_piece::UInt64,
+    mask_table::Vector{UInt64},
+    attack_table::Vector{Vector{UInt64}},
+    magic_table::Vector{UInt64},
+    moves::Vector{Move},
+    start_idx::Int,
+)
+    idx = start_idx
 
-    friendly_pieces = board.side_to_move == WHITE ?
-                      [Piece.W_PAWN, Piece.W_KNIGHT, Piece.W_BISHOP,
-        Piece.W_ROOK, Piece.W_QUEEN, Piece.W_KING] :
-                      [Piece.B_PAWN, Piece.B_KNIGHT, Piece.B_BISHOP,
-        Piece.B_ROOK, Piece.B_QUEEN, Piece.B_KING]
+    # Determine friendly/enemy pieces
+    if board.side_to_move == WHITE
+        friendly_pieces = Piece.W_PAWN:Piece.W_KING
+        enemy_pieces = Piece.B_PAWN:Piece.B_KING
+    else
+        friendly_pieces = Piece.B_PAWN:Piece.B_KING
+        enemy_pieces = Piece.W_PAWN:Piece.W_KING
+    end
 
-    enemy_pieces = board.side_to_move == WHITE ?
-                   [Piece.B_PAWN, Piece.B_KNIGHT, Piece.B_BISHOP,
-        Piece.B_ROOK, Piece.B_QUEEN, Piece.B_KING] :
-                   [Piece.W_PAWN, Piece.W_KNIGHT, Piece.W_BISHOP,
-        Piece.W_ROOK, Piece.W_QUEEN, Piece.W_KING]
-
-    friendly_bb = UInt64(0)
+    # Compute occupancy bitboards
+    friendly_bb = zero(UInt64)
     for p in friendly_pieces
         friendly_bb |= board.bitboards[p]
     end
+    full_occ = occupied_bb(board)
 
-    full_occ = new_occupied_bb(board)
-
-    for sq in 0:63
+    @inbounds for sq in 0:63
         if !testbit(bb_piece, sq)
             continue
         end
 
         mask = mask_table[sq + 1]
-        relevant_bits = new_count_bits(mask)
+        relevant_bits = count_bits(mask)
         shift = 64 - relevant_bits
-
         table = attack_table[sq + 1]
 
-        idx = Int((((full_occ & mask) * magic_table[sq + 1]) >> shift) + 1)
+        idx_magic = Int((((full_occ & mask) * magic_table[sq + 1]) >> shift) + 1)
+        @assert 1 <= idx_magic <= length(table)
 
-        @assert 1 <= idx <= length(table)
-
-        attacks = table[idx]
-
-        attacks &= ~friendly_bb
+        attacks = table[idx_magic] & ~friendly_bb
 
         while attacks != 0
             to_sq = trailing_zeros(attacks)
@@ -263,17 +232,40 @@ function new_generate_sliding_moves_magic(board::Board, bb_piece::UInt64,
                 end
             end
 
-            push!(moves, Move(sq, to_sq; capture = capture))
+            moves[idx] = Move(sq, to_sq; capture = capture)
+            idx += 1
+
             attacks &= attacks - 1
         end
     end
 
-    return moves
+    return idx  # new length after appending all generated moves
 end
 
-function new_generate_bishop_moves_magic(board::Board)
-    bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_BISHOP] :
-         board.bitboards[Piece.B_BISHOP]
-    return new_generate_sliding_moves_magic(
-        board, bb, new_BISHOP_MASKS, new_BISHOP_ATTACK_TABLES, new_BISHOP_MAGICS)
+function generate_bishop_moves_magic!(
+    board::Board,
+    moves::Vector{Move},
+    start_idx::Int
+)
+    bb = board.side_to_move == WHITE ?
+        board.bitboards[Piece.W_BISHOP] :
+        board.bitboards[Piece.B_BISHOP]
+
+    return generate_sliding_moves_magic!(
+        board,
+        bb,
+        BISHOP_MASKS,
+        BISHOP_ATTACK_TABLES,
+        BISHOP_MAGICS,
+        moves,
+        start_idx
+    )
+end
+
+function generate_bishop_moves_magic(
+    board::Board
+)::Vector{Move}
+    moves = Vector{Move}(undef, 256)  # preallocate space for moves
+    n_moves = generate_bishop_moves_magic!(board, moves, 1)
+    return moves[1:(n_moves - 1)] # return only filled portion
 end

@@ -98,7 +98,7 @@ function handle_go(command::String, board)
                 push!(moves, tokens[i])
                 i += 1
             end
-            search_params["searchmoves"] = moves
+            # search_params["searchmoves"] = moves
             continue  # skip the i increment at the end of the loop
         # All times are in milliseconds
         elseif token == "wtime"

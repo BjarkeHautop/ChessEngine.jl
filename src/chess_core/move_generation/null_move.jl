@@ -8,7 +8,7 @@ function make_null_move!(board::Board)
     board.undo_index += 1
     pos_index = board.undo_index + 1
 
-    # Write UndoInfo directly
+    # Save UndoInfo
     board.undo_stack[board.undo_index] = UndoInfo(
         0,                    # captured piece (none)
         board.en_passant,
@@ -17,21 +17,30 @@ function make_null_move!(board::Board)
         0,                    # moved_piece (none)
         0,                    # promotion (none)
         false,                # not en passant
-        board.eval_score,     # store current eval
-        board.game_phase_value # store current game phase
+        board.eval_score,
+        board.game_phase_value
     )
 
-    # Clear en passant
+    # --- Initialize incremental Zobrist hash ---
+    h = board.position_history[board.undo_index]  # current hash
+
+    # --- Remove old en passant --- 
+    if board.en_passant != -1
+        h ⊻= ZOBRIST_EP[(board.en_passant % 8) + 1]
+    end
+
+    # --- Clear en passant ---
     board.en_passant = -1
 
-    # Increment halfmove clock
+    # --- Halfmove clock increment ---
     board.halfmove_clock += 1
 
-    # Flip side
+    # --- Flip side to move ---
     board.side_to_move = board.side_to_move == WHITE ? BLACK : WHITE
+    h ⊻= ZOBRIST_SIDE[]
 
-    # Update zobrist hash in position history
-    board.position_history[pos_index] = zobrist_hash(board)
+    # --- Save updated hash ---
+    board.position_history[pos_index] = h
 
     return board
 end

@@ -29,3 +29,23 @@ end
     @test OrbisChessEngine.split_indices(10, 2) == [1:5, 6:10]
     @test OrbisChessEngine.split_indices(10, 3) == [1:4, 5:7, 8:10]
 end
+
+@testset "perft bishop magic tests" begin
+    b = Board()
+    @test OrbisChessEngine.perft_bishop_magic(b, 0) == 1
+    @test OrbisChessEngine.perft_bishop_magic(b, 1) == 20
+    @test OrbisChessEngine.perft_bishop_magic(b, 2) == 400
+    @test OrbisChessEngine.perft_bishop_magic(b, 3) == 8902
+    @test OrbisChessEngine.perft_bishop_magic(b, 4) == 197_281
+    @test OrbisChessEngine.perft_bishop_magic(b, 5) == 4_865_609
+end
+
+@testset "perft_new tests" begin
+    b = Board()
+    @test OrbisChessEngine.perft_new(b, 0) == 1
+    @test OrbisChessEngine.perft_new(b, 1) == 20
+    @test OrbisChessEngine.perft_new(b, 2) == 400
+    @test OrbisChessEngine.perft_new(b, 3) == 8902
+    @test OrbisChessEngine.perft_new(b, 4) == 197_281
+    @test OrbisChessEngine.perft_new(b, 5) == 4_865_609
+end

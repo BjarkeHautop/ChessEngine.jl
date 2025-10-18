@@ -38,6 +38,6 @@ Visit chess programming wiki for useful articles on chess engine programming: [h
 
 - Make executable with [PackageCompiler.jl](https://julialang.github.io/PackageCompiler.jl/dev/)
 
-- Add magic bitboards for faster move generation
+- Add magic bitboards for faster move generation (added for bishops, but not yet used. Minimal performance improvement observed.)
 
 - Implement into Lichess bot (see https://github.com/lichess-bot-devs/lichess-bot)

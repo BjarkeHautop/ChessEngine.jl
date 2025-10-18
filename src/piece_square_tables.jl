@@ -130,45 +130,50 @@ const QUEEN_TABLE_B = flip_table(QUEEN_TABLE_W)
 const KING_TABLE_B = flip_table(KING_TABLE_W)
 const KING_TABLE_END_B = flip_table(KING_TABLE_END_W)
 
+const PIECE_TABLES = [
+    PAWN_TABLE_W,
+    KNIGHT_TABLE_W,
+    BISHOP_TABLE_W,
+    ROOK_TABLE_W,
+    QUEEN_TABLE_W,
+    KING_TABLE_W,
+    PAWN_TABLE_B,
+    KNIGHT_TABLE_B,
+    BISHOP_TABLE_B,
+    ROOK_TABLE_B,
+    QUEEN_TABLE_B,
+    KING_TABLE_B
+]
+
+const MAX_PHASE = 24
+
+function is_black(piece)
+    return piece >= 7
+end
+
 """
 Return the PSQT value of a piece on a given square.
 - piece: Piece.W_PAWN..Piece.B_KING
 - square: 0..63 (a1=0, h8=63)
-- phase: Float64 in [0.0, 1.0], where 1.0 = opening, 0.0 = endgame
+- phase: Int (0..MAX_PHASE)
 """
-function piece_square_value(piece, square, phase)
+@inline function piece_square_value(piece, square, phase)
     idx = psqt_index(square)
+    t = PIECE_TABLES[piece]
 
-    if piece == Piece.W_PAWN
-        return PAWN_TABLE_W[idx]
-    elseif piece == Piece.B_PAWN
-        return -PAWN_TABLE_B[idx]
-    elseif piece == Piece.W_KNIGHT
-        return KNIGHT_TABLE_W[idx]
-    elseif piece == Piece.B_KNIGHT
-        return -KNIGHT_TABLE_B[idx]
-    elseif piece == Piece.W_BISHOP
-        return BISHOP_TABLE_W[idx]
-    elseif piece == Piece.B_BISHOP
-        return -BISHOP_TABLE_B[idx]
-    elseif piece == Piece.W_ROOK
-        return ROOK_TABLE_W[idx]
-    elseif piece == Piece.B_ROOK
-        return -ROOK_TABLE_B[idx]
-    elseif piece == Piece.W_QUEEN
-        return QUEEN_TABLE_W[idx]
-    elseif piece == Piece.B_QUEEN
-        return -QUEEN_TABLE_B[idx]
-    elseif piece == Piece.W_KING
-        # interpolate between opening and endgame tables
-        return round(Int,
-            phase * KING_TABLE_W[idx] + (1 - phase) * KING_TABLE_END_W[idx]
-        )
+    if piece == Piece.W_KING
+        open = t[idx]
+        endg = KING_TABLE_END_W[idx]
+        return ((phase * open + (MAX_PHASE - phase) * endg) ÷ MAX_PHASE)
     elseif piece == Piece.B_KING
-        return round(Int,
-            -phase * KING_TABLE_B[idx] - (1 - phase) * KING_TABLE_END_B[idx]
-        )
-    else
-        error("Invalid piece type: $piece")
+        open = t[idx]
+        endg = KING_TABLE_END_B[idx]
+        return -((phase * open + (MAX_PHASE - phase) * endg) ÷ MAX_PHASE)
+    elseif is_black(piece) 
+        return -t[idx] 
+    else 
+        return t[idx]
     end
 end
+
+sum(OrbisChessEngine.PIECE_TABLES[1]) 
