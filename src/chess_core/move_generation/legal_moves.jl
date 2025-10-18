@@ -69,8 +69,6 @@ function generate_legal_moves(board::Board)
     return moves[1:n_moves]  # Return only the filled portion
 end
 
-# Test bishop magics
-
 function generate_legal_moves_bishop_magic!(
         board::Board,
         moves::Vector{Move},
@@ -93,26 +91,6 @@ function generate_legal_moves_bishop_magic!(
     n_moves = _filter_legal_moves!(board, pseudo, 1, pseudo_len - 1, moves, n_moves)
 
     return n_moves
-end
-
-# In-place bishop moves using magic bitboards
-function generate_legal_moves_bishop_magic(board::Board)
-    moves = Vector{Move}(undef, MAX_MOVES)  # Preallocate maximum possible moves
-    pseudo = Vector{Move}(undef, MAX_MOVES) # Preallocate maximum possible moves
-    n_moves = generate_legal_moves_bishop_magic!(board, moves, pseudo)
-    return moves[1:n_moves]  # Return only the filled portion
-end
-
-function generate_pseudo_legal_moves!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})
-    pseudo_len = 1
-    pseudo_len = generate_pawn_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_knight_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_bishop_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_rook_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_queen_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_king_moves!(board, pseudo, pseudo_len)
-
-    return pseudo_len - 1  # number of pseudo-legal moves
 end
 
 const ROOK_DIRECTIONS = [(1, 0), (-1, 0), (0, 1), (0, -1)]
