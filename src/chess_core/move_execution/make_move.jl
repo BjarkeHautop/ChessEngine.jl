@@ -213,7 +213,6 @@ function make_move!(board::Board, m::Move)
     board.position_history[board.undo_index + 1] = h
 end
 
-
 """
     make_move(board, m) -> Board
 

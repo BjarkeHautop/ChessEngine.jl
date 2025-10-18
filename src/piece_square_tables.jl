@@ -169,11 +169,11 @@ Return the PSQT value of a piece on a given square.
         open = t[idx]
         endg = KING_TABLE_END_B[idx]
         return -((phase * open + (MAX_PHASE - phase) * endg) ÷ MAX_PHASE)
-    elseif is_black(piece) 
-        return -t[idx] 
-    else 
+    elseif is_black(piece)
+        return -t[idx]
+    else
         return t[idx]
     end
 end
 
-sum(OrbisChessEngine.PIECE_TABLES[1]) 
+sum(OrbisChessEngine.PIECE_TABLES[1])

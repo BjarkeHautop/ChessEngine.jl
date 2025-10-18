@@ -49,7 +49,7 @@ function occupancy_variations(mask)
     bits = [i for i in 0:63 if testbit(mask, i)]   # actual square indices 0..63
     n = length(bits)
     variations = UInt64[]
-    for i in 0:(2^n - 1)
+    for i in 0:(2 ^ n - 1)
         occ = UInt64(0)
         for j in 1:n
             if i & (1 << (j - 1)) != 0
@@ -157,17 +157,17 @@ for sq in 0:63
     n = count_ones(mask)
     shift = 64 - n
     table_size = 1 << n
-    
+
     table = zeros(UInt64, table_size)
     occs = occupancy_variations(mask)
-    
+
     for occ in occs
         magic = BISHOP_MAGICS[sq + 1]
         idx = Int(((occ * magic) >> shift)) + 1
         attack = bishop_attack_from_occupancy(sq, occ)
         table[idx] = attack
     end
-    
+
     BISHOP_ATTACK_TABLES[sq + 1] = table
 end
 
@@ -180,13 +180,13 @@ function occupied_bb(board::Board)
 end
 
 function generate_sliding_moves_magic!(
-    board::Board,
-    bb_piece::UInt64,
-    mask_table::Vector{UInt64},
-    attack_table::Vector{Vector{UInt64}},
-    magic_table::Vector{UInt64},
-    moves::Vector{Move},
-    start_idx::Int,
+        board::Board,
+        bb_piece::UInt64,
+        mask_table::Vector{UInt64},
+        attack_table::Vector{Vector{UInt64}},
+        magic_table::Vector{UInt64},
+        moves::Vector{Move},
+        start_idx::Int
 )
     idx = start_idx
 
@@ -243,13 +243,13 @@ function generate_sliding_moves_magic!(
 end
 
 function generate_bishop_moves_magic!(
-    board::Board,
-    moves::Vector{Move},
-    start_idx::Int
+        board::Board,
+        moves::Vector{Move},
+        start_idx::Int
 )
     bb = board.side_to_move == WHITE ?
-        board.bitboards[Piece.W_BISHOP] :
-        board.bitboards[Piece.B_BISHOP]
+         board.bitboards[Piece.W_BISHOP] :
+         board.bitboards[Piece.B_BISHOP]
 
     return generate_sliding_moves_magic!(
         board,
@@ -263,7 +263,7 @@ function generate_bishop_moves_magic!(
 end
 
 function generate_bishop_moves_magic(
-    board::Board
+        board::Board
 )::Vector{Move}
     moves = Vector{Move}(undef, 256)  # preallocate space for moves
     n_moves = generate_bishop_moves_magic!(board, moves, 1)

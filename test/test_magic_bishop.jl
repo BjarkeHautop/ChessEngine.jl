@@ -1,4 +1,4 @@
-using OrbisChessEngine 
+using OrbisChessEngine
 using Test
 
 @testset "find_magic_number tests" begin
@@ -6,7 +6,7 @@ using Test
         OrbisChessEngine.generate_magics(
             OrbisChessEngine.BISHOP_MASKS,
             OrbisChessEngine.bishop_attack_from_occupancy;
-            tries=1_000_000
+            tries = 1_000_000
         )
     end
 

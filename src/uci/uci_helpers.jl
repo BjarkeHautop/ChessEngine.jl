@@ -107,7 +107,7 @@ function handle_go(command::String, board)
         elseif token == "btime"
             i += 1
             search_params["btime"] = parse(Int, tokens[i])
-        # Currently only have shared increment in Game struct
+            # Currently only have shared increment in Game struct
         elseif token == "winc"
             i += 1
             search_params["winc"] = parse(Int, tokens[i])

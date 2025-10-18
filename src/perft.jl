@@ -108,7 +108,6 @@ function perft_fast(board::Board, depth::Int)
     return sum(fetch.(futures))
 end
 
-
 # Using magic bitboard for bishop moves in perft
 
 function perft_bishop_magic(board::Board, depth::Int)
@@ -140,7 +139,8 @@ function _perft_bishop_magic!(
     @inbounds for i in 1:n_moves
         move = moves[i]
         make_move!(board, move)
-        nodes += _perft_bishop_magic!(board, depth - 1, moves_stack, pseudo_stack, level + 1)
+        nodes += _perft_bishop_magic!(
+            board, depth - 1, moves_stack, pseudo_stack, level + 1)
         undo_move!(board, move)
     end
 

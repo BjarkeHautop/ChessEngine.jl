@@ -72,9 +72,9 @@ end
 # Test bishop magics
 
 function generate_legal_moves_bishop_magic!(
-    board::Board,
-    moves::Vector{Move},
-    pseudo::Vector{Move}
+        board::Board,
+        moves::Vector{Move},
+        pseudo::Vector{Move}
 )
     pseudo_len = 1
 
@@ -115,9 +115,7 @@ function generate_pseudo_legal_moves!(board::Board, moves::Vector{Move}, pseudo:
     return pseudo_len - 1  # number of pseudo-legal moves
 end
 
-
-
-const ROOK_DIRECTIONS   = [(1,0), (-1,0), (0,1), (0,-1)]
+const ROOK_DIRECTIONS = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 const SLIDING_DIRECTIONS = vcat(ROOK_DIRECTIONS, BISHOP_DIRECTIONS)
 """
     ray_between(board, king_sq::Int, from_sq::Int) -> Bool
@@ -147,7 +145,7 @@ end
 Returns the next square index in direction `dir = (df, dr)` from `sq`.
 Returns `nothing` if it goes off-board.
 """
-function next_square(sq::Int, dir::Tuple{Int,Int})
+function next_square(sq::Int, dir::Tuple{Int, Int})
     f, r = file_rank(sq)  # current file/rank (1..8)
     nf, nr = f + dir[1], r + dir[2]
 
@@ -180,9 +178,8 @@ for moves that clearly cannot expose the king.
 """
 function _filter_legal_moves_fast!(board::Board, pseudo::Vector{Move},
         start::Int, stop::Int, moves::Vector{Move}, n_moves::Int)
-
     side = board.side_to_move
-    opp  = opposite(side)
+    opp = opposite(side)
     king_sq = king_square(board, side)
     occ = occupancy(board)
     in_check_now = in_check(board, side)
