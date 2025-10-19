@@ -20,4 +20,4 @@ b = Board()
 perft_bishop_magic(b, 5) # warm up
 @benchmark perft_bishop_magic($b, 5)
 ```
-Seems to be slightly slower than the default implementation.
+Seems to be barely affect performance.
