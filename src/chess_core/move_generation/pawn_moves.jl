@@ -84,11 +84,11 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
         if 0 <= to_sq < 64 && ((all_occupied & (UInt64(1) << to_sq)) == 0)
             if (UInt64(1) << to_sq) & promo_rank_mask != 0
                 for promo in promo_pieces
-                    moves[idx] = Move(Int(sq), Int(to_sq); promotion = promo)
+                    moves[idx] = Move(sq, to_sq; promotion = promo)
                     idx += 1
                 end
             else
-                moves[idx] = Move(Int(sq), Int(to_sq))
+                moves[idx] = Move(sq, to_sq)
                 idx += 1
             end
 
@@ -96,7 +96,7 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
             if (UInt64(1) << sq) & start_rank_mask != 0
                 to_sq2 = sq + 2*direction
                 if 0 <= to_sq2 < 64 && (all_occupied & (UInt64(1) << to_sq2)) == 0
-                    moves[idx] = Move(Int(sq), Int(to_sq2))
+                    moves[idx] = Move(sq, to_sq2)
                     idx += 1
                 end
             end
@@ -117,12 +117,12 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
                     )
                     if (UInt64(1) << to_sq) & promo_rank_mask != 0
                         for promo in promo_pieces
-                            moves[idx] = Move(Int(sq), Int(to_sq);
+                            moves[idx] = Move(sq, to_sq;
                                 capture = capture_piece, promotion = promo)
                             idx += 1
                         end
                     else
-                        moves[idx] = Move(Int(sq), Int(to_sq); capture = capture_piece)
+                        moves[idx] = Move(sq, to_sq; capture = capture_piece)
                         idx += 1
                     end
                 end
@@ -134,7 +134,7 @@ function generate_pawn_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
             ep_sq = board.en_passant
             if (sq % 8 != 0 && sq + left_capture_offset == ep_sq) ||
                (sq % 8 != 7 && sq + right_capture_offset == ep_sq)
-                moves[idx] = Move(Int(sq), Int(ep_sq); capture = ep_capture_piece, en_passant = true)
+                moves[idx] = Move(sq, ep_sq; capture = ep_capture_piece, en_passant = true)
                 idx += 1
             end
         end

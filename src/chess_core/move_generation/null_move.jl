@@ -42,7 +42,7 @@ function make_null_move!(board::Board)
     # --- Save updated hash ---
     board.position_history[pos_index] = h
 
-    return board
+    return nothing
 end
 
 """
@@ -68,5 +68,5 @@ function undo_null_move!(board::Board)
     # Clear the corresponding hash slot
     board.position_history[pos_index] = 0
 
-    return board
+    return nothing
 end

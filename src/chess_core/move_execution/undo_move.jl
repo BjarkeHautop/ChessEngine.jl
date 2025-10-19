@@ -65,6 +65,8 @@ function undo_move!(board::Board, m::Move)
 
     # --- 7. Restore position history ---
     board.position_history[pos_index] = 0
+
+    return nothing
 end
 
 """

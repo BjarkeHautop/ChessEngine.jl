@@ -79,37 +79,49 @@ Castling can be specified with "O-O" (kingside) or "O-O-O" (queenside).
 Also accepts "o-o", "0-0", "o-o-o", "0-0-0".
 """
 function Move(board::Board, str::AbstractString)
-    # Castling shortcuts
+    # --- Handle castling shortcuts ---
     if str in ["O-O", "o-o", "0-0"]
-        return Move(Int8(4), Int8(6); castling = Int8(1))
+        if board.side_to_move == WHITE
+            from = 4
+            to = 6
+        else
+            from = 60
+            to = 62
+        end
+        return Move(from, to, 0, 0, 1, false)  # castling=1
     elseif str in ["O-O-O", "o-o-o", "0-0-0"]
-        return Move(Int8(4), Int8(2); castling = Int8(2))
+        if board.side_to_move == WHITE
+            from = 4
+            to = 2
+        else
+            from = 60
+            to = 58
+        end
+        return Move(from, to, 0, 0, 2, false)  # castling=2
     end
 
-    # Parse squares
+    # --- Parse squares ---
     from = square_from_name(str[1:2])
-    to = square_from_name(str[3:4])
+    to   = square_from_name(str[3:4])
 
-    # Parse promotion if present
+    # --- Parse promotion ---
     promotion = 0
     if length(str) > 4
-        if str[5] == '='
-            # old format e7e8=Q
-            promotion_char = uppercase(str[6])
-        else
-            # UCI-style format e7e8q
-            promotion_char = uppercase(str[5])
-        end
+        # e7e8Q or e7e8=Q
+        promotion_char = uppercase(str[end])
         promotion = piece_from_symbol(promotion_char, board.side_to_move)
     end
 
-    # Infer captured piece
+    # --- Infer captured piece ---
     captured_piece = 0
-    for p in 1:12
-        captured_piece = testbit(board.bitboards[p], to) ? p : captured_piece
+    for p in ALL_PIECES
+        if testbit(board.bitboards[p], to)
+            captured_piece = p
+            break
+        end
     end
 
-    # Infer en passant
+    # --- Infer moving piece ---
     moving_piece = 0
     for p in (board.side_to_move == WHITE ? (Piece.W_PAWN:Piece.W_KING) :
          (Piece.B_PAWN:Piece.B_KING))
@@ -119,17 +131,18 @@ function Move(board::Board, str::AbstractString)
         end
     end
 
+    # --- Check en passant ---
     is_ep = moving_piece in (Piece.W_PAWN, Piece.B_PAWN) && to == board.en_passant
     if is_ep
         captured_piece = board.side_to_move == WHITE ? Piece.B_PAWN : Piece.W_PAWN
     end
 
-    return Move(
-        Int8(from),
-        Int8(to);
-        promotion = Int8(promotion),
-        capture = Int8(captured_piece),
-        castling = Int8(0),
-        en_passant = is_ep
+    Move(
+        from,
+        to,
+        promotion,
+        captured_piece,
+        0,          # castling flag
+        is_ep
     )
 end
