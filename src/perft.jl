@@ -1,5 +1,13 @@
 const MAX_MOVES = 256  # 256 is safely larger than max legal moves
 
+"""
+    perft(board::Board, depth::Int) -> Int
+
+Compute the number of leaf nodes reachable from the given board position at the given depth.
+It uses the Board struct to immitate [search](@ref) behavior. In particular,
+this means it still computes zobrist hashes and updates evaluation scores
+slowing it down compared to a minimal perft implementation.
+"""
 function perft(board::Board, depth::Int)
     levels = depth + 1  # allocate one buffer for each level
     moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
@@ -8,11 +16,6 @@ function perft(board::Board, depth::Int)
     return _perft!(board, depth, moves_stack, pseudo_stack, 1)
 end
 
-"""
-    perft(board::Board, depth::Int) -> Int
-
-Compute the number of leaf nodes reachable from the given board position at the given depth.
-"""
 function _perft!(
         board::Board,
         depth::Int,
@@ -65,6 +68,9 @@ end
 
 Compute the number of leaf nodes reachable from the given board position at the given depth
 using multiple threads at the root.
+It uses the Board struct to immitate [search](@ref) behavior. In particular,
+this means it still computes zobrist hashes and updates evaluation scores
+slowing it down compared to a minimal perft implementation.
 """
 function perft_fast(board::Board, depth::Int)
     if depth == 0
@@ -147,6 +153,14 @@ function _perft_bishop_magic!(
     return nodes
 end
 
+"""
+    perft_new(board::Board, depth::Int) -> Int
+
+Compute the number of leaf nodes reachable from the given board position at the given depth.
+It uses the Board struct to immitate [search](@ref) behavior. In particular,
+this means it still computes zobrist hashes and updates evaluation scores
+slowing it down compared to a minimal perft implementation.
+"""
 function perft_new(board::Board, depth::Int)
     levels = depth + 1  # allocate one buffer for each level
     moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
@@ -155,11 +169,6 @@ function perft_new(board::Board, depth::Int)
     return _perft_new!(board, depth, moves_stack, pseudo_stack, 1)
 end
 
-"""
-    perft(board::Board, depth::Int) -> Int
-
-Compute the number of leaf nodes reachable from the given board position at the given depth.
-"""
 function _perft_new!(
         board::Board,
         depth::Int,
@@ -187,3 +196,5 @@ function _perft_new!(
 
     return nodes
 end
+
+# Could consider making a minimal board struct for faster perft (no eval, no zobrist, etc.).
