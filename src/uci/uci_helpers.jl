@@ -88,18 +88,18 @@ function handle_go(command::String, board)
         token = tokens[i]
 
         if token == "searchmoves"
-            # restrict search to this moves only
-            # Example: After "position startpos" and "go infinite searchmoves e2e4 d2d4"
-            # the engine should only search the two moves e2e4 and d2d4 in the initial position.
-
-            # Not implemented yet
-            i += 1
-            while i <= length(tokens) && !occursin(r"^[a-z]", tokens[i])
-                push!(moves, tokens[i])
-                i += 1
+            moves = String[]
+            i += 1  # skip "searchmoves"
+            while i <= length(tokens)
+                tok = tokens[i]
+                if occursin(r"^[a-h][1-8][a-h][1-8][qrbn]?$", tok) || uppercase(tok) in ["O-O", "O-O-O"]
+                    push!(moves, tok)
+                    i += 1
+                else
+                    break  # stop when we reach something that is NOT a move
+                end
             end
-            # search_params["searchmoves"] = moves
-            continue  # skip the i increment at the end of the loop
+            search_params["searchmoves"] = moves
         # All times are in milliseconds
         elseif token == "wtime"
             i += 1
