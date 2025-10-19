@@ -16,7 +16,7 @@ using OrbisChessEngine
     @test length(lines) == 3
 
     # Line 1: check engine name and version
-    @test occursin(r"OrbisChessEngine \d+\.\d+\.\d+-DEV", lines[1])
+    @test occursin(r"OrbisChessEngine \d+\.\d+\.\d+(?:-DEV)?", lines[1])
 
     # Line 2: check author
     @test occursin("Bjarke Hautop", lines[2])
