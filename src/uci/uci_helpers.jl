@@ -92,7 +92,8 @@ function handle_go(command::String, board)
             i += 1  # skip "searchmoves"
             while i <= length(tokens)
                 tok = tokens[i]
-                if occursin(r"^[a-h][1-8][a-h][1-8][qrbn]?$", tok) || uppercase(tok) in ["O-O", "O-O-O"]
+                if occursin(r"^[a-h][1-8][a-h][1-8][qrbn]?$", tok) ||
+                   uppercase(tok) in ["O-O", "O-O-O"]
                     push!(moves, tok)
                     i += 1
                 else
@@ -100,7 +101,7 @@ function handle_go(command::String, board)
                 end
             end
             search_params["searchmoves"] = moves
-        # All times are in milliseconds
+            # All times are in milliseconds
         elseif token == "wtime"
             i += 1
             search_params["wtime"] = parse(Int, tokens[i])

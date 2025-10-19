@@ -211,7 +211,7 @@ function make_move!(board::Board, m::Move)
 
     # --- Save updated hash ---
     board.position_history[board.undo_index + 1] = h
-    
+
     return nothing
 end
 

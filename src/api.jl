@@ -102,7 +102,7 @@ function Move(board::Board, str::AbstractString)
 
     # --- Parse squares ---
     from = square_from_name(str[1:2])
-    to   = square_from_name(str[3:4])
+    to = square_from_name(str[3:4])
 
     # --- Parse promotion ---
     promotion = 0
