@@ -52,7 +52,7 @@ export in_check, game_status
 export evaluate, search, search_with_time
 
 # Perft & testing
-export perft, perft_fast
+export perft, perft_fast, perft_bishop_magic
 
 # Opening book
 export PolyglotBook, load_polyglot_book

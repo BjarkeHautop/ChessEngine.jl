@@ -1,4 +1,4 @@
-Starting from version 0.1.2-DEV of OrbisChessEngine this page shows benchmark results for perft for various depths.
+Starting from version 0.1.2 of OrbisChessEngine this page shows benchmark results for perft for various depths.
 
 ## Benchmark Results
 
@@ -12,19 +12,12 @@ perft(b, 5) # warm up
 @benchmark perft($b, 5)
 ```
 
-Using `perft_bishop_magic`:
+Using `perft_bishop_magic` which uses magic bitboards for bishop move generation:
 ```@example
 using OrbisChessEngine
 using BenchmarkTools
 b = Board()
-OrbisChessEngine.perft_bishop_magic(b, 5) # warm up
-@benchmark OrbisChessEngine.perft_bishop_magic($b, 5)
+perft_bishop_magic(b, 5) # warm up
+@benchmark perft_bishop_magic($b, 5)
 ```
-Using the new perft implementation:
-```@example
-using OrbisChessEngine
-using BenchmarkTools
-b = Board()
-OrbisChessEngine.perft_new(b, 5) # warm up
-@benchmark OrbisChessEngine.perft_new($b, 5)
-```
+Seems to be slightly slower than the default implementation.
