@@ -77,6 +77,8 @@ using the board to infer capture, en passant, and castling.
 Captures are inferred based on the board state (so "e4d5" captures if d5 is occupied by opponent).
 Castling can be specified with "O-O" (kingside) or "O-O-O" (queenside). 
 Also accepts "o-o", "0-0", "o-o-o", "0-0-0".
+
+Note, that this function does not validate the legality of the move; it only constructs the Move object.
 """
 function Move(board::Board, str::AbstractString)
     # --- Handle castling shortcuts ---
