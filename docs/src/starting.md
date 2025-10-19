@@ -57,7 +57,7 @@ Note, that `make_move` allows for illegal moves. You can get all legal moves usi
 legal_moves = generate_legal_moves(board)
 ```
 
-You can check if the game is over using `game_status`:
+You can check the game status using `game_status`:
 
 ```julia
 game_status(board)
@@ -65,7 +65,7 @@ game_status(board)
 
 ## Using the Engine
 
-We can generate a move using the chess engine:
+To generate a move using the engine we can use `search`:
 
 ```julia
 result = search(board; depth=3, opening_book=nothing)
@@ -73,13 +73,13 @@ result = search(board; depth=3, opening_book=nothing)
 
 `search` returns a `SearchResult` object containing the evaluation score, the move and if it is a book move. This package ships with a small opening book, which is default when calling `search`. To disable the opening book, set `opening_book=nothing`. To use a custom opening book use `load_polyglot_book` to load another polyglot book in `.bin` format.
 
-To make a 3+2 game we can use:
+To make a 3+2 game we can use `Game`:
 
 ```julia
 game = Game(; minutes = 3, increment = 2)
 ```
 
-or the shorter version:
+or the short-hand notation:
 
 ```julia
 game = Game("3+2")
@@ -87,7 +87,7 @@ game = Game("3+2")
 
 This is a struct of type `Game` which contains the board, white and black time left, and the increment.
 
-The engine will then automatically allocate how much time to use for each move. To make a move in the game we can use `make_timed_move!` (or the non-mutating version `make_timed_move`):
+The engine will then automatically allocate how much time to use for each move. To let the engine make a move in a timed game we can use `make_timed_move!`:
 
 ```julia
 make_timed_move!(game)
