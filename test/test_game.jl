@@ -9,9 +9,11 @@ using Test
     @test game.black_time == 0.5*60*1000
     @test game.increment == 2000
 
-    allocated = OrbisChessEngine.allocate_time(game)
-    @test isa(allocated, Int)
-    @test allocated > 0
+    opt_time, max_time = OrbisChessEngine.allocate_time(game)
+    @test isa(opt_time, Int)
+    @test isa(max_time, Int)
+    @test opt_time > 0
+    @test max_time > opt_time
 
     # Test make_timed_move!
     old_white_time = game.white_time
@@ -26,17 +28,21 @@ using Test
 end
 
 @testset "Time management heuristic" begin
-    @test OrbisChessEngine.time_mangement(20000, 2000) == 20000 ÷ 20 + 2000 ÷ 2
-    @test OrbisChessEngine.time_mangement(1000, 0) == 1000 ÷ 20
+    opt_time, max_time = OrbisChessEngine.time_management(20000, 2000)
+    @test opt_time == 20000 ÷ 30 + (2000 * 3) ÷ 5
+    @test max_time == (opt_time * 15) ÷ 10
+    opt_time, max_time = OrbisChessEngine.time_management(1000, 0)
+    @test opt_time == 1000 ÷ 30
+    @test max_time == (opt_time * 15) ÷ 10
 end
 
 @testset "Search with time respects allocation" begin
-    game = Game(minutes = 1, increment = 0)
+    game = Game(minutes = 0.1, increment = 0)
     make_timed_move!(game; opening_book = nothing)
 
-    # Should have spent 60000 ms / 20 = 3000ms on first move and then some overhead thus, 56000 < game.white_time < 57000
-    @test game.white_time <= 57000
-    @test game.white_time > 56000
+    # Should have spent at least 6000 ms / 30 = 200ms and at most 1.5 * 2000ms = 300ms
+    @test game.white_time <= 5800
+    @test game.white_time >= 5650 # allow some margin
 end
 
 @testset "Search with time opening book move" begin
@@ -82,7 +88,7 @@ end
 @testset "Make timed move no time left" begin
     game = Game(minutes = 0, increment = 0)
     old_board = deepcopy(game.board)
-    make_timed_move!(game; opening_book = nothing)
+    make_timed_move!(game; opening_book = nothing, verbose = true)
     @test game.board == old_board  # no move made
     @test game.white_time == 0
 end

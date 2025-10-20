@@ -417,10 +417,13 @@ function extract_pv(board::Board, max_depth::Int)
 end
 
 # Root-level iterative deepening search
+
 function search_root(board::Board, max_depth::Int;
-        stop_time::Int = typemax(Int),
+        opt_stop_time::Int = typemax(Int),
+        max_stop_time::Int = typemax(Int),
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
-        verbose::Bool = false)::SearchResult
+        verbose::Bool = false
+)::SearchResult
     # Use NO_MOVE as placeholder internally
     best_result_internal = SearchResult(0, NO_MOVE, false)
 
@@ -439,9 +442,15 @@ function search_root(board::Board, max_depth::Int;
             return SearchResult(0, book_mv, true)
         end
     end
+
+    # --- Iterative deepening ---
     for depth in 1:max_depth
+         if (time_ns() ÷ 1_000_000) >= max_stop_time
+            break
+        end
+
         result = _search(board, depth, 0, -MATE_VALUE, MATE_VALUE,
-            opening_book, stop_time,
+            opening_book, max_stop_time,
             moves_stack, pseudo_stack, score_stack)
 
         # Keep the internal best result
@@ -454,11 +463,8 @@ function search_root(board::Board, max_depth::Int;
             pv_str = join(string.(pv), " ")
             println("Depth $depth | Score: $(best_result_internal.score) | PV: $pv_str")
         end
-        if (time_ns() ÷ 1_000_000) >= stop_time
-            break
-        end
 
-        # Stop if a mate is found
+        # Stop early if a mate is found
         if abs(best_result_internal.score) >= MATE_THRESHOLD
             if verbose
                 mate_in = MATE_VALUE - abs(best_result_internal.score)
@@ -467,7 +473,14 @@ function search_root(board::Board, max_depth::Int;
 
             break
         end
+
+        now = time_ns() ÷ 1_000_000
+        # --- Soft stop: if optimal time reached, stop after completed depth ---
+        if now >= opt_stop_time
+            break
+        end
     end
+
     return SearchResult(best_result_internal.score, best_result_internal.move, best_result_internal.from_book)
 end
 
@@ -504,7 +517,8 @@ function search(
     tt_clear!()  # reset TT for this search
     tb = min(time_budget, 1_000_000_000)  # cap to 1e9 ms ~ 11 days
     stop_time = Int((time_ns() ÷ 1_000_000) + tb)
-    result = search_root(board, depth; stop_time = stop_time, opening_book = opening_book,
+    result = search_root(board, depth; opt_stop_time = stop_time,
+        max_stop_time = stop_time, opening_book = opening_book,
         verbose = verbose)
 
     # Convert NO_MOVE to nothing for public API

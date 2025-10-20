@@ -17,15 +17,25 @@ mutable struct Game
     increment::Int    # per-move increment in ms
 end
 
-function time_mangement(move_time, increment)
-    # Use current_time / 20 + increment / 2 as a heuristic for time management
-    return move_time ÷ 20 + increment ÷ 2
+function time_management(remaining_ms::Int, increment_ms::Int)
+    # Base heuristic
+    base = remaining_ms ÷ 30
+    bonus = (increment_ms * 3) ÷ 5    # 0.6 * increment
+
+    opt_time = base + bonus
+
+    # Max time = 1.5 * opt_time
+    max_time = (opt_time * 15) ÷ 10
+
+    return opt_time, max_time
 end
+
+
 
 function allocate_time(game::Game)
     side = game.board.side_to_move
     remaining = side == WHITE ? game.white_time : game.black_time
-    return time_mangement(remaining, game.increment)
+    return time_management(remaining, game.increment)
 end
 
 function search_with_time(
@@ -34,20 +44,25 @@ function search_with_time(
         opening_book::Union{Nothing, PolyglotBook} = KOMODO_OPENING_BOOK,
         verbose::Bool = false
 )
-    allocated = allocate_time(game)
-    stop_time = Int(time_ns() ÷ 1_000_000 + allocated)
+    # --- Time management ---
+    allocated_opt, allocated_max = allocate_time(game)
+    opt_stop_time = Int(time_ns() ÷ 1_000_000 + allocated_opt)
+    max_stop_time = Int(time_ns() ÷ 1_000_000 + allocated_max)
 
-    # Use search_root to perform iterative deepening at the root
+    if verbose
+        println("Allocated time (ms): optimal = ", allocated_opt,
+            " max = ", allocated_max)
+    end
+
+    # --- Run iterative deepening ---
     result = search_root(
         game.board,
         max_depth;
-        stop_time = stop_time,
+        opt_stop_time = opt_stop_time,
+        max_stop_time = max_stop_time,
         opening_book = opening_book,
         verbose = verbose
     )
-    if result.move === NO_MOVE
-        return nothing
-    end
     return result
 end
 
@@ -73,7 +88,10 @@ function make_timed_move!(
     result = search_with_time(game; opening_book = opening_book, verbose = verbose)
     elapsed = (time_ns() ÷ 1_000_000) - start_time
 
-    if result === nothing
+    if result.move === NO_MOVE
+        if verbose
+            println("search returned no move")
+        end
         return nothing
     end
 

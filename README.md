@@ -30,7 +30,7 @@ Visit chess programming wiki for useful articles on chess engine programming: [h
 
 ## TODO
 
-- Soft time management; define optimal time and maximum time per move. Stop search when optimal time is reached after completing a depth or end immediately when maximum time is reached.
+- Improve evaluation function (e.g. add pawn structure, king safety, trapped pieces, etc.)
 
 - Add support for multiple threads in search (e.g. lazy SMP)
 
