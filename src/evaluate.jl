@@ -29,6 +29,16 @@ Evaluate a position from White’s perspective using piece-square tables.
 - board: Board struct
 """
 function evaluate(board::Board)
+    # --- Check for terminal game states ---
+    status = game_status(board)
+    if status == :checkmate_white
+        return MATE_VALUE
+    elseif status == :checkmate_black
+        return -MATE_VALUE
+    elseif status in (:stalemate, :draw_insufficient_material, :draw_threefold, :draw_fiftymove)
+        return 0
+    end
+
     score = 0
     for (p, bb) in enumerate(board.bitboards)
         while bb != 0

@@ -1,8 +1,11 @@
+using StaticArrays
+
 const MATE_VALUE = 30_000
 const MATE_THRESHOLD = 29_000  # threshold to consider a position as mate
 
 const MAX_PLY = 128  # safe upper bound for typical search depth
-const KILLERS = [Vector{Union{Move, Nothing}}(undef, 2) for _ in 1:MAX_PLY]
+const NO_MOVE = Move(0, 0, 0, 0, 0, false)
+const KILLERS = [MVector{MAX_PLY, Move}(fill(NO_MOVE, MAX_PLY)) for _ in 1:MAX_PLY]
 
 """
 Store a killer move for the given ply.
@@ -83,7 +86,6 @@ struct TTEntry
     best_move::Move
 end
 
-const NO_MOVE = Move(0, 0, 0, 0, 0, false)
 const TT_SIZE = 1 << 20  # ~1M entries
 const EMPTY_ENTRY = TTEntry(0, 0, -1, EXACT, NO_MOVE)
 const TRANSPOSITION_TABLE = fill(EMPTY_ENTRY, TT_SIZE)

@@ -230,8 +230,7 @@ Returns: Symbol - one of
   - `:ongoing`
 """
 function game_status(board::Board)
-    legal = generate_legal_moves(board)
-    if isempty(legal)
+    if !has_legal_move(board)
         if in_check(board, board.side_to_move)
             return (board.side_to_move == WHITE) ? :checkmate_black : :checkmate_white
         else

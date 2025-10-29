@@ -31,7 +31,6 @@ function _perft!(
     moves = moves_stack[level]
     pseudo = pseudo_stack[level]
 
-    # Generate legal moves and get the number of moves
     n_moves = generate_legal_moves!(board, moves, pseudo)
 
     @inbounds for i in 1:n_moves
@@ -46,7 +45,6 @@ end
 
 using Base.Threads
 
-# Helper: split moves into chunks for threads
 function split_indices(nmoves, nthreads)
     chunk_sizes = fill(div(nmoves, nthreads), nthreads)
     for i in 1:rem(nmoves, nthreads)
@@ -77,20 +75,16 @@ function perft_fast(board::Board, depth::Int)
         return 1
     end
 
-    # Preallocate moves/pseudo stacks for the root
     moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
     pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
 
-    # Generate legal moves at root
     root_moves = moves_stack[1]
     root_pseudo = pseudo_stack[1]
     n_moves = generate_legal_moves!(board, root_moves, root_pseudo)
 
-    # Split moves among threads
-    nthreads_ = min(n_moves, Threads.nthreads())  # don't spawn more threads than moves
+    nthreads_ = min(n_moves, Threads.nthreads())
     chunks = split_indices(n_moves, nthreads_)
 
-    # Spawn tasks for each thread
     futures = Vector{Task}(undef, nthreads_)
     for t in 1:nthreads_
         range = chunks[t]
@@ -113,8 +107,6 @@ function perft_fast(board::Board, depth::Int)
 
     return sum(fetch.(futures))
 end
-
-# Using magic bitboard for bishop moves in perft
 
 function perft_bishop_magic(board::Board, depth::Int)
     levels = depth + 1  # allocate one buffer for each level
@@ -139,7 +131,6 @@ function _perft_bishop_magic!(
     moves = moves_stack[level]
     pseudo = pseudo_stack[level]
 
-    # Generate legal moves and get the number of moves
     n_moves = generate_legal_moves_bishop_magic!(board, moves, pseudo)
 
     @inbounds for i in 1:n_moves
@@ -153,4 +144,5 @@ function _perft_bishop_magic!(
     return nodes
 end
 
-# Could consider making a minimal board struct for faster perft (no eval, no zobrist, etc.).
+# Could consider making a minimal board struct for faster perft (no eval, no zobrist,
+# no history, smaller preallocated arrays, etc.).

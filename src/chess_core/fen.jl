@@ -1,6 +1,5 @@
 # Add further checks for valid FEN strings such as castling rights
-
-const MAX_MOVES_PER_GAME = 1024
+using StaticArrays
 
 function board_from_fen(fen::String)
     parts = split(fen)
@@ -36,8 +35,7 @@ function board_from_fen(fen::String)
         @assert file == 8 "Each rank must have 8 squares"
     end
 
-    # Convert to immutable SVector
-    bitboards = SVector{NUM_PIECES, UInt64}(bb_vec)
+    bitboards = MVector{NUM_PIECES, UInt64}(bb_vec)
 
     # Side to move
     side_to_move = parts[2] == "w" ? WHITE : BLACK
@@ -58,8 +56,9 @@ function board_from_fen(fen::String)
     halfmove = length(parts) >= 5 ? UInt16(parse(Int, parts[5])) : UInt16(0)
 
     # Preallocate position_history and undo_stack to fixed size
-    pos_hist = zeros(UInt64, MAX_MOVES_PER_GAME) # Intialize with zeros so we can check for threefold repetition
-    undo_stk = Vector{UndoInfo}(undef, MAX_MOVES_PER_GAME)
+    pos_hist = MVector{MAX_MOVES_PER_GAME, UInt64}(zeros(UInt64, MAX_MOVES_PER_GAME))
+    undo_stk = MVector{MAX_MOVES_PER_GAME, UndoInfo}(undef)
+
     # Initialize Board
     board = Board(
         bitboards,

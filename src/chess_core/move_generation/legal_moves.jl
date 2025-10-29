@@ -53,6 +53,31 @@ Returns a bitboard of all occupied squares.
     return occ
 end
 
+function is_move_legal(board::Board, m::Move, side::Side,
+                        king_sq::Int, occ, in_check_now::Bool)::Bool
+    # --- Castling check ---
+    if m.castling != 0
+        path = if side == WHITE
+            m.castling == 1 ? (5, 6) : (3, 2)
+        else
+            m.castling == 1 ? (61, 62) : (59, 58)
+        end
+        if in_check_now || any(sq -> square_attacked(board, sq, opposite(side)), path)
+            return false
+        end
+    end
+
+    if !in_check_now && !ray_between(occ, king_sq, m.from) && m.from != king_sq
+        return true
+    else
+        make_move!(board, m)
+        legal = !in_check(board, side)
+        undo_move!(board, m)
+        return legal
+    end
+end
+
+
 """
     _filter_legal_moves!(board, pseudo, start, stop, moves, n_moves)
 
@@ -60,51 +85,47 @@ Filters pseudo-legal moves into legal moves, avoiding full make/undo
 for moves that clearly cannot expose the king.
 """
 function _filter_legal_moves!(board::Board, pseudo::Vector{Move},
-        start::Int, stop::Int, moves::Vector{Move}, n_moves::Int)
+                              start::Int, stop::Int,
+                              moves::Vector{Move}, n_moves::Int)
     side = board.side_to_move
-    opp = opposite(side)
     king_sq = king_square(board, side)
     occ = occupancy(board)
     in_check_now = in_check(board, side)
 
     @inbounds for i in start:stop
         m = pseudo[i]
-
-        # --- Castling check ---
-        if m.castling != 0
-            # path squares for castling
-            path = if side == WHITE
-                m.castling == 1 ? (5, 6) : (3, 2)
-            else
-                m.castling == 1 ? (61, 62) : (59, 58)
-            end
-            if in_check(board, side) || any(sq -> square_attacked(board, sq, opp), path)
-                continue
-            end
-        end
-
-        # --- Lightweight legality check ---
-        legal = false
-
-        # quiet move that doesn't move the king and doesn't expose king along a ray
-        if !in_check_now && !ray_between(occ, king_sq, m.from) && m.from != king_sq
-            legal = true
-        else
-            # potentially dangerous move → full make/undo
-            make_move!(board, m)
-            legal = !in_check(board, side)
-            undo_move!(board, m)
-        end
-
-        # --- Append to legal moves ---
-        if legal
+        if is_move_legal(board, m, side, king_sq, occ, in_check_now)
             n_moves += 1
             moves[n_moves] = m
         end
     end
-
     return n_moves
 end
+
+function has_legal_move(board::Board)::Bool
+    pseudo = Vector{Move}(undef, MAX_MOVES)
+    side = board.side_to_move
+    king_sq = king_square(board, side)
+    occ = occupancy(board)
+    in_check_now = in_check(board, side)
+
+    pseudo_len = 1
+    pseudo_len = generate_pawn_moves!(board, pseudo, pseudo_len)
+    pseudo_len = generate_knight_moves!(board, pseudo, pseudo_len)
+    pseudo_len = generate_bishop_moves!(board, pseudo, pseudo_len)
+    pseudo_len = generate_rook_moves!(board, pseudo, pseudo_len)
+    pseudo_len = generate_queen_moves!(board, pseudo, pseudo_len)
+    pseudo_len = generate_king_moves!(board, pseudo, pseudo_len)
+
+    @inbounds for i in 1:pseudo_len-1
+        if is_move_legal(board, pseudo[i], side, king_sq, occ, in_check_now)
+            return true
+        end
+    end
+
+    return false
+end
+
 
 # Public API
 function generate_legal_moves!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})

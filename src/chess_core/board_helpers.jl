@@ -80,9 +80,7 @@ Check if a square is attacked by the given side.
 Returns: Bool
 """
 function square_attacked(board::Board, sq, attacker::Side)::Bool
-    ########################
     # 1) Pawn attacks
-    ########################
     pawns = attacker == WHITE ? board.bitboards[Piece.W_PAWN] :
             board.bitboards[Piece.B_PAWN]
     mask = attacker == WHITE ? pawn_attack_masks_white[sq + 1] :
@@ -105,9 +103,7 @@ function square_attacked(board::Board, sq, attacker::Side)::Bool
         return true
     end
 
-    ########################
     # 3) Sliding pieces
-    ########################
     occ = zero(UInt64)
     for p in ALL_PIECES
         occ |= board.bitboards[p]
@@ -159,10 +155,8 @@ function in_check(board::Board, side::Side)::Bool
 end
 
 function generate_captures!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})
-    # Generate all legal moves into `moves`
     n_moves = generate_legal_moves!(board, moves, pseudo)
 
-    # Filter in-place: keep only capture moves
     write_idx = 1
     @inbounds for i in 1:n_moves
         m = moves[i]
@@ -172,7 +166,6 @@ function generate_captures!(board::Board, moves::Vector{Move}, pseudo::Vector{Mo
         end
     end
 
-    # Return number of capture moves
     return write_idx - 1
 end
 

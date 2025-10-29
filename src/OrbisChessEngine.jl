@@ -58,4 +58,7 @@ export perft, perft_fast, perft_bishop_magic
 export PolyglotBook, load_polyglot_book
 export book_move, polyglot_hash, KOMODO_OPENING_BOOK
 
+# ui
+export plot_board
+
 end

@@ -32,6 +32,8 @@ const ALL_PIECES = Piece.W_PAWN:Piece.B_KING
 
 const NUM_PIECES = length(ALL_PIECES)
 
+const MAX_MOVES_PER_GAME = 512
+
 #########################
 # Board representation  #
 #########################
@@ -86,8 +88,8 @@ mutable struct Board
     castling_rights::UInt8      # four bits: KQkq
     en_passant::Int8             # square index 0..63, or -1 if none
     halfmove_clock::UInt16          # for 50-move rule
-    position_history::Vector{UInt64}  # for threefold repetition
-    undo_stack::Vector{UndoInfo} # stack of UndoInfo for unmaking moves
+    position_history::MVector{MAX_MOVES_PER_GAME, UInt64}  # for threefold repetition
+    undo_stack::MVector{MAX_MOVES_PER_GAME, UndoInfo} # stack of UndoInfo for unmaking moves
     undo_index::Int16         # current index in undo_stack
     eval_score::Int32           # cached evaluation from White’s POV
     game_phase_value::UInt8     # cached phase numerator (sum of weights)

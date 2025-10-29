@@ -25,10 +25,10 @@ board = Board(fen="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
 This is a struct of type `Board` which contains the bitboards, side to move, castling rights, en passant square, halfmove clock, position history, undo stack, eval score and game phase value.
 
-To display the board, we can use `display`:
+To view the board in a Plot panel we can use
 
 ```julia
-display(board)
+plot_board(board)
 ```
 
 We can use `Move` to create a move. Several formats are supported, but the simplest is

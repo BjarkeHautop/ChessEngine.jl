@@ -54,4 +54,5 @@ end
               "depth 5 nodes 10000 mate 3 movetime 2000 infinite " *
               "unknowncommand"
     OrbisChessEngine.handle_go(command, b)
+    @test true
 end
