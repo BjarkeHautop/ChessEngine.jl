@@ -35,16 +35,17 @@ Plot the chess board and pieces using Makie.jl
 """
 function plot_board(board::Board)
     fig = Figure(size = (600, 600))
-    ax = Axis(fig[1,1]; aspect = DataAspect())
+    ax = Axis(fig[1, 1]; aspect = DataAspect())
 
-    ax.xticks = (collect(0.5:1:7.5), ["a","b","c","d","e","f","g","h"])
-    ax.yticks = (collect(0.5:1:7.5), ["1","2","3","4","5","6","7","8"])
+    ax.xticks = (collect(0.5:1:7.5), ["a", "b", "c", "d", "e", "f", "g", "h"])
+    ax.yticks = (collect(0.5:1:7.5), ["1", "2", "3", "4", "5", "6", "7", "8"])
 
-    light, dark = RGB(0.93,0.81,0.65), RGB(0.62,0.44,0.27)
+    light, dark = RGB(0.93, 0.81, 0.65), RGB(0.62, 0.44, 0.27)
 
     for rank in 1:8, file in 1:8
+
         color = isodd(rank + file) ? dark : light
-        poly!(ax, Rect(file-1, rank-1, 1, 1); color=color)
+        poly!(ax, Rect(file-1, rank-1, 1, 1); color = color)
     end
 
     for (ptype, bb) in enumerate(board.bitboards)
@@ -74,18 +75,18 @@ end
 import Base: show
 
 const PIECE_CHARS = Dict(
-    Piece.W_PAWN   => 'P',
+    Piece.W_PAWN => 'P',
     Piece.W_KNIGHT => 'N',
     Piece.W_BISHOP => 'B',
-    Piece.W_ROOK   => 'R',
-    Piece.W_QUEEN  => 'Q',
-    Piece.W_KING   => 'K',
-    Piece.B_PAWN   => 'p',
+    Piece.W_ROOK => 'R',
+    Piece.W_QUEEN => 'Q',
+    Piece.W_KING => 'K',
+    Piece.B_PAWN => 'p',
     Piece.B_KNIGHT => 'n',
     Piece.B_BISHOP => 'b',
-    Piece.B_ROOK   => 'r',
-    Piece.B_QUEEN  => 'q',
-    Piece.B_KING   => 'k'
+    Piece.B_ROOK => 'r',
+    Piece.B_QUEEN => 'q',
+    Piece.B_KING => 'k'
 )
 
 """
@@ -144,5 +145,3 @@ g = Game() # prints the initial chess position
 function Base.show(io::IO, game::Game)
     show(io, game.board)
 end
-
-

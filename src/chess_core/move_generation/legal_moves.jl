@@ -54,7 +54,7 @@ Returns a bitboard of all occupied squares.
 end
 
 function is_move_legal(board::Board, m::Move, side::Side,
-                        king_sq::Int, occ, in_check_now::Bool)::Bool
+        king_sq::Int, occ, in_check_now::Bool)::Bool
     # --- Castling check ---
     if m.castling != 0
         path = if side == WHITE
@@ -77,7 +77,6 @@ function is_move_legal(board::Board, m::Move, side::Side,
     end
 end
 
-
 """
     _filter_legal_moves!(board, pseudo, start, stop, moves, n_moves)
 
@@ -85,8 +84,8 @@ Filters pseudo-legal moves into legal moves, avoiding full make/undo
 for moves that clearly cannot expose the king.
 """
 function _filter_legal_moves!(board::Board, pseudo::Vector{Move},
-                              start::Int, stop::Int,
-                              moves::Vector{Move}, n_moves::Int)
+        start::Int, stop::Int,
+        moves::Vector{Move}, n_moves::Int)
     side = board.side_to_move
     king_sq = king_square(board, side)
     occ = occupancy(board)
@@ -117,7 +116,7 @@ function has_legal_move(board::Board)::Bool
     pseudo_len = generate_queen_moves!(board, pseudo, pseudo_len)
     pseudo_len = generate_king_moves!(board, pseudo, pseudo_len)
 
-    @inbounds for i in 1:pseudo_len-1
+    @inbounds for i in 1:(pseudo_len - 1)
         if is_move_legal(board, pseudo[i], side, king_sq, occ, in_check_now)
             return true
         end
@@ -125,7 +124,6 @@ function has_legal_move(board::Board)::Bool
 
     return false
 end
-
 
 # Public API
 function generate_legal_moves!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})

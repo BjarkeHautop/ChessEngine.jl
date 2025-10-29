@@ -447,7 +447,7 @@ function search_root(board::Board, max_depth::Int;
 
     # --- Iterative deepening ---
     for depth in 1:max_depth
-         if (time_ns() ÷ 1_000_000) >= max_stop_time
+        if (time_ns() ÷ 1_000_000) >= max_stop_time
             break
         end
 

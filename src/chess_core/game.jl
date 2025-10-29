@@ -30,8 +30,6 @@ function time_management(remaining_ms::Int, increment_ms::Int)
     return opt_time, max_time
 end
 
-
-
 function allocate_time(game::Game)
     side = game.board.side_to_move
     remaining = side == WHITE ? game.white_time : game.black_time

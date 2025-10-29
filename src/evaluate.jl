@@ -35,7 +35,8 @@ function evaluate(board::Board)
         return MATE_VALUE
     elseif status == :checkmate_black
         return -MATE_VALUE
-    elseif status in (:stalemate, :draw_insufficient_material, :draw_threefold, :draw_fiftymove)
+    elseif status in (
+        :stalemate, :draw_insufficient_material, :draw_threefold, :draw_fiftymove)
         return 0
     end
 
