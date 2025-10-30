@@ -11,8 +11,8 @@ this means it still computes zobrist hashes and updates evaluation scores
 slowing it down compared to a minimal perft implementation.
 """
 function perft(board::Board, depth::Int)
-    moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
-    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
+    moves_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth + 1)]
+    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth + 1)]
 
     return _perft!(board, depth, moves_stack, pseudo_stack, 1)
 end
@@ -77,8 +77,8 @@ function perft_fast(board::Board, depth::Int)
         return 1
     end
 
-    moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
-    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
+    moves_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth + 1)]
+    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth + 1)]
 
     root_moves = moves_stack[1]
     root_pseudo = pseudo_stack[1]
@@ -92,8 +92,8 @@ function perft_fast(board::Board, depth::Int)
         range = chunks[t]
         futures[t] = Threads.@spawn begin
             local_board = deepcopy(board)  # thread-local board
-            local_moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
-            local_pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
+            local_moves_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth + 1)]
+            local_pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth + 1)]
 
             nodes = 0
             for i in range
@@ -111,8 +111,8 @@ function perft_fast(board::Board, depth::Int)
 end
 
 function perft_bishop_magic(board::Board, depth::Int)
-    moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
-    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
+    moves_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth + 1)]
+    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth + 1)]
 
     return _perft_bishop_magic!(board, depth, moves_stack, pseudo_stack, 1)
 end

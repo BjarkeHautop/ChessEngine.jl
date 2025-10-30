@@ -429,9 +429,9 @@ function search_root(board::Board, max_depth::Int;
     # Use NO_MOVE as placeholder internally
     best_result_internal = SearchResult(0, NO_MOVE, false)
 
-    moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(max_depth+1)]
-    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(max_depth+1)]
-    score_stack  = [MVector{MAX_MOVES, Int}(undef) for _ in 1:(max_depth+1)]
+    moves_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(max_depth + 1)]
+    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(max_depth + 1)]
+    score_stack = [MVector{MAX_MOVES, Int}(undef) for _ in 1:(max_depth + 1)]
 
     # Opening book probe
     if opening_book !== nothing
