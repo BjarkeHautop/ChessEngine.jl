@@ -1,4 +1,4 @@
-# See https://www.wbec-ridderkerk.nl/html/UCIProtocol.html 
+# See https://www.wbec-ridderkerk.nl/html/UCIProtocol.html
 # for the UCI protocol specification
 # Need to modify search to support node limits, ponder mode, etc.
 # Need to modify game struct to support different time increments for
@@ -31,7 +31,7 @@ function handle_uci_command()
     # 1. Print engine identification
     id()  # prints name, version, author
 
-    # 2. Print engine options 
+    # 2. Print engine options
     # (none for now)
 
     # 3. Signal that UCI mode is ready

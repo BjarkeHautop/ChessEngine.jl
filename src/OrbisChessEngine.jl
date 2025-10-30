@@ -1,7 +1,7 @@
 module OrbisChessEngine
 
 # === Core types and basic utilities ===
-include("chess_core/types.jl") # Board struct and related 
+include("chess_core/types.jl") # Board struct and related
 include("chess_core/move.jl") # Move struct and related
 include("chess_core/bit_helpers.jl")  # Bitboard manipulation
 include("chess_core/zobrist.jl")      # Zobrist hashing

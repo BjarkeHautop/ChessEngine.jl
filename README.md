@@ -17,7 +17,7 @@ Particularly, *OrbisChessEngine* implements:
 - All chess rules
 - Bitboard representation
 - Legal move generation (tested with [perft](https://www.chessprogramming.org/Perft))
-- [FEN](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) parsing 
+- [FEN](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) parsing
 - Opening book support
 - Minimax search with alpha–beta pruning, iterative deepening, quiescence search, transposition tables, null move pruning, and move ordering heuristics
 - Evaluation function based on piece-square tables
@@ -40,4 +40,4 @@ Visit chess programming wiki for useful articles on chess engine programming: [h
 
 - Add magic bitboards for faster move generation (added for bishops, but not yet used. Minimal performance improvement observed.)
 
-- Implement into Lichess bot (see https://github.com/lichess-bot-devs/lichess-bot)
+- Implement into Lichess bot (see <https://github.com/lichess-bot-devs/lichess-bot>)

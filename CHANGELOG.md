@@ -3,10 +3,12 @@
 ## [Unreleased]
 
 ### Changes
+
 - Renamed the old `display` function to `plot_board` for clarity in plotting boards.
 - Added `show` method for `Board` and `Game`, providing a simple ASCII representation.
 
 ### Improvements
+
 - Small speed improvements.
 
 ## [0.2.0] - 2025-10-19

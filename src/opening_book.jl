@@ -141,7 +141,7 @@ end
 using Distributions
 
 function book_move(board::Board, book::PolyglotBook)
-    # Add seed? 
+    # Add seed?
 
     key = polyglot_hash(board)
     total_weight = 0
@@ -192,7 +192,7 @@ function decode_polyglot_move(code::UInt16, board::Board)
         end
     end
 
-    # Capture 
+    # Capture
     capture = piece_at(board, to)
 
     # en passant detection

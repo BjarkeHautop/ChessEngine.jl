@@ -1,6 +1,7 @@
 # [Getting Started](@id quick_guide)
 
 ## Installation
+
 The OrbisChessEngine package is available through the Julia package system by running Pkg.add("OrbisChessEngine"). Throughout, we assume that you have installed the package.
 
 ## Playing Chess
@@ -112,4 +113,3 @@ for i in eachindex(plots)
     display(plots[i])
 end
 ```
-
