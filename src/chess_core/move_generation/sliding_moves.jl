@@ -89,7 +89,6 @@ end
 function generate_rook_moves!(board::Board, moves, start_idx::Int)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_ROOK] :
          board.bitboards[Piece.B_ROOK]
-    directions = [-8, -1, 1, 8]  # orthogonal
     return generate_sliding_moves!(board, bb, ORTHOGONAL_DIRS, moves, start_idx)
 end
 
@@ -97,7 +96,6 @@ end
 function generate_queen_moves!(board::Board, moves, start_idx::Int)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_QUEEN] :
          board.bitboards[Piece.B_QUEEN]
-    directions = [-9, -8, -7, -1, 1, 7, 8, 9]  # all directions
     return generate_sliding_moves!(board, bb, ALL_DIRS, moves, start_idx)
 end
 

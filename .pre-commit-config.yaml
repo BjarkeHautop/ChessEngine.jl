@@ -1,12 +1,12 @@
 repos:
   - repo: local
     hooks:
-      # Prevent committing .rej files
+      # Prevent committing .rej files and .pb.gz (profiling) files
       - id: forbidden-files
         name: forbidden files
-        entry: found Copier update rejection files; review them and remove them
+        entry: found forbidden files; remove them before committing
         language: fail
-        files: "\\.rej$"
+        files: "\\.rej$|\\.pb\\.gz$"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:

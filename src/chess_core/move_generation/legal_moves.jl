@@ -101,23 +101,40 @@ function _filter_legal_moves!(board::Board, pseudo,
     return n_moves
 end
 
+function check_piece_moves!(board::Board, pseudo, pseudo_len, gen_func,
+        side, king_sq, occ, in_check_now)
+    old_len = pseudo_len[]
+    pseudo_len[] = gen_func(board, pseudo, pseudo_len[])
+    @inbounds for i in old_len:(pseudo_len[] - 1)
+        if is_move_legal(board, pseudo[i], side, king_sq, occ, in_check_now)
+            return true
+        end
+    end
+    return false
+end
+
+# Start with king if in check to find legal moves faster
+const GEN_CHECKS_IN_CHECK = (generate_king_moves!, generate_knight_moves!,
+    generate_pawn_moves!, generate_bishop_moves!,
+    generate_rook_moves!, generate_queen_moves!)
+
+const GEN_CHECKS_NORMAL = (generate_pawn_moves!, generate_knight_moves!,
+    generate_king_moves!, generate_bishop_moves!,
+    generate_rook_moves!, generate_queen_moves!)
+
 function has_legal_move(board::Board)::Bool
-    pseudo = Vector{Move}(undef, MAX_MOVES)
+    pseudo = MVector{MAX_MOVES, Move}(undef)
     side = board.side_to_move
     king_sq = king_square(board, side)
     occ = occupancy(board)
     in_check_now = in_check(board, side)
 
-    pseudo_len = 1
-    pseudo_len = generate_pawn_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_knight_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_bishop_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_rook_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_queen_moves!(board, pseudo, pseudo_len)
-    pseudo_len = generate_king_moves!(board, pseudo, pseudo_len)
+    pseudo_len = Ref(1)
 
-    @inbounds for i in 1:(pseudo_len - 1)
-        if is_move_legal(board, pseudo[i], side, king_sq, occ, in_check_now)
+    gens = in_check_now ? GEN_CHECKS_IN_CHECK : GEN_CHECKS_NORMAL
+    @inbounds for gen_func in gens
+        if check_piece_moves!(
+            board, pseudo, pseudo_len, gen_func, side, king_sq, occ, in_check_now)
             return true
         end
     end

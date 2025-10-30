@@ -87,6 +87,7 @@ struct TTEntry
 end
 
 const TT_SIZE = 1 << 20  # ~1M entries
+const TT_MASK = TT_SIZE - 1
 const EMPTY_ENTRY = TTEntry(0, 0, -1, EXACT, NO_MOVE)
 const TRANSPOSITION_TABLE = fill(EMPTY_ENTRY, TT_SIZE)
 
@@ -94,7 +95,7 @@ const TRANSPOSITION_TABLE = fill(EMPTY_ENTRY, TT_SIZE)
 Get index in transposition table from hash.
 """
 @inline function tt_index(hash::UInt64)
-    return Int(hash & (TT_SIZE - 1)) + 1  # mask for power-of-2 table
+    return hash & (TT_MASK) + 1  # mask for power-of-2 table
 end
 
 """

@@ -87,7 +87,7 @@ function perft_fast(board::Board, depth::Int)
     nthreads_ = min(n_moves, Threads.nthreads())
     chunks = split_indices(n_moves, nthreads_)
 
-    futures = Vector{Task}(undef, nthreads_)
+    futures = MVector{nthreads_, Task}(undef)
     for t in 1:nthreads_
         range = chunks[t]
         futures[t] = Threads.@spawn begin
