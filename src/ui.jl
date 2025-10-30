@@ -1,4 +1,5 @@
-using Images, FileIO
+import FileIO: load
+import Images: rotr90
 import CairoMakie: Figure, Axis, poly!, image!, Rect, hidespines!, DataAspect, RGB
 
 # Path relative to this source file
@@ -53,7 +54,7 @@ function plot_board(board::Board)
             if testbit(bb, sq)
                 file = (sq % 8) + 1
                 rank = (sq ÷ 8) + 1
-                image!(ax, file-1 .. file, rank-1 .. rank, PIECE_PIXELS[ptype])
+                image!(ax, (file-1, file), (rank-1, rank), PIECE_PIXELS[ptype])
             end
         end
     end
