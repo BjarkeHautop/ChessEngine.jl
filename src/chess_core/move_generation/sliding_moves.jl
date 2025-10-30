@@ -9,7 +9,7 @@ function generate_sliding_moves!(
         board::Board,
         bb_piece::UInt64,
         directions::Vector{Int},
-        moves::Vector{Move},
+        moves,
         start_idx::Int
 )
     idx = start_idx
@@ -79,14 +79,14 @@ function generate_sliding_moves!(
 end
 
 # In-place bishop moves
-function generate_bishop_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
+function generate_bishop_moves!(board::Board, moves, start_idx::Int)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_BISHOP] :
          board.bitboards[Piece.B_BISHOP]
     return generate_sliding_moves!(board, bb, DIAGONAL_DIRS, moves, start_idx)
 end
 
 # In-place rook moves
-function generate_rook_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
+function generate_rook_moves!(board::Board, moves, start_idx::Int)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_ROOK] :
          board.bitboards[Piece.B_ROOK]
     directions = [-8, -1, 1, 8]  # orthogonal
@@ -94,7 +94,7 @@ function generate_rook_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
 end
 
 # In-place queen moves
-function generate_queen_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
+function generate_queen_moves!(board::Board, moves, start_idx::Int)
     bb = board.side_to_move == WHITE ? board.bitboards[Piece.W_QUEEN] :
          board.bitboards[Piece.B_QUEEN]
     directions = [-9, -8, -7, -1, 1, 7, 8, 9]  # all directions

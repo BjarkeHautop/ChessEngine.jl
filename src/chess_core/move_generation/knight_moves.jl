@@ -22,7 +22,7 @@ end
 # Initialize once at startup
 init_knight_masks!()
 
-function generate_knight_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
+function generate_knight_moves!(board::Board, moves, start_idx::Int)
     idx = start_idx
 
     if board.side_to_move == WHITE

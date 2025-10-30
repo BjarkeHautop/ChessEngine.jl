@@ -23,7 +23,7 @@ end
 # Initialize once
 init_king_masks!()
 
-function generate_king_moves!(board::Board, moves::Vector{Move}, start_idx::Int = 1)
+function generate_king_moves!(board::Board, moves, start_idx::Int = 1)
     idx = start_idx
 
     # Choose correct side bitboards

@@ -185,7 +185,7 @@ function generate_sliding_moves_magic!(
         mask_table::Vector{UInt64},
         attack_table::Vector{Vector{UInt64}},
         magic_table::Vector{UInt64},
-        moves::Vector{Move},
+        moves,
         start_idx::Int
 )
     idx = start_idx
@@ -244,7 +244,7 @@ end
 
 function generate_bishop_moves_magic!(
         board::Board,
-        moves::Vector{Move},
+        moves,
         start_idx::Int
 )
     bb = board.side_to_move == WHITE ?

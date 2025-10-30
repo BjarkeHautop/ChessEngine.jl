@@ -36,7 +36,7 @@ Generate pseudo-legal pawn moves in-place
 - `moves`: preallocated buffer to append moves
 Returns: number of moves added
 """
-function generate_pawn_moves!(board::Board, moves::Vector{Move}, start_idx::Int)
+function generate_pawn_moves!(board::Board, moves, start_idx::Int)
     idx = start_idx
 
     # Setup depending on side

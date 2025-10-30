@@ -36,6 +36,6 @@ Benchmarking search to depth 10 from starting position:
 using OrbisChessEngine
 using BenchmarkTools
 b = Board()
-search(b; depth = 4) # warm up
+search(b; depth = 4, opening_book = nothing) # warm up
 @benchmark search($b; depth = 10, opening_book = nothing)
 ```

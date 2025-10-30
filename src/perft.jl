@@ -1,5 +1,7 @@
-const MAX_MOVES = 256  # 256 is safely larger than max legal moves
+const MAX_MOVES = 256  # 256 is safely larger than max legal moves:
+# https://www.reddit.com/r/chess/comments/o4ajnn/whats_the_most_possible_legal_moves_in_a_chess/
 
+using StaticArrays
 """
     perft(board::Board, depth::Int) -> Int
 
@@ -9,9 +11,8 @@ this means it still computes zobrist hashes and updates evaluation scores
 slowing it down compared to a minimal perft implementation.
 """
 function perft(board::Board, depth::Int)
-    levels = depth + 1  # allocate one buffer for each level
-    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
-    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
+    moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
+    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
 
     return _perft!(board, depth, moves_stack, pseudo_stack, 1)
 end
@@ -19,8 +20,8 @@ end
 function _perft!(
         board::Board,
         depth::Int,
-        moves_stack::Vector{Vector{Move}},
-        pseudo_stack::Vector{Vector{Move}},
+        moves_stack,
+        pseudo_stack,
         level::Int
 )
     if depth == 0
@@ -33,6 +34,7 @@ function _perft!(
 
     n_moves = generate_legal_moves!(board, moves, pseudo)
 
+    # 3% faster with @inbounds here
     @inbounds for i in 1:n_moves
         move = moves[i]
         make_move!(board, move)
@@ -75,8 +77,8 @@ function perft_fast(board::Board, depth::Int)
         return 1
     end
 
-    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
-    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
+    moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
+    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
 
     root_moves = moves_stack[1]
     root_pseudo = pseudo_stack[1]
@@ -90,8 +92,8 @@ function perft_fast(board::Board, depth::Int)
         range = chunks[t]
         futures[t] = Threads.@spawn begin
             local_board = deepcopy(board)  # thread-local board
-            local_moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
-            local_pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(depth + 1)]
+            local_moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
+            local_pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
 
             nodes = 0
             for i in range
@@ -109,9 +111,8 @@ function perft_fast(board::Board, depth::Int)
 end
 
 function perft_bishop_magic(board::Board, depth::Int)
-    levels = depth + 1  # allocate one buffer for each level
-    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
-    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:levels]
+    moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
+    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(depth+1)]
 
     return _perft_bishop_magic!(board, depth, moves_stack, pseudo_stack, 1)
 end
@@ -119,8 +120,8 @@ end
 function _perft_bishop_magic!(
         board::Board,
         depth::Int,
-        moves_stack::Vector{Vector{Move}},
-        pseudo_stack::Vector{Vector{Move}},
+        moves_stack,
+        pseudo_stack,
         level::Int
 )
     if depth == 0

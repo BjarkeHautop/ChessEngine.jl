@@ -83,9 +83,9 @@ end
 Filters pseudo-legal moves into legal moves, avoiding full make/undo
 for moves that clearly cannot expose the king.
 """
-function _filter_legal_moves!(board::Board, pseudo::Vector{Move},
+function _filter_legal_moves!(board::Board, pseudo,
         start::Int, stop::Int,
-        moves::Vector{Move}, n_moves::Int)
+        moves, n_moves::Int)
     side = board.side_to_move
     king_sq = king_square(board, side)
     occ = occupancy(board)
@@ -126,7 +126,7 @@ function has_legal_move(board::Board)::Bool
 end
 
 # Public API
-function generate_legal_moves!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})
+function generate_legal_moves!(board::Board, moves, pseudo)
     pseudo_len = 1
     pseudo_len = generate_pawn_moves!(board, pseudo, pseudo_len)
     pseudo_len = generate_knight_moves!(board, pseudo, pseudo_len)
@@ -150,8 +150,8 @@ end
 
 function generate_legal_moves_bishop_magic!(
         board::Board,
-        moves::Vector{Move},
-        pseudo::Vector{Move}
+        moves,
+        pseudo
 )
     pseudo_len = 1
 

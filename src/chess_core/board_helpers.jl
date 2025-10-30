@@ -154,7 +154,7 @@ function in_check(board::Board, side::Side)::Bool
     return square_attacked(board, king_sq, attacker)
 end
 
-function generate_captures!(board::Board, moves::Vector{Move}, pseudo::Vector{Move})
+function generate_captures!(board::Board, moves, pseudo)
     n_moves = generate_legal_moves!(board, moves, pseudo)
 
     write_idx = 1

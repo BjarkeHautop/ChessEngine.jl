@@ -153,8 +153,8 @@ end
 
 # Quiescence search: only searches captures
 const MAX_QUIESCENCE_PLY = 4
-const moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:MAX_QUIESCENCE_PLY]
-const pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:MAX_QUIESCENCE_PLY]
+const moves_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(MAX_QUIESCENCE_PLY)]
+const pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(MAX_QUIESCENCE_PLY)]
 
 function quiescence(board::Board, α::Int, β::Int;
         ply::Int = 0
@@ -256,9 +256,9 @@ function _search(
         β::Int,
         opening_book::Union{Nothing, PolyglotBook},
         stop_time::Int,
-        moves_stack::Vector{Vector{Move}},
-        pseudo_stack::Vector{Vector{Move}},
-        score_stack::Vector{Vector{Int}}
+        moves_stack,
+        pseudo_stack,
+        score_stack
 )::SearchResult
 
     # Time check
@@ -429,9 +429,9 @@ function search_root(board::Board, max_depth::Int;
     # Use NO_MOVE as placeholder internally
     best_result_internal = SearchResult(0, NO_MOVE, false)
 
-    moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(max_depth + 1)]
-    pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:(max_depth + 1)]
-    score_stack = [Vector{Int}(undef, MAX_MOVES) for _ in 1:(max_depth + 1)]
+    moves_stack  = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(max_depth+1)]
+    pseudo_stack = [MVector{MAX_MOVES, Move}(undef) for _ in 1:(max_depth+1)]
+    score_stack  = [MVector{MAX_MOVES, Int}(undef) for _ in 1:(max_depth+1)]
 
     # Opening book probe
     if opening_book !== nothing
