@@ -1,4 +1,4 @@
-######################### # Square / bit helpers # ######################### 
+######################### # Square / bit helpers # #########################
 "Map (file, rank) → square index (0..63). file=1→a, rank=1→1."
 square_index(file, rank) = (rank - 1) * 8 + (file - 1)
 

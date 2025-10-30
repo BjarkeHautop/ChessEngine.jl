@@ -64,7 +64,7 @@ end
     b.bitboards[Piece.W_KNIGHT] = OrbisChessEngine.clearbit(
         b.bitboards[Piece.W_KNIGHT], OrbisChessEngine.square_index(7, 1))
 
-    # Clear all white pawns 
+    # Clear all white pawns
     b.bitboards[Piece.W_PAWN] = UInt64(0)
     # Add black pawn on a2 and h2
     b.bitboards[Piece.B_PAWN] = OrbisChessEngine.setbit(

@@ -1,0 +1,39 @@
+# Changes here will be overwritten by Copier
+AddAllcontributors: false
+AddCitationCFF: false
+AddCodeOfConduct: false
+AddCompatHelperCI: true
+AddContributionDocs: false
+AddCopierCI: false
+AddDependabot: true
+AddDocs: true
+AddDocsCI: true
+AddFormatterAndLinterConfigFiles: true
+AddGitHubPRTemplate: true
+AddGitHubTemplates: false
+AddLintCI: true
+AddLychee: true
+AddMacToCI: false
+AddPrecommit: true
+AddTagBotCI: true
+AddTestCI: true
+AddWinToCI: false
+Authors: Bjarke Hautop <bjarke.hautop@gmail.com> and contributors
+AutoIncludeTests: true
+CheckExplicitImports: false
+ConfigIndentation: 2
+JuliaIndentation: 4
+JuliaMinCIVersion: '1.10'
+JuliaMinVersion: '1.6'
+License: MIT
+LicenseCopyrightHolders: Bjarke Hautop
+MarkdownIndentation: 2
+PackageName: OrbisChessEngine
+PackageOwner: BjarkeHautop
+PackageUUID: 2eacc985-a635-41e1-b67f-45fa7ceb5b4d
+RunJuliaNightlyOnCI: false
+StrategyConfirmIncluded: true
+StrategyLevel: 2
+StrategyReviewExcluded: false
+UseCirrusCI: false
+_src_path: C:\Users\bjark\.julia\packages\BestieTemplate\jdG8v

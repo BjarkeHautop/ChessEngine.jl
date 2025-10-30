@@ -216,15 +216,18 @@ end
 """
     game_status(board::Board) -> Symbol
 
-Return the current game status (checkmate, stalemate, draw, or ongoing)
-- `board`: Board struct
-Returns: Symbol - one of 
-  - `:checkmate_white`  
-  - `:checkmate_black`  
-  - `:stalemate`  
-  - `:draw_threefold`  
-  - `:draw_fiftymove`  
-  - `:draw_insufficient_material`  
+Return the current game status (checkmate, stalemate, draw, timeout, or ongoing).
+
+- `game`: Game struct
+Returns: Symbol — one of
+  - `:checkmate_white`
+  - `:checkmate_black`
+  - `:stalemate`
+  - `:draw_threefold`
+  - `:draw_fiftymove`
+  - `:draw_insufficient_material`
+  - `:timeout_white`
+  - `:timeout_black`
   - `:ongoing`
 """
 function game_status(board::Board)
@@ -248,20 +251,20 @@ function game_status(board::Board)
 end
 
 """
-    game_status(game::Game)
+    game_status(game::Game) -> Symbol
 
 Return the current game status (checkmate, stalemate, draw, timeout, or ongoing).
 
-- `game`: Game struct  
-Returns: Symbol — one of  
-  - `:checkmate_white`  
-  - `:checkmate_black`  
-  - `:stalemate`  
-  - `:draw_threefold`  
-  - `:draw_fiftymove`  
-  - `:draw_insufficient_material`  
-  - `:timeout_white`  
-  - `:timeout_black`  
+- `game`: Game struct
+Returns: Symbol — one of
+  - `:checkmate_white`
+  - `:checkmate_black`
+  - `:stalemate`
+  - `:draw_threefold`
+  - `:draw_fiftymove`
+  - `:draw_insufficient_material`
+  - `:timeout_white`
+  - `:timeout_black`
   - `:ongoing`
 """
 function game_status(game::Game)

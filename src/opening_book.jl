@@ -23,6 +23,13 @@ struct PolyglotBook
     entries::Vector{PolyglotEntry}
 end
 
+"""
+    load_polyglot_book(path::String) -> PolyglotBook
+
+Load a Polyglot opening book from the specified binary file. See for example
+[free-opening-books](https://github.com/gmcheems-org/free-opening-books)
+for several free Polyglot book files.
+"""
 function load_polyglot_book(path::String)
     bytes = read(path)
     n = div(length(bytes), 16)
@@ -134,7 +141,7 @@ end
 using Distributions
 
 function book_move(board::Board, book::PolyglotBook)
-    # Add seed? 
+    # Add seed?
 
     key = polyglot_hash(board)
     total_weight = 0
@@ -185,7 +192,7 @@ function decode_polyglot_move(code::UInt16, board::Board)
         end
     end
 
-    # Capture 
+    # Capture
     capture = piece_at(board, to)
 
     # en passant detection

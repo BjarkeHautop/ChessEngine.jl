@@ -151,7 +151,7 @@ function tt_store(
     end
 end
 
-# Quiescence search: only searches captures 
+# Quiescence search: only searches captures
 const MAX_QUIESCENCE_PLY = 4
 const moves_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:MAX_QUIESCENCE_PLY]
 const pseudo_stack = [Vector{Move}(undef, MAX_MOVES) for _ in 1:MAX_QUIESCENCE_PLY]
@@ -501,9 +501,9 @@ quiescence search, null move pruning, and transposition tables.
 Arguments:
 - `board`: current board position
 - `depth`: search depth
-- `opening_book`: if provided, uses a opening book. Default is `KOMODO_OPENING_BOOK` 
-taken from [free-opening-books](https://github.com/gmcheems-org/free-opening-books). 
-Set to `nothing` to disable. 
+- `opening_book`: if provided, uses a opening book. Default is `KOMODO_OPENING_BOOK`
+taken from [free-opening-books](https://github.com/gmcheems-org/free-opening-books).
+Set to `nothing` to disable. See [`load_polyglot_book`](@ref) to load custom books.
 - `verbose`: if true, prints search information and principal variation (PV) at each depth
 - `time_budget`: time in milliseconds to stop the search (if depth not reached)
 Returns:

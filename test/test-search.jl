@@ -9,7 +9,7 @@ using Test
         make_move!(b, m)
     end
     result = search(b; depth = 2, opening_book = nothing)
-    @test result.score < -10_000  # Checkmate 
+    @test result.score < -10_000  # Checkmate
     @test result.move == Move("d8", "h4")
 end
 

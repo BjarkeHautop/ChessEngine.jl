@@ -96,10 +96,10 @@ Display a simple ASCII representation of the given `Board` in the terminal.
 
 Each square shows either a piece or a dot `.` for empty squares. Piece symbols:
 
-- White: `P` (pawn), `N` (knight), `B` (bishop), `R` (rook), `Q` (queen), `K` (king)  
-- Black: `p` (pawn), `n` (knight), `b` (bishop), `r` (rook), `q` (queen), `k` (king)  
+- White: `P` (pawn), `N` (knight), `B` (bishop), `R` (rook), `Q` (queen), `K` (king)
+- Black: `p` (pawn), `n` (knight), `b` (bishop), `r` (rook), `q` (queen), `k` (king)
 
-The board is printed with rank 8 at the top and file `a` on the left.  
+The board is printed with rank 8 at the top and file `a` on the left.
 
 # Example
 
@@ -131,10 +131,10 @@ Display a simple ASCII representation of the given `Board` in the terminal.
 
 Each square shows either a piece or a dot `.` for empty squares. Piece symbols:
 
-- White: `P` (pawn), `N` (knight), `B` (bishop), `R` (rook), `Q` (queen), `K` (king)  
-- Black: `p` (pawn), `n` (knight), `b` (bishop), `r` (rook), `q` (queen), `k` (king)  
+- White: `P` (pawn), `N` (knight), `B` (bishop), `R` (rook), `Q` (queen), `K` (king)
+- Black: `p` (pawn), `n` (knight), `b` (bishop), `r` (rook), `q` (queen), `k` (king)
 
-The board is printed with rank 8 at the top and file `a` on the left.  
+The board is printed with rank 8 at the top and file `a` on the left.
 
 # Example
 

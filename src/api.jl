@@ -69,13 +69,13 @@ end
 
 """
     Move(board::Board, str::AbstractString)
-Construct a Move from a long algebraic string like "e2e4" or "e7e8=Q", 
+Construct a Move from a long algebraic string like "e2e4" or "e7e8=Q",
 using the board to infer capture, en passant, and castling.
 - `board`: current Board state
 - `str`: move string in long algebraic notation
 
 Captures are inferred based on the board state (so "e4d5" captures if d5 is occupied by opponent).
-Castling can be specified with "O-O" (kingside) or "O-O-O" (queenside). 
+Castling can be specified with "O-O" (kingside) or "O-O-O" (queenside).
 Also accepts "o-o", "0-0", "o-o-o", "0-0-0".
 
 Note, that this function does not validate the legality of the move; it only constructs the Move object.

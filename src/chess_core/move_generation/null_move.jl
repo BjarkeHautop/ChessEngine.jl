@@ -24,7 +24,7 @@ function make_null_move!(board::Board)
     # --- Initialize incremental Zobrist hash ---
     h = board.position_history[board.undo_index]  # current hash
 
-    # --- Remove old en passant --- 
+    # --- Remove old en passant ---
     if board.en_passant != -1
         h ⊻= ZOBRIST_EP[(board.en_passant % 8) + 1]
     end
