@@ -1,4 +1,4 @@
-# Getting Started
+# [Getting Started](@id quick_guide)
 
 ## Installation
 The OrbisChessEngine package is available through the Julia package system by running Pkg.add("OrbisChessEngine"). Throughout, we assume that you have installed the package.
@@ -71,7 +71,7 @@ To generate a move using the engine we can use `search`:
 result = search(board; depth=3, opening_book=nothing)
 ```
 
-`search` returns a `SearchResult` object containing the evaluation score, the move and if it is a book move. This package ships with a small opening book, which is default when calling `search`. To disable the opening book, set `opening_book=nothing`. To use a custom opening book use `load_polyglot_book` to load another polyglot book in `.bin` format.
+`search` returns a `SearchResult` object containing the evaluation score, the move and if it is a book move. This package ships with a small opening book, which is default when calling `search`. To disable the opening book, set `opening_book=nothing`. To use a custom opening book use [`load_polyglot_book`](@ref) to load another polyglot book in `.bin` format.
 
 To make a 3+2 game we can use `Game`:
 

@@ -503,7 +503,7 @@ Arguments:
 - `depth`: search depth
 - `opening_book`: if provided, uses a opening book. Default is `KOMODO_OPENING_BOOK` 
 taken from [free-opening-books](https://github.com/gmcheems-org/free-opening-books). 
-Set to `nothing` to disable. 
+Set to `nothing` to disable. See [`load_polyglot_book`](@ref) to load custom books.
 - `verbose`: if true, prints search information and principal variation (PV) at each depth
 - `time_budget`: time in milliseconds to stop the search (if depth not reached)
 Returns:

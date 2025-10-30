@@ -1,3 +1,5 @@
+# Benchmarks
+
 Starting from version 0.2.0 of OrbisChessEngine this page shows benchmark results for perft for various depths. Can be used to compare performance
 with older versions.
 

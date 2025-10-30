@@ -4,8 +4,7 @@ CurrentModule = OrbisChessEngine
 
 # OrbisChessEngine
 
-[OrbisChessEngine](https://github.com/BjarkeHautop/OrbisChessEngine.jl) is a Julia chess engine. It implements functionality for playing chess and for searching for the best move
-using the implemented chess engine.
+[OrbisChessEngine](https://github.com/BjarkeHautop/OrbisChessEngine.jl) is a chess engine written in Julia. It implements functionality for playing chess and for searching for the best move using the implemented chess engine.
 
 ## Features
 
@@ -19,4 +18,4 @@ using the implemented chess engine.
 
 ## Getting Started
 
-See the [Getting Started](starting.md) page for installation instructions and basic usage examples.
+See the [Getting Started](@ref quick_guide) page for installation instructions and basic usage examples.

@@ -23,6 +23,13 @@ struct PolyglotBook
     entries::Vector{PolyglotEntry}
 end
 
+"""
+    load_polyglot_book(path::String) -> PolyglotBook
+
+Load a Polyglot opening book from the specified binary file. See for example
+[free-opening-books](https://github.com/gmcheems-org/free-opening-books)
+for several free Polyglot book files.
+"""
 function load_polyglot_book(path::String)
     bytes = read(path)
     n = div(length(bytes), 16)
