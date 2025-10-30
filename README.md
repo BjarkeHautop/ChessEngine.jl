@@ -31,6 +31,8 @@ Visit chess programming wiki for useful articles on chess engine programming: [h
 
 ## TODO
 
+- Improve search performance by minimizing allocations
+
 - Improve evaluation function (e.g. add pawn structure, king safety, trapped pieces, etc.)
 
 - Add support for multiple threads in search (e.g. lazy SMP)
@@ -39,6 +41,6 @@ Visit chess programming wiki for useful articles on chess engine programming: [h
 
 - Make executable with [PackageCompiler.jl](https://julialang.github.io/PackageCompiler.jl/dev/)
 
-- Add magic bitboards for faster move generation (added for bishops, but not yet used. Minimal performance improvement observed.)
+- Add magic bitboards for faster move generation (added for bishops, but not yet used. Minimal performance improvement observed - see [Benchmarks](https://bjarkehautop.github.io/OrbisChessEngine.jl/dev/40-benchmarks/) for details.)
 
 - Implement into Lichess bot (see <https://github.com/lichess-bot-devs/lichess-bot>)
